@@ -1,28 +1,78 @@
+import { useEffect, useState } from "react";
 import { useLibraryStore } from "@/stores/libraryStore";
-import { LibraryBookCard } from "@/components/BookCard";
+import { BookCard } from "@/components/BookCard";
+import { Plus, Search } from "lucide-react";
 
 export default function LibraryPage() {
-  // Get books and removeBook action from Zustand store
   const books = useLibraryStore((s) => s.books);
-  const removeBook = useLibraryStore((s) => s.removeBook);
+  const loadBooks = useLibraryStore((s) => s.loadBooks);
+
+  const [search, setSearch] = useState("");
+
+  // Load books on mount
+  useEffect(() => {
+    loadBooks();
+  }, []);
+
+  const filteredBooks = books.filter((b) =>
+    b.title.toLowerCase().includes(search.toLowerCase())
+  );
+
+  const readCount = books.filter((b) => b.status === "Lu").length;
+  const readingCount = books.filter((b) => b.status === "en cours").length;
+  const toReadCount = books.filter((b) => b.status === "A lire").length;
 
   return (
-    <div className="p-6">
-      <h1 className="text-3xl font-bold mb-6">My Library</h1>
+    <div className="p-2 max-w-screen-xl mx-auto">
+      {/* Banner */}
+      <div className="bg-bookcream rounded-xl p-6 shadow-md flex flex-col items-center">
+        <h1 className="text-2xl font-bold mb-3 text-bookdark">
+          Ma Bibliothèque
+        </h1>
+        <button className="px-4 py-2 bg-bookterracotta text-white rounded-lg flex items-center gap-2 text-sm shadow">
+          <Plus size={16} />
+          Ajouter
+        </button>
+      </div>
 
-      {books.length === 0 ? (
-        <p className="text-gray-500">Your library is empty.</p>
-      ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-          {books.map((book) => (
-            <LibraryBookCard
-              key={book.id}
-              book={book}
-              onRemove={() => removeBook(book.id)}
-            />
-          ))}
-        </div>
-      )}
+      {/* Status */}
+      <div className="flex justify-center gap-4 mt-4 text-sm text-bookdark">
+        <span className="px-2 py-1 bg-bookbeige rounded-full">
+          Lus : <strong>{readCount}</strong>
+        </span>
+
+        <span className="px-2 py-1 bg-bookbeige rounded-full">
+          En cours : <strong>{readingCount}</strong>
+        </span>
+
+        <span className="px-2 py-1 bg-bookbeige rounded-full">
+          À lire : <strong>{toReadCount}</strong>
+        </span>
+      </div>
+
+      {/* Search */}
+      <div className="mt-4 flex items-center gap-2">
+        <input
+          type="text"
+          placeholder="Rechercher un livre, un auteur..."
+          className="flex-1 p-2 border border-bookbeige rounded-lg text-sm bg-white text-bookdark"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+        />
+        <button className="p-2 bg-bookochre rounded-lg text-white shadow">
+          <Search size={18} />
+        </button>
+      </div>
+      {/* Books list */}
+      <div className="mt-6 grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+        {filteredBooks.length === 0 ? (
+          <p className="text-gray-500 text-center col-span-full">
+            Aucun livre trouvé.
+          </p>
+        ) : (
+          filteredBooks.map((book) => <BookCard key={book.id} book={book} />)
+        )}
+      </div>
     </div>
   );
 }
