@@ -25,16 +25,13 @@ services:
 
   # Backend service (NestJS + Prisma)
   backend:
+    container_name: backend
     build:
       context: ./backend
       dockerfile: Dockerfile.dev
     environment:
-      # Database connection variables
-      - PGHOST=${DB_HOST}
-      - PGUSER=${DB_USER}
-      - PGDATABASE=${DB_NAME}
-      - PGPASSWORD=${DB_PASSWORD}
-      - PGPORT=${DB_PORT}
+      # Drizzle url
+      - DATABASE_URL=${DATABASE_URL}
       # - REDIS_HOST=${REDIS_HOST}
       # - REDIS_PORT=${REDIS_PORT}
     ports:
@@ -81,6 +78,14 @@ services:
   #     interval: 10s
   #     timeout: 3s
   #     retries: 5
+
+  adminer:
+    image: adminer
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres
 
 volumes:
   # Persistent volume for PostgreSQL data
