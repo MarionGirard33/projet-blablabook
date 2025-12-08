@@ -1,8 +1,9 @@
 # ERD
 
 Légende :
-- Bleu - table entité 
-- Orange - table pivot 
+
+- Bleu - table entité
+- Orange - table pivot
 - Rouge - evolution future
 
 # MVP
@@ -27,7 +28,7 @@ user {
   string role "definis le role de l'utilisateur"
   datetime created_at
   datetime updated_at
-  datetime deleted_at 
+  datetime deleted_at
 }
 
 list {
@@ -53,7 +54,7 @@ list_book {
 book {
   int id PK
   string name "nom du livre"
-  int cover "identifiant de l'image de couverture récupérer avec api"
+  string cover "identifiant de l'image de couverture récupérer avec api"
   string author "Nom et prénom de l'auteur du livre"
   string description "Résumé du livre"
   string ISBN "reference ISBN du livre"
@@ -65,7 +66,7 @@ review {
   int id PK
   string review "avis de l'utilisateur"
   number note "note de 0 à 10"
-  datetime created_at 
+  datetime created_at
   datetime updated_at
   datetime deleted_at
   int book_id FK "permet de lier un livre à un avis + note"
@@ -78,14 +79,14 @@ category {
   boolean is_active
 }
 
-book_category {        
+book_category {
   int id
   int category_id FK
   int book_id FK
 }
 
 user_category {
-  int id 
+  int id
   int category_id FK
   int user_id FK
 }
@@ -99,5 +100,3 @@ class user,list,book,category entity
 class user_category,book_category,list_book pivot
 
 ```
-
-
