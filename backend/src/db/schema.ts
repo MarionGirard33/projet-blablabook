@@ -1,27 +1,11 @@
-import {
-  pgTable,
-  serial,
-  timestamp,
-  pgEnum,
-  varchar,
-} from 'drizzle-orm/pg-core';
 
-// --- Définition des Enums ---
 
-// Drizzle utilise pgEnum pour les types ENUM de PostgreSQL
-export const userRoleEnum = pgEnum('role', ['USER', 'ADMIN']);
+import { users } from '../user/user.schema';
 
-// --- Définition des Tables ---
-export const users = pgTable('user', {
-  id: serial('id').primaryKey(),
-  email: varchar('email').unique().notNull(),
-  password: varchar('password').notNull(),
-  username: varchar({ length: 100 }),
-  role: userRoleEnum('role').default('USER').notNull(),
-  createdAt: timestamp('created_at').defaultNow().notNull(),
-  updatedAt: timestamp('updated_at').defaultNow().notNull(), // Drizzle ne gère pas @updatedAt automatiquement, vous devrez le faire dans l'application ou en utilisant un trigger DB.
-  deletedAt: timestamp('deleted_at'),
-});
+export const schema = {
+  users,
+};
+
 
 // export const lists = pgTable('list', {
 //   id: serial('id').primaryKey(),
