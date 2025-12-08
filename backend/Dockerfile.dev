@@ -21,4 +21,5 @@ RUN npm install
 EXPOSE 3000
 
 # Start the backend in development mode (package.json must contain "start:dev": "nest start --watch")
-CMD ["npm", "run", "start:dev"]
+# CMD npm run migrate && npm run start:dev
+CMD ["./start.sh"]
