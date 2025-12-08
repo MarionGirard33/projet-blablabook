@@ -119,3 +119,12 @@ export const review = pgTable('review', {
     .references(() => users.id)
     .notNull(),
 });
+
+export const refreshToken = pgTable('refresh_token', {
+  id: serial().primaryKey(),
+  token: varchar().notNull(),
+  createdAt: timestamp().defaultNow().notNull(),
+  userId: integer('user_id')
+    .references(() => users.id)
+    .notNull(),
+});
