@@ -3,7 +3,7 @@ import { Link } from "@tanstack/react-router";
 
 export default function Hero() {
   return (
-    <section className="w-full">
+    <section className="w-full mt-2">
       <div className="w-full px-6 py-10 rounded-2xl shadow-xl bg-white flex flex-col items-center">
         <h1 className="text-3xl md:text-5xl font-bold text-center mb-6">
           Découvrez, lisez, partagez vos lectures
