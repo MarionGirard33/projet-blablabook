@@ -1,6 +1,7 @@
 import RootLayout from "@/layouts/RootLayout";
 import HomePage from "@/pages/HomePage";
 import NotFound from "@/pages/NotFound";
+import LibraryPage from "@/pages/LibraryPage";
 
 import {
   createRouter,
@@ -19,7 +20,13 @@ const homeRoute = createRoute({
   component: () => <HomePage />,
 });
 
-const routeTree = rootRoute.addChildren([homeRoute]);
+const libraryRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/library",
+  component: () => <LibraryPage />,
+});
+
+const routeTree = rootRoute.addChildren([homeRoute, libraryRoute]);
 
 export const router = createRouter({
   routeTree,
