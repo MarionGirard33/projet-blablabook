@@ -30,7 +30,7 @@ services:
       context: ./backend
       dockerfile: Dockerfile.dev
     environment:
-      # url pour Drizzle
+      # Drizzle url
       - DATABASE_URL=${DATABASE_URL}
       # - REDIS_HOST=${REDIS_HOST}
       # - REDIS_PORT=${REDIS_PORT}

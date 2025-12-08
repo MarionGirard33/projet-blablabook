@@ -1,15 +1,15 @@
 #!/bin/sh
-# 1. étape de préparation 
-# lancement des migration avec Drizzle
+# 1. preparation
+# start migrage with Drizzle
 echo "Start migrate with Drizzle"
 npm run migrate
 
-# Vérifie si la commande précédente (npm run migrate) a échoué (code de sortie != 0)
+# stop the script if migrate is failed
 if [ $? -ne 0 ]; then
   echo "Migration failed. Exiting."
   exit 1
 fi
 
-# 2. Lancement du backend 
+# 2. launch the server
 echo "Start the server"
 exec npm run start:dev
