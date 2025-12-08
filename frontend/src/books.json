@@ -1,0 +1,338 @@
+{
+  "featured": [
+    {
+      "id": 1,
+      "title": "Le Maître du Haut Château",
+      "author": "Philip K. Dick",
+      "cover": "https://images.unsplash.com/photo-1512820790803-83ca734da794",
+      "description": "Et si l’Axe avait gagné la Seconde Guerre mondiale ? Un roman uchronique fascinant.",
+      "genre": "Science-fiction",
+      "rating": 4.7,
+      "year": 1962,
+      "pages": 320
+    },
+    {
+      "id": 2,
+      "title": "La Vie est Facile, Ne T’inquiète Pas",
+      "author": "Agnès Martin-Lugand",
+      "cover": "https://images.unsplash.com/photo-1524985069026-dd778a71c7b4",
+      "description": "La suite des aventures de Diane, entre reconstruction et nouveaux départs.",
+      "genre": "Contemporain",
+      "rating": 4.3,
+      "year": 2015,
+      "pages": 352
+    },
+    {
+      "id": 3,
+      "title": "La Passe-miroir",
+      "author": "Christelle Dabos",
+      "cover": "https://images.unsplash.com/photo-1507842217343-583bb7270b66",
+      "description": "Une saga fantastique pleine de magie et de mystères.",
+      "genre": "Fantasy",
+      "rating": 4.8,
+      "year": 2013,
+      "pages": 528
+    },
+    {
+      "id": 4,
+      "title": "L’Art de Perdre",
+      "author": "Alice Zeniter",
+      "cover": "https://images.unsplash.com/photo-1465101046530-73398c7f28ca",
+      "description": "Une fresque familiale sur l’exil et la mémoire.",
+      "genre": "Roman",
+      "rating": 4.5,
+      "year": 2017,
+      "pages": 512
+    },
+    {
+      "id": 5,
+      "title": "La Nuit des Temps",
+      "author": "René Barjavel",
+      "cover": "https://images.unsplash.com/photo-1516979187457-637abb4f9353",
+      "description": "Un chef-d’œuvre de la science-fiction française.",
+      "genre": "Science-fiction",
+      "rating": 4.6,
+      "year": 1968,
+      "pages": 416
+    },
+    {
+      "id": 6,
+      "title": "Ensemble, c’est tout",
+      "author": "Anna Gavalda",
+      "cover": "https://images.unsplash.com/photo-1519681393784-d120267933ba",
+      "description": "Une histoire d’amitié et de reconstruction.",
+      "genre": "Contemporain",
+      "rating": 4.2,
+      "year": 2004,
+      "pages": 603
+    },
+    {
+      "id": 7,
+      "title": "La Horde du Contrevent",
+      "author": "Alain Damasio",
+      "cover": "https://images.unsplash.com/photo-1512820790803-83ca734da794",
+      "description": "Un roman d’aventure et de vent, culte en SF française.",
+      "genre": "Science-fiction",
+      "rating": 4.9,
+      "year": 2004,
+      "pages": 728
+    },
+    {
+      "id": 8,
+      "title": "Chanson Douce",
+      "author": "Leïla Slimani",
+      "cover": "https://images.unsplash.com/photo-1524985069026-dd778a71c7b4",
+      "description": "Un thriller psychologique glaçant.",
+      "genre": "Thriller",
+      "rating": 4.1,
+      "year": 2016,
+      "pages": 240
+    },
+    {
+      "id": 9,
+      "title": "L’Île Mystérieuse",
+      "author": "Jules Verne",
+      "cover": "https://images.unsplash.com/photo-1507842217343-583bb7270b66",
+      "description": "Aventure et survie sur une île inconnue.",
+      "genre": "Aventure",
+      "rating": 4.4,
+      "year": 1874,
+      "pages": 672
+    },
+    {
+      "id": 10,
+      "title": "Le Livre des Baltimore",
+      "author": "Joël Dicker",
+      "cover": "https://images.unsplash.com/photo-1465101046530-73398c7f28ca",
+      "description": "Une saga familiale pleine de secrets.",
+      "genre": "Roman",
+      "rating": 4.3,
+      "year": 2015,
+      "pages": 480
+    }
+  ],
+  "random": [
+    {
+      "id": 11,
+      "title": "Le Petit Prince",
+      "author": "Antoine de Saint-Exupéry",
+      "cover": "https://images.unsplash.com/photo-1507842217343-583bb7270b66",
+      "description": "Un conte poétique et philosophique devenu un classique universel.",
+      "genre": "Conte",
+      "rating": 4.9,
+      "year": 1943,
+      "pages": 96
+    },
+    {
+      "id": 12,
+      "title": "L’Étranger",
+      "author": "Albert Camus",
+      "cover": "https://images.unsplash.com/photo-1465101046530-73398c7f28ca",
+      "description": "Le roman de l’absurde par excellence, entre fatalité et liberté.",
+      "genre": "Philosophie",
+      "rating": 4.5,
+      "year": 1942,
+      "pages": 184
+    },
+    {
+      "id": 13,
+      "title": "1984",
+      "author": "George Orwell",
+      "cover": "https://images.unsplash.com/photo-1512820790803-83ca734da794",
+      "description": "Un classique de la dystopie et de la surveillance.",
+      "genre": "Science-fiction",
+      "rating": 4.8,
+      "year": 1949,
+      "pages": 328
+    },
+    {
+      "id": 14,
+      "title": "Le Comte de Monte-Cristo",
+      "author": "Alexandre Dumas",
+      "cover": "https://images.unsplash.com/photo-1516979187457-637abb4f9353",
+      "description": "Une épopée de vengeance et de justice.",
+      "genre": "Aventure",
+      "rating": 4.7,
+      "year": 1844,
+      "pages": 1243
+    },
+    {
+      "id": 15,
+      "title": "Orgueil et Préjugés",
+      "author": "Jane Austen",
+      "cover": "https://images.unsplash.com/photo-1519681393784-d120267933ba",
+      "description": "Un roman d’amour et de mœurs intemporel.",
+      "genre": "Romance",
+      "rating": 4.6,
+      "year": 1813,
+      "pages": 279
+    },
+    {
+      "id": 16,
+      "title": "Le Vieil Homme et la Mer",
+      "author": "Ernest Hemingway",
+      "cover": "https://images.unsplash.com/photo-1524985069026-dd778a71c7b4",
+      "description": "Un récit de courage et de solitude.",
+      "genre": "Roman",
+      "rating": 4.2,
+      "year": 1952,
+      "pages": 127
+    },
+    {
+      "id": 17,
+      "title": "Les Misérables",
+      "author": "Victor Hugo",
+      "cover": "https://images.unsplash.com/photo-1507842217343-583bb7270b66",
+      "description": "Un chef-d’œuvre sur la misère, la justice et la rédemption.",
+      "genre": "Classique",
+      "rating": 4.9,
+      "year": 1862,
+      "pages": 1488
+    },
+    {
+      "id": 18,
+      "title": "Le Parfum",
+      "author": "Patrick Süskind",
+      "cover": "https://images.unsplash.com/photo-1465101046530-73398c7f28ca",
+      "description": "Un roman envoûtant sur l’obsession et le génie.",
+      "genre": "Thriller",
+      "rating": 4.4,
+      "year": 1985,
+      "pages": 263
+    },
+    {
+      "id": 19,
+      "title": "La Peste",
+      "author": "Albert Camus",
+      "cover": "https://images.unsplash.com/photo-1512820790803-83ca734da794",
+      "description": "Une allégorie puissante sur la condition humaine.",
+      "genre": "Philosophie",
+      "rating": 4.3,
+      "year": 1947,
+      "pages": 320
+    },
+    {
+      "id": 20,
+      "title": "Le Seigneur des Anneaux",
+      "author": "J.R.R. Tolkien",
+      "cover": "https://images.unsplash.com/photo-1516979187457-637abb4f9353",
+      "description": "La saga épique de la Terre du Milieu.",
+      "genre": "Fantasy",
+      "rating": 4.9,
+      "year": 1954,
+      "pages": 1216
+    }
+  ],
+  "horror": [
+    {
+      "id": 21,
+      "title": "Ça",
+      "author": "Stephen King",
+      "cover": "https://images.unsplash.com/photo-1519681393784-d120267933ba",
+      "description": "Le mal rôde à Derry… Un chef-d’œuvre de l’horreur moderne.",
+      "genre": "Horreur",
+      "rating": 4.8,
+      "year": 1986,
+      "pages": 1138
+    },
+    {
+      "id": 22,
+      "title": "Dracula",
+      "author": "Bram Stoker",
+      "cover": "https://images.unsplash.com/photo-1516979187457-637abb4f9353",
+      "description": "Le roman fondateur du mythe du vampire, entre peur et fascination.",
+      "genre": "Horreur",
+      "rating": 4.6,
+      "year": 1897,
+      "pages": 488
+    },
+    {
+      "id": 23,
+      "title": "Frankenstein",
+      "author": "Mary Shelley",
+      "cover": "https://images.unsplash.com/photo-1512820790803-83ca734da794",
+      "description": "La créature la plus célèbre de la littérature.",
+      "genre": "Horreur",
+      "rating": 4.5,
+      "year": 1818,
+      "pages": 280
+    },
+    {
+      "id": 24,
+      "title": "Shining",
+      "author": "Stephen King",
+      "cover": "https://images.unsplash.com/photo-1524985069026-dd778a71c7b4",
+      "description": "Un huis clos terrifiant dans un hôtel isolé.",
+      "genre": "Horreur",
+      "rating": 4.7,
+      "year": 1977,
+      "pages": 447
+    },
+    {
+      "id": 25,
+      "title": "L’Exorciste",
+      "author": "William Peter Blatty",
+      "cover": "https://images.unsplash.com/photo-1465101046530-73398c7f28ca",
+      "description": "Le combat ultime entre le bien et le mal.",
+      "genre": "Horreur",
+      "rating": 4.4,
+      "year": 1971,
+      "pages": 400
+    },
+    {
+      "id": 26,
+      "title": "Le Horla",
+      "author": "Guy de Maupassant",
+      "cover": "https://images.unsplash.com/photo-1512820790803-83ca734da794",
+      "description": "Une nouvelle angoissante sur la folie et l’invisible.",
+      "genre": "Fantastique",
+      "rating": 4.2,
+      "year": 1887,
+      "pages": 96
+    },
+    {
+      "id": 27,
+      "title": "American Psycho",
+      "author": "Bret Easton Ellis",
+      "cover": "https://images.unsplash.com/photo-1519681393784-d120267933ba",
+      "description": "Un thriller psychologique dérangeant et culte.",
+      "genre": "Thriller",
+      "rating": 4.1,
+      "year": 1991,
+      "pages": 416
+    },
+    {
+      "id": 28,
+      "title": "Le Silence des Agneaux",
+      "author": "Thomas Harris",
+      "cover": "https://images.unsplash.com/photo-1516979187457-637abb4f9353",
+      "description": "Le face-à-face glaçant entre Clarice Starling et Hannibal Lecter.",
+      "genre": "Thriller",
+      "rating": 4.6,
+      "year": 1988,
+      "pages": 352
+    },
+    {
+      "id": 29,
+      "title": "Carrie",
+      "author": "Stephen King",
+      "cover": "https://images.unsplash.com/photo-1524985069026-dd778a71c7b4",
+      "description": "La vengeance sanglante d’une adolescente persécutée.",
+      "genre": "Horreur",
+      "rating": 4.3,
+      "year": 1974,
+      "pages": 253
+    },
+    {
+      "id": 30,
+      "title": "L’Appel de Cthulhu",
+      "author": "H.P. Lovecraft",
+      "cover": "https://images.unsplash.com/photo-1465101046530-73398c7f28ca",
+      "description": "Le mythe fondateur de l’horreur cosmique.",
+      "genre": "Fantastique",
+      "rating": 4.5,
+      "year": 1928,
+      "pages": 64
+    }
+  ]
+}
