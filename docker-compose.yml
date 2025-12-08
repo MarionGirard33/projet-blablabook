@@ -30,13 +30,7 @@ services:
       context: ./backend
       dockerfile: Dockerfile.dev
     environment:
-      # Database connection variables
-      - PGHOST=${DB_HOST}
-      - PGUSER=${DB_USER}
-      - PGDATABASE=${DB_NAME}
-      - PGPASSWORD=${DB_PASSWORD}
-      - PGPORT=${DB_PORT}
-      # url pour Prisma
+      # url pour Drizzle
       - DATABASE_URL=${DATABASE_URL}
       # - REDIS_HOST=${REDIS_HOST}
       # - REDIS_PORT=${REDIS_PORT}
@@ -61,16 +55,16 @@ services:
       - /app/node_modules
 
   # Frontend service (React + Vite)
-  # frontend:
-  #   build:
-  #     context: ./frontend
-  #     dockerfile: Dockerfile.dev
-  #   ports:
-  #     # Publish frontend port to host for direct browser access
-  #     - "5173:5173"
-  #   volumes:
-  #     - ./frontend:/app
-  #     - /app/node_modules
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.dev
+    ports:
+      # Publish frontend port to host for direct browser access
+      - "5173:5173"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
 
   # Redis service
   # redis:

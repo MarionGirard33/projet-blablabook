@@ -1,5 +1,16 @@
-## Description
+# Adminer
 
+```
+http://localhost:8080
+```
+
+- Host: postgres (nom du service de la db)
+- Username: postgres
+- Pwd: postgres
+- Database name: blablabook
+
+<!-- ## Description -->
+<!--
 Back-end du projet Blablabook
 
 ## Lancer le back
@@ -8,9 +19,9 @@ Back-end du projet Blablabook
 $ npm install
 ```
 
-- Lancer la DB à la racine du projet 
+- Lancer la DB à la racine du projet
 ```shell
-sudo docker compose up --build 
+sudo docker compose up --build
 ```
 
 
@@ -45,4 +56,4 @@ Le backend est ensuite accessible sur l'adresse : `http://localhost:3000/`
 Check out a few resources that may come in handy when working with NestJS:
 
 - Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
+- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com). -->
