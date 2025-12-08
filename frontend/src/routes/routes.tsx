@@ -1,5 +1,6 @@
 import RootLayout from "@/layouts/RootLayout";
 import HomePage from "@/pages/HomePage";
+import NotFound from "@/pages/NotFound";
 
 import {
   createRouter,
@@ -9,7 +10,7 @@ import {
 
 const rootRoute = createRootRoute({
   component: () => <RootLayout />,
-  // notFoundComponent: () => <NotFound />,
+  notFoundComponent: () => <NotFound />,
 });
 
 const homeRoute = createRoute({
