@@ -11,4 +11,10 @@ export default defineConfig({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  server: {
+    // active le hot reload
+    watch: {
+      usePolling: true,
+    },
+  },
 });
