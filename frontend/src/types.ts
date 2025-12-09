@@ -14,3 +14,9 @@ export type BookType = {
   year: number;
   pages: number;
 };
+
+export type GetBooksParams = {
+  type: "random" | "category" | "search";
+  categoryName?: string;
+  searchText?: string;
+};
