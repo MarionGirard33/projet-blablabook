@@ -35,9 +35,11 @@ const libraryRoute = createRoute({
   component: () => <LibraryPage />,
 });
 
-const routeTree = rootRoute.addChildren([homeRoute, registerPage]);
-
-const routeTree = rootRoute.addChildren([homeRoute, libraryRoute]);
+const routeTree = rootRoute.addChildren([
+  homeRoute,
+  registerPage,
+  libraryRoute,
+]);
 
 export const router = createRouter({
   routeTree,
