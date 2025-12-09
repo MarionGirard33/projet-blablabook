@@ -11,7 +11,7 @@ import {
   ApiTags,
   ApiUnprocessableEntityResponse,
 } from '@nestjs/swagger';
-import { RegisterResponseDto } from './dto/register-respoonse.dto';
+import { RegisterResponseDto } from './dto/register-response.dto';
 import { RegisterRequestDto } from './dto/register-request.dto';
 
 @ApiTags('auth') // annotation swagger => permet de grouper la classe sous l'étiquette auth dans la documentation

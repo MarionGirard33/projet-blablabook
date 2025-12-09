@@ -35,4 +35,9 @@ async function bootstrap() {
   await app.listen(process.env.PORT ?? 3000);
 }
 
-bootstrap();
+// best practice
+bootstrap().catch((err) => {
+  console.error('Fatal error during application bootstrap: ', err);
+  // exit programme with failed error if failed
+  process.exit(1);
+});
