@@ -2,6 +2,7 @@ import RootLayout from "@/layouts/RootLayout";
 import RegisterPage from "@/pages/Auth/RegisterPage";
 import HomePage from "@/pages/HomePage";
 import NotFound from "@/pages/NotFound";
+import ProfilePage from "@/pages/ProfilePage.tsx/ProfilePage";
 
 import {
   createRouter,
@@ -27,9 +28,20 @@ const registerPage = createRoute({
   component: () => <RegisterPage />
 })
 
+// Profile ROUTE 
+const profilePage = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/profile",
+  component: () => <ProfilePage userId={1} />, // temporaire
+});
+
+
+
+
 const routeTree = rootRoute.addChildren([
   homeRoute,
   registerPage,
+  profilePage
 ]);
 
 export const router = createRouter({
