@@ -18,14 +18,3 @@ Content-Type: application/json
   "password": "12345678",
   "confirmPassword": "12345678"
 }
-
-###
-POST http://localhost:3000/auth/register
-Content-Type: application/json
-
-{
-  "email": "giz@mail.com",
-  "username": "giz",
-  "password": "12345678",
-  "confirmPassword": "12345678"
-}

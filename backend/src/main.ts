@@ -6,6 +6,13 @@ import { ValidationPipe } from '@nestjs/common';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
+  // enabled CORS
+  app.enableCors({
+    // origin: process.env.FRONTEND_URL_CORS,
+    origin: 'http://localhost:5173', //TODO: passer sur la variable .env
+    credentials: true,
+  });
+
   // Add ValidationPipe for use dto validator
   app.useGlobalPipes(
     new ValidationPipe({

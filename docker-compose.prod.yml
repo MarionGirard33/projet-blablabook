@@ -42,6 +42,7 @@ services:
       # - REDIS_PORT=${REDIS_PORT}
       # - REDIS_PASSWORD=${REDIS_PASSWORD}
       - JWT_SECRET=${JWT_SECRET}
+      - FRONTEND_URL_CORS=${FRONTEND_URL_CORS}
     ports:
       # Publish backend port to host for direct access
       - "3000:3000"

@@ -17,6 +17,7 @@ export default function FormInput({ field, type, placeholder }: FormInputProps) 
       onBlur={field.handleBlur}
       onChange={(e) => field.handleChange(e.target.value)}
       placeholder={placeholder}
+      className="w-full"
     />
   )
 }
