@@ -8,6 +8,7 @@ import {
   date,
   text,
   boolean,
+  unique,
 } from 'drizzle-orm/pg-core';
 
 export const userRoleEnum = pgEnum('role', ['USER', 'ADMIN']);
@@ -16,7 +17,8 @@ export const users = pgTable('user', {
   id: serial().primaryKey(),
   email: varchar().unique().notNull(),
   password: varchar().notNull(),
-  username: varchar({ length: 100 }),
+  username: varchar({ length: 50 }),
+  image: varchar(),
   role: userRoleEnum().default('USER').notNull(),
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
@@ -47,44 +49,61 @@ export const book = pgTable('book', {
 
 export const category = pgTable('category', {
   id: serial().primaryKey(),
-  name: varchar({ length: 150 }).notNull().unique(),
+  name: varchar({ length: 100 }).notNull().unique(),
   isActive: boolean('is_active').default(true),
 });
 
-export const bookCategory = pgTable('book_category', {
-  id: serial().primaryKey(),
-  categoryId: integer('category_id')
-    .references(() => category.id)
-    .notNull(),
-  bookId: integer('book_id')
-    .references(() => book.id)
-    .notNull(),
-});
+export const bookCategory = pgTable(
+  'book_category',
+  {
+    id: serial().primaryKey(),
+    categoryId: integer('category_id')
+      .references(() => category.id)
+      .notNull(),
+    bookId: integer('book_id')
+      .references(() => book.id)
+      .notNull(),
+  },
+  // prevent duplicate cotegory for book
+  (t) => [unique('unique_categroy_book').on(t.bookId, t.categoryId)],
+);
 
-export const userCategory = pgTable('user_category', {
-  id: serial().primaryKey(),
-  categoryId: integer('category_id')
-    .references(() => category.id)
-    .notNull(),
-  userId: integer('user_id')
-    .references(() => users.id)
-    .notNull(),
-});
+export const userCategory = pgTable(
+  'user_category',
+  {
+    id: serial().primaryKey(),
+    categoryId: integer('category_id')
+      .references(() => category.id)
+      .notNull(),
+    userId: integer('user_id')
+      .references(() => users.id)
+      .notNull(),
+  },
+  // prevent duplicate cotegory for user
+  (t) => [unique('unique_categroy_user').on(t.userId, t.categoryId)],
+);
 
-export const listBook = pgTable('list_book', {
-  id: serial().primaryKey(),
-  comment: text(),
-  readStart: timestamp('read_start'),
-  readEnd: timestamp('read_end'),
-  addedAt: timestamp('added_at').defaultNow().notNull(),
-  updatedAt: timestamp('updated_at').defaultNow().notNull(),
-  bookId: integer('book_id')
-    .references(() => book.id)
-    .notNull(),
-  listId: integer('list_id')
-    .references(() => list.id)
-    .notNull(),
-});
+export const listBook = pgTable(
+  'list_book',
+  {
+    id: serial().primaryKey(),
+    comment: text(),
+    readStart: timestamp('read_start'),
+    readEnd: timestamp('read_end'),
+    addedAt: timestamp('added_at').defaultNow().notNull(),
+    updatedAt: timestamp('updated_at').defaultNow().notNull(),
+    bookId: integer('book_id')
+      .references(() => book.id)
+      .notNull(),
+    listId: integer('list_id')
+      .references(() => list.id)
+      .notNull(),
+  },
+  (t) => [
+    // add constraint for prevent duplicate book on list
+    unique('unique_book_list').on(t.listId, t.bookId),
+  ],
+);
 
 export const review = pgTable('review', {
   id: serial().primaryKey(),

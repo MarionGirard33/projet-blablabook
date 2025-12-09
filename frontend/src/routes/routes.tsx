@@ -1,4 +1,5 @@
 import RootLayout from "@/layouts/RootLayout";
+import RegisterPage from "@/pages/Auth/RegisterPage";
 import HomePage from "@/pages/HomePage";
 import NotFound from "@/pages/NotFound";
 
@@ -19,7 +20,17 @@ const homeRoute = createRoute({
   component: () => <HomePage />,
 });
 
-const routeTree = rootRoute.addChildren([homeRoute]);
+// AUTH ROUTE 
+const registerPage = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/register",
+  component: () => <RegisterPage />
+})
+
+const routeTree = rootRoute.addChildren([
+  homeRoute,
+  registerPage,
+]);
 
 export const router = createRouter({
   routeTree,
