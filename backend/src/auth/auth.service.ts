@@ -3,10 +3,12 @@ import {
   InternalServerErrorException,
   UnprocessableEntityException,
 } from '@nestjs/common';
+import { plainToInstance } from 'class-transformer';
 import { RegisterRequestDto } from './dto/register-request.dto';
 import { UsersService } from 'src/users/users.service';
 import argon2 from 'argon2';
 import { UserInsert, UserSelect } from 'src/users/types/users';
+import { RegisterResponseDto } from './dto/register-respoonse.dto';
 
 @Injectable()
 export class AuthService {
@@ -54,20 +56,10 @@ export class AuthService {
       throw new InternalServerErrorException('failed to create new user');
     }
 
-    // TODO: à revoir le password est envoyer. Check avec le DTO response pour que ça fonctionne de manière automatiser
-    const response: UserSelect = {
-      id: userEntity.id,
-      email: userEntity.email,
-      username: userEntity.username,
-      role: userEntity.role,
-      password: userEntity.password,
-      image: userEntity.image,
-      createdAt: userEntity.createdAt,
-      updatedAt: userEntity.updatedAt,
-      deletedAt: userEntity.deletedAt,
-    };
-
-    // transforme le retour de Drizzle
-    return response;
+    // plainToInstance allow to convert response with ResponseDTO
+    // with parameter excludeExtraneousMesBols, values @Exlude is not submit in the response
+    return plainToInstance(RegisterResponseDto, userEntity, {
+      excludeExtraneousValues: true,
+    });
   }
 }

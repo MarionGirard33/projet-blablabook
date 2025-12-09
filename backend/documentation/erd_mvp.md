@@ -8,6 +8,9 @@ Légende :
 
 # MVP
 
+<!-- TODO: ajouter modif image + contrainte unicité sur listBook, userCategory, bookCategory -->
+<!-- TODO: ajouter refreshToken si conservé -->
+
 ```mermaid
 erDiagram
 user ||--|| list : gère
