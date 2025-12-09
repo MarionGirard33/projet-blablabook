@@ -7,26 +7,27 @@ export class RegisterRequestDto {
     uniqueItems: true,
     example: 'user@mail.com',
   })
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-call
   @IsEmail({}, { message: 'email is not valid' })
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-call
   @IsNotEmpty({ message: 'email is required' })
   email: string;
 
   @ApiProperty({
     required: true,
   })
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-call
   @IsNotEmpty()
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-  @MinLength(8, { message: 'password need 8 or more caractere' })
+  @MinLength(8, { message: 'password need 8 or more caracteres' })
   password: string;
 
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+  @ApiProperty({
+    required: true,
+  })
   @IsNotEmpty()
   confirmPassword: string;
 
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+  @ApiProperty({
+    required: true,
+    uniqueItems: true,
+  })
   @IsNotEmpty()
   username: string;
 }
