@@ -7,7 +7,7 @@ import { plainToInstance } from 'class-transformer';
 import { RegisterRequestDto } from './dto/register-request.dto';
 import { UsersService } from 'src/users/users.service';
 import argon2 from 'argon2';
-import { UserInsert, UserSelect } from 'src/users/types/users';
+import { UserInsert } from 'src/users/types/users';
 import { RegisterResponseDto } from './dto/register-respoonse.dto';
 
 @Injectable()

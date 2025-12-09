@@ -20,7 +20,7 @@ export default function FormFieldInfo({ field }: FormFieldInfoProps) {
     }
 
     return (
-      <em className="text-red-500 italic text-sm" role="alert">
+      <em className="text-red-500 italic text-sm text-center font-bold" role="alert">
         {errorMessage}
       </em>
     )
