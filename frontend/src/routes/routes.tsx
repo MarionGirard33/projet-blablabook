@@ -2,6 +2,7 @@ import RootLayout from "@/layouts/RootLayout";
 import RegisterPage from "@/pages/Auth/RegisterPage";
 import HomePage from "@/pages/HomePage";
 import NotFound from "@/pages/NotFound";
+import BookDetails from "@/pages/BookDetails";
 
 import {
   createRouter,
@@ -27,9 +28,17 @@ const registerPage = createRoute({
   component: () => <RegisterPage />
 })
 
+// DETAILS BOOK ROUTE
+const bookDetailsRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/books/:id",
+  component: () => <BookDetails />,
+});
+
 const routeTree = rootRoute.addChildren([
   homeRoute,
   registerPage,
+  bookDetailsRoute,
 ]);
 
 export const router = createRouter({
