@@ -13,6 +13,13 @@ import { CreateBookDto } from './dto/create-book.dto';
 @Controller('books')
 export class BooksController {
   constructor(private readonly booksService: BooksService) {}
+  // -----------------------------
+  // Get all books
+  // -----------------------------
+  @Get()
+  async getAllBooks() {
+    return this.booksService.findAllBooks();
+  }
 
   // -----------------------------
   // Get all books for a specific user

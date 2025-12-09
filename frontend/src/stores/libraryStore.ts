@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { getBooks } from "@/api/getBooks"; // Ton mock axios
+import { getBooks } from "@/api/getBooks";
 
 export type Book = {
   id: string;

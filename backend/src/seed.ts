@@ -1,20 +1,27 @@
 import { db } from './db'; // instance Drizzle
 import { users, list, book, listBook } from './db/schema';
 
-async function main() {
-  // --- Create a test user ---
+async function seed() {
+  console.log('Seeding database...');
+
+  // 1️⃣ Supprimer les anciennes données (si besoin)
+  await db.delete(listBook).execute();
+  await db.delete(book).execute();
+  await db.delete(list).execute();
+  await db.delete(users).execute();
+
+  // 2️⃣ Créer un utilisateur test
   const [user] = await db
     .insert(users)
     .values({
       email: 'test@example.com',
       password: 'password123',
       username: 'TestUser',
+      role: 'USER',
     })
     .returning();
 
-  console.log('Created user:', user);
-
-  // --- Create a list for this user ---
+  // 3️⃣ Créer une liste pour cet utilisateur
   const [userList] = await db
     .insert(list)
     .values({
@@ -23,49 +30,46 @@ async function main() {
     })
     .returning();
 
-  console.log('Created list:', userList);
-
-  // --- Create some books ---
+  // 4️⃣ Créer des livres
   const booksToInsert = [
     {
       name: 'The Great Gatsby',
-      coverId: 'https://example.com/gatsby.jpg',
+      coverId: 'cover1.jpg',
       author: 'F. Scott Fitzgerald',
-      description: 'A classic novel about the Jazz Age.',
-      isbn: '978-3-16-148410-0',
+      description: 'A classic novel.',
+      isbn: '9780743273565',
       publishingHouse: 'Scribner',
-      publishedAt: new Date('1925-04-10'),
+      publishedAt: '1925-04-10', // ⚡ mettre en string YYYY-MM-DD
     },
     {
       name: '1984',
-      coverId: 'https://example.com/1984.jpg',
+      coverId: 'cover2.jpg',
       author: 'George Orwell',
-      description: 'Dystopian novel about totalitarian regime.',
-      isbn: '978-0-452-28423-4',
+      description: 'Dystopian novel.',
+      isbn: '9780451524935',
       publishingHouse: 'Secker & Warburg',
-      publishedAt: new Date('1949-06-08'),
+      publishedAt: '1949-06-08', // ⚡ string
     },
   ];
 
   const insertedBooks = await db.insert(book).values(booksToInsert).returning();
-  console.log('Inserted books:', insertedBooks);
 
-  // --- Add books to user list ---
+  // 5️⃣ Ajouter les livres à la liste de l'utilisateur
   for (const b of insertedBooks) {
-    await db.insert(listBook).values({
-      bookId: b.id,
-      listId: userList.id,
-    });
+    await db
+      .insert(listBook)
+      .values({
+        listId: userList.id,
+        bookId: b.id,
+      })
+      .execute();
   }
 
-  console.log('Books added to user list');
+  console.log('Database seeded successfully!');
 }
 
-main()
-  .then(() => {
-    console.log('Seeding finished');
-    process.exit(0);
-  })
+seed()
+  .then(() => process.exit(0))
   .catch((err) => {
     console.error(err);
     process.exit(1);
