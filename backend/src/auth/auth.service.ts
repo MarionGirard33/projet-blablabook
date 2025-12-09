@@ -8,7 +8,7 @@ import { RegisterRequestDto } from './dto/register-request.dto';
 import { UsersService } from 'src/users/users.service';
 import argon2 from 'argon2';
 import { UserInsert } from 'src/users/types/users';
-import { RegisterResponseDto } from './dto/register-respoonse.dto';
+import { RegisterResponseDto } from './dto/register-response.dto';
 
 @Injectable()
 export class AuthService {
