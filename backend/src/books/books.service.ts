@@ -16,7 +16,7 @@ export class BooksService {
   // Get all books from a specific user's list
   // -------------------------------------------------------
   async findUserBooks(userId: number) {
-    return db
+    const rows = await db
       .select({
         id: book.id,
         name: book.name,
@@ -26,12 +26,21 @@ export class BooksService {
         isbn: book.isbn,
         publishingHouse: book.publishingHouse,
         publishedAt: book.publishedAt,
-        listName: list.name,
+
+        // Keep dates so we can compute status
+        readStart: listBook.readStart,
+        readEnd: listBook.readEnd,
       })
       .from(listBook)
       .innerJoin(book, eq(book.id, listBook.bookId))
       .innerJoin(list, eq(list.id, listBook.listId))
       .where(eq(list.userId, userId));
+
+    // Add "status" property dynamically
+    return rows.map((b) => ({
+      ...b,
+      status: b.readEnd ? 'Lu' : b.readStart ? 'En cours' : 'À lire',
+    }));
   }
 
   // -------------------------------------------------------

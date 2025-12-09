@@ -24,10 +24,10 @@ export default function LibraryPage() {
     books?.filter((b) => b.name.toLowerCase().includes(search.toLowerCase())) ||
     [];
 
-  const readCount = books?.filter((b) => b.listName === "Lu").length || 0;
+  const readCount = books?.filter((b) => b.status === "Lu").length || 0;
   const readingCount =
-    books?.filter((b) => b.listName === "en cours").length || 0;
-  const toReadCount = books?.filter((b) => b.listName === "A lire").length || 0;
+    books?.filter((b) => b.status === "En cours").length || 0;
+  const toReadCount = books?.filter((b) => b.status === "À lire").length || 0;
 
   return (
     <div className="p-2 max-w-screen-xl mx-auto">

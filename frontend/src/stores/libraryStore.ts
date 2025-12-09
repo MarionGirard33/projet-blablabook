@@ -14,7 +14,7 @@ export type Book = {
   isbn: string;
   publishingHouse: string;
   publishedAt: string;
-  listName?: string;
+  status?: string;
 };
 
 type LibraryState = {

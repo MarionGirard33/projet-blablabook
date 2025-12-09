@@ -24,9 +24,9 @@ export function BookCard({ book, onRemove }: Props) {
         )}
 
         {/* Status badge */}
-        {book.listName && (
+        {book.status && (
           <span className="absolute top-3 left-3 px-3 py-1 text-xs font-semibold rounded-full shadow bg-bookcream text-bookdark">
-            {book.listName}
+            {book.status}
           </span>
         )}
 

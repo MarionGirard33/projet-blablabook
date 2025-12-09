@@ -1,16 +1,16 @@
-import { db } from './db'; // instance Drizzle
+import { db } from './db';
 import { users, list, book, listBook } from './db/schema';
 
 async function seed() {
   console.log('Seeding database...');
 
-  // 1️⃣ Supprimer les anciennes données
+  // 1️⃣ Delete old data
   await db.delete(listBook).execute();
   await db.delete(book).execute();
   await db.delete(list).execute();
   await db.delete(users).execute();
 
-  // 2️⃣ Créer un utilisateur test
+  // 2️⃣ Create test user
   const [user] = await db
     .insert(users)
     .values({
@@ -21,7 +21,7 @@ async function seed() {
     })
     .returning();
 
-  // 3️⃣ Créer une liste pour cet utilisateur
+  // 3️⃣ Create the user list
   const [userList] = await db
     .insert(list)
     .values({
@@ -30,7 +30,7 @@ async function seed() {
     })
     .returning();
 
-  // 4️⃣ Créer des livres avec URL d'images pour les couvertures
+  // 4️⃣ Create books
   const booksToInsert = [
     {
       name: 'The Great Gatsby',
@@ -76,16 +76,36 @@ async function seed() {
 
   const insertedBooks = await db.insert(book).values(booksToInsert).returning();
 
-  // 5️⃣ Ajouter les livres à la liste de l'utilisateur
-  for (const b of insertedBooks) {
-    await db
-      .insert(listBook)
-      .values({
+  // 5️⃣ Add each book with different reading status
+  await db
+    .insert(listBook)
+    .values([
+      {
         listId: userList.id,
-        bookId: b.id,
-      })
-      .execute();
-  }
+        bookId: insertedBooks[0].id,
+        readStart: null,
+        readEnd: null, // → À lire
+      },
+      {
+        listId: userList.id,
+        bookId: insertedBooks[1].id,
+        readStart: new Date('2025-01-01'),
+        readEnd: null, // → En cours
+      },
+      {
+        listId: userList.id,
+        bookId: insertedBooks[2].id,
+        readStart: new Date('2024-10-01'),
+        readEnd: new Date('2024-11-01'), // → Lu
+      },
+      {
+        listId: userList.id,
+        bookId: insertedBooks[3].id,
+        readStart: null,
+        readEnd: null, // → À lire
+      },
+    ])
+    .execute();
 
   console.log('Database seeded successfully!');
 }
