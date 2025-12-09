@@ -2,25 +2,32 @@ import { useEffect, useState } from "react";
 import { useLibraryStore } from "@/stores/libraryStore";
 import { BookCard } from "@/components/BookCard";
 import { Plus, Search } from "lucide-react";
+//import { useAuth } from "@/contexts/AuthContext";
 
 export default function LibraryPage() {
+  //const { userId } = useAuth();
+  const userId = 1; // dev
   const books = useLibraryStore((s) => s.books);
   const loadBooks = useLibraryStore((s) => s.loadBooks);
+  const removeBook = useLibraryStore((s) => s.removeBook);
 
   const [search, setSearch] = useState("");
 
-  // Load books on mount
+  // Load books
   useEffect(() => {
-    loadBooks();
-  }, []);
+    if (userId) {
+      loadBooks(userId);
+    }
+  }, [userId]);
 
-  const filteredBooks = books.filter((b) =>
-    b.title.toLowerCase().includes(search.toLowerCase())
-  );
+  const filteredBooks =
+    books?.filter((b) => b.name.toLowerCase().includes(search.toLowerCase())) ||
+    [];
 
-  const readCount = books.filter((b) => b.status === "Lu").length;
-  const readingCount = books.filter((b) => b.status === "en cours").length;
-  const toReadCount = books.filter((b) => b.status === "A lire").length;
+  const readCount = books?.filter((b) => b.listName === "Lu").length || 0;
+  const readingCount =
+    books?.filter((b) => b.listName === "en cours").length || 0;
+  const toReadCount = books?.filter((b) => b.listName === "A lire").length || 0;
 
   return (
     <div className="p-2 max-w-screen-xl mx-auto">
@@ -63,6 +70,7 @@ export default function LibraryPage() {
           <Search size={18} />
         </button>
       </div>
+
       {/* Books list */}
       <div className="mt-6 grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
         {filteredBooks.length === 0 ? (
@@ -70,7 +78,13 @@ export default function LibraryPage() {
             Aucun livre trouvé.
           </p>
         ) : (
-          filteredBooks.map((book) => <BookCard key={book.id} book={book} />)
+          filteredBooks.map((book) => (
+            <BookCard
+              key={book.id}
+              book={book}
+              onRemove={() => removeBook(userId, book.id)}
+            />
+          ))
         )}
       </div>
     </div>

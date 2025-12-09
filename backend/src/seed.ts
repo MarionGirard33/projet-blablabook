@@ -4,7 +4,7 @@ import { users, list, book, listBook } from './db/schema';
 async function seed() {
   console.log('Seeding database...');
 
-  // 1️⃣ Supprimer les anciennes données (si besoin)
+  // 1️⃣ Supprimer les anciennes données
   await db.delete(listBook).execute();
   await db.delete(book).execute();
   await db.delete(list).execute();
@@ -30,25 +30,47 @@ async function seed() {
     })
     .returning();
 
-  // 4️⃣ Créer des livres
+  // 4️⃣ Créer des livres avec URL d'images pour les couvertures
   const booksToInsert = [
     {
       name: 'The Great Gatsby',
-      coverId: 'cover1.jpg',
+      coverId:
+        'https://www.stockvault.net/data/2016/10/26/214474/preview16.jpg',
       author: 'F. Scott Fitzgerald',
       description: 'A classic novel.',
       isbn: '9780743273565',
       publishingHouse: 'Scribner',
-      publishedAt: '1925-04-10', // ⚡ mettre en string YYYY-MM-DD
+      publishedAt: '1925-04-10',
     },
     {
       name: '1984',
-      coverId: 'cover2.jpg',
+      coverId:
+        'https://img.pikbest.com/png-images/20240923/open-old-book-on-the-wooden-table-_10876027.png!w700wp',
       author: 'George Orwell',
       description: 'Dystopian novel.',
       isbn: '9780451524935',
       publishingHouse: 'Secker & Warburg',
-      publishedAt: '1949-06-08', // ⚡ string
+      publishedAt: '1949-06-08',
+    },
+    {
+      name: 'To Kill a Mockingbird',
+      coverId:
+        'https://www.publicdomainpictures.net/pictures/260000/t2/vintage-stack-of-books.jpg',
+      author: 'Harper Lee',
+      description: 'Pulitzer Prize-winning novel.',
+      isbn: '9780061120084',
+      publishingHouse: 'J.B. Lippincott & Co.',
+      publishedAt: '1960-07-11',
+    },
+    {
+      name: 'Brave New World',
+      coverId:
+        'https://st2.depositphotos.com/50301268/46502/i/450/depositphotos_465023244-stock-photo-cup-coffee-table-spring-flowers.jpg',
+      author: 'Aldous Huxley',
+      description: 'Dystopian science fiction.',
+      isbn: '9780060850524',
+      publishingHouse: 'Chatto & Windus',
+      publishedAt: '1932-08-01',
     },
   ];
 
