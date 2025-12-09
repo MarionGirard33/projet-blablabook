@@ -16,7 +16,8 @@ export const users = pgTable('user', {
   id: serial().primaryKey(),
   email: varchar().unique().notNull(),
   password: varchar().notNull(),
-  username: varchar({ length: 100 }),
+  username: varchar({ length: 50 }),
+  image: varchar(),
   role: userRoleEnum().default('USER').notNull(),
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
@@ -47,7 +48,7 @@ export const book = pgTable('book', {
 
 export const category = pgTable('category', {
   id: serial().primaryKey(),
-  name: varchar({ length: 150 }).notNull().unique(),
+  name: varchar({ length: 100 }).notNull().unique(),
   isActive: boolean('is_active').default(true),
 });
 
