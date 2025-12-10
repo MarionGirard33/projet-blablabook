@@ -1,12 +1,14 @@
 import api from "@/api/axios";
 import FormAction from "@/components/Form/FormAction/FormAction";
 import FormField from "@/components/Form/FormFields/FormField";
+import FormGlobalError from "@/components/Form/FormGlobalError";
 import FormTitle from "@/components/Form/FormTitle";
 import { useAuthStore } from "@/stores/authStore";
 import { useForm } from "@tanstack/react-form";
 import { useMutation } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
 import type { AxiosError } from "axios";
+import { useState } from "react";
 import { z } from "zod";
 
 const schema = z.object({
@@ -19,11 +21,18 @@ type LoginFormData = {
   password: string;
 }
 
+type BackendErrorResponse = {
+  message: string;
+}
+
 export default function LoginPage() {
   const navigate = useNavigate();
   const authStore = useAuthStore();
+  // state for global error if request is failed
+  const [globalError, setGlobalError] = useState<string | null>(null);
 
-  const mutation = useMutation({
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const mutation = useMutation<any, AxiosError<BackendErrorResponse>, LoginFormData>({
     mutationFn: async (data: LoginFormData) => {
       return api.post("/auth/login", data);
     },
@@ -31,7 +40,7 @@ export default function LoginPage() {
       authStore.login(response.data);
       navigate({ to: "/" })
     },
-    onError: (error: AxiosError<{ message?: string }>) => {
+    onError: (error) => {
       console.error("Erreur serveur: ", error.message)
     }
   })
@@ -44,7 +53,21 @@ export default function LoginPage() {
   const form = useForm({
     defaultValues,
     onSubmit: async ({ value }) => {
-      mutation.mutate(value)
+      setGlobalError(null);
+      mutation.mutate(value, {
+        // if request failed, we set error message in the state, and reset input password
+        onError: (error) => {
+          const errorMessage = error.response?.data?.message || "Une erreur est survenue"
+          setGlobalError(errorMessage); // add error message to the globalError state
+
+          // reset input password
+          form.setFieldValue('password', '');
+          form.setFieldMeta('password', (prev) => ({
+            ...prev,
+            isTouched: false
+          }))
+        }
+      })
     },
     validators: {
       onChange: schema
@@ -62,6 +85,10 @@ export default function LoginPage() {
     >
 
       <FormTitle title="Connexion" />
+
+      {globalError && (
+        <FormGlobalError message={globalError} />
+      )}
 
       <form.Field name="username">
         {(field) => {
