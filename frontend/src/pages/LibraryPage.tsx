@@ -45,7 +45,7 @@ export default function LibraryPage() {
         </h1>
         <button
           onClick={() => setOpen(true)}
-          className="px-4 py-2 bg-bookterracotta text-white rounded-lg flex items-center gap-2 text-sm shadow"
+          className="px-4 py-2 bg-bookterracotta text-white rounded-lg flex items-center gap-2 text-sm shadow hover:bg-bookochre"
           aria-label="Search books"
         >
           <Plus size={16} />
@@ -61,15 +61,15 @@ export default function LibraryPage() {
 
       {/* Status */}
       <div className="flex justify-center gap-4 mt-4 text-sm text-bookdark">
-        <span className="px-2 py-1 bg-bookbeige rounded-full">
+        <span className="px-2 py-1 bg-bookbeige rounded-lg">
           Lus : <strong>{readCount}</strong>
         </span>
 
-        <span className="px-2 py-1 bg-bookbeige rounded-full">
+        <span className="px-2 py-1 bg-bookbeige rounded-lg">
           En cours : <strong>{readingCount}</strong>
         </span>
 
-        <span className="px-2 py-1 bg-bookbeige rounded-full">
+        <span className="px-2 py-1 bg-bookbeige rounded-lg">
           À lire : <strong>{toReadCount}</strong>
         </span>
       </div>
@@ -78,7 +78,7 @@ export default function LibraryPage() {
       <div className="mt-4 flex items-center gap-2">
         <input
           type="text"
-          placeholder="Rechercher un livre, un auteur..."
+          placeholder="Rechercher un livre..."
           className="flex-1 p-2 border border-bookbeige rounded-lg text-sm bg-white text-bookdark"
           value={search}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
