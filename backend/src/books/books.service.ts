@@ -38,6 +38,7 @@ export class BooksService {
       );
       return res.data.docs;
     } catch (error) {
+      console.error('Error searching books:', error);
       return [];
     }
   }
@@ -49,6 +50,7 @@ export class BooksService {
       );
       return res.data.works;
     } catch (error) {
+      console.error('Error searching books:', error);
       return [];
     }
   }
@@ -60,6 +62,7 @@ export class BooksService {
       );
       return res.data.docs;
     } catch (error) {
+      console.error('Error searching books:', error);
       return [];
     }
   }
