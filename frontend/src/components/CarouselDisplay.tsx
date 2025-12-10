@@ -10,8 +10,28 @@ import BookCard from "./BookCard";
 import type { BookCarouselProps } from "@/types";
 import { Button } from "./ui/button";
 import { ArrowRight } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
+
+function BookCardSkeleton() {
+  return (
+    <div className="flex flex-col items-center rounded-xl overflow-hidden shadow w-full h-full p-0 max-h-96 min-h-96">
+      <div className="w-full flex flex-col items-center p-4">
+        <Skeleton className="h-48 w-32 object-cover mb-2 rounded shadow" />
+        <Skeleton className="h-5 w-24 mb-1 rounded" />
+        <Skeleton className="h-4 w-20 mb-1 rounded" />
+      </div>
+      <div className="w-full flex flex-col items-center px-4 pb-4">
+        <Skeleton className="h-3 w-16 mb-1 rounded" />
+        <Skeleton className="h-3 w-24 mb-1 rounded" />
+        <Skeleton className="h-3 w-20 mb-1 rounded" />
+      </div>
+    </div>
+  );
+}
 
 export default function CarouselDisplay({ title, books }: BookCarouselProps) {
+  const isLoading = books.length === 0;
+
   return (
     <section className="my-8">
       <div className="flex mb-4 items-center justify-between">
@@ -35,14 +55,23 @@ export default function CarouselDisplay({ title, books }: BookCarouselProps) {
         className="w-full max-w-4xl mx-auto"
       >
         <CarouselContent>
-          {books.map((book) => (
-            <CarouselItem
-              key={book.id}
-              className="basis-full sm:basis-1/2 md:basis-1/3 lg:basis-1/4"
-            >
-              <BookCard book={book} />
-            </CarouselItem>
-          ))}
+          {isLoading
+            ? Array.from({ length: 4 }).map((_, i) => (
+                <CarouselItem
+                  key={i}
+                  className="basis-full md:basis-1/3 lg:basis-1/4"
+                >
+                  <BookCardSkeleton />
+                </CarouselItem>
+              ))
+            : books.map((book) => (
+                <CarouselItem
+                  key={book.key}
+                  className="basis-full md:basis-1/3 lg:basis-1/4"
+                >
+                  <BookCard book={book} />
+                </CarouselItem>
+              ))}
         </CarouselContent>
         <CarouselPrevious className="sm:flex w-8 h-8" />
         <CarouselNext className="sm:flex w-8 h-8" />
