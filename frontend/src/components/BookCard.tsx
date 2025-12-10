@@ -22,7 +22,7 @@ export default function BookCard({ book }: { readonly book: BookType }) {
   }
 
   return (
-    <Card className="flex flex-col items-center bg-orange-100 rounded-xl gap-0 overflow-hidden shadow w-full h-full p-0 min-h-96">
+    <Card className="flex flex-col items-center rounded-xl gap-0 overflow-hidden shadow w-full h-full p-0 min-h-96">
       <CardHeader className="w-full flex flex-col items-center p-4">
         {cover ? (
           <img
