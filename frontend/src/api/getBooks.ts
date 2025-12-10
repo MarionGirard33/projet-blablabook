@@ -1,4 +1,4 @@
-import type { GetBooksParams } from "@/types";
+import type { GetBooksParams } from "@/types/books";
 import api from "./axios";
 
 export function getBooks(params: GetBooksParams) {

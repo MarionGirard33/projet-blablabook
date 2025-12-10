@@ -5,13 +5,24 @@ import {
   CardDescription,
   CardContent,
 } from "@/components/ui/card";
-import type { BookType } from "@/types";
+import type { BookType } from "@/types/books";
 
-export default function BookCard({ book }: { book: BookType }) {
+export default function BookCard({ book }: { readonly book: BookType }) {
   const cover = book.cover_id || book.cover_i;
 
+  let languageLabel = "Langue inconnue";
+  if (Array.isArray(book.language) && book.language.length > 0) {
+    if (book.language.includes("fre")) {
+      languageLabel = "Français";
+    } else if (book.language.includes("eng")) {
+      languageLabel = "Anglais";
+    } else {
+      languageLabel = "Autre langue";
+    }
+  }
+
   return (
-    <Card className="flex flex-col items-center rounded-xl gap-0 overflow-hidden shadow w-full h-full p-0 min-h-96">
+    <Card className="flex flex-col items-center bg-orange-100 rounded-xl gap-0 overflow-hidden shadow w-full h-full p-0 min-h-96">
       <CardHeader className="w-full flex flex-col items-center p-4">
         {cover ? (
           <img
@@ -34,11 +45,7 @@ export default function BookCard({ book }: { book: BookType }) {
       </CardHeader>
       <CardContent className="w-full flex flex-col items-center px-4 pb-0">
         <p className="text-xs text-gray-500 mb-1 text-center">
-          {book.language?.includes("fre")
-            ? "Français"
-            : book.language?.includes("eng")
-              ? "Anglais"
-              : "Autre langue"}
+          {languageLabel}
         </p>
         <p className="text-xs text-gray-500 mb-1 text-center">
           {book.first_publish_year

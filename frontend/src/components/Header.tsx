@@ -19,12 +19,12 @@ export default function Header() {
           <Link to="/" className="hover:underline">
             Accueil
           </Link>
-          {!user ? (
+          {user ? (
+            <Link to="/profile">{user.username}</Link>
+          ) : (
             <Link to="/login">
               <Button>Se connecter</Button>
             </Link>
-          ) : (
-            <Link to="/profile">{user.username}</Link>
           )}
         </nav>
         <button className="md:hidden" onClick={() => setOpen(true)}>
@@ -43,17 +43,17 @@ export default function Header() {
               >
                 Accueil
               </Link>
-              {!user ? (
-                <Link to="/login" onClick={() => setOpen(false)}>
-                  <Button>Se connecter</Button>
-                </Link>
-              ) : (
+              {user ? (
                 <Link
-                  to="/profile"
+                  to={{ to: "/profile" }}
                   className="text-white text-xl"
                   onClick={() => setOpen(false)}
                 >
                   {user.username}
+                </Link>
+              ) : (
+                <Link to={{ to: "/login" }} onClick={() => setOpen(false)}>
+                  <Button>Se connecter</Button>
                 </Link>
               )}
             </nav>

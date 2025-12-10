@@ -4,11 +4,11 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Search } from "lucide-react";
 
-export default function SearchBar({
-  onSearch,
-}: {
-  onSearch: (query: string) => void;
-}) {
+type SearchBarProps = {
+  readonly onSearch: (query: string) => void;
+};
+
+export default function SearchBar({ onSearch }: SearchBarProps) {
   const [query, setQuery] = useState("");
   const [debouncedQuery] = useDebounce(query, 400);
 
