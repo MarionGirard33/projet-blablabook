@@ -28,16 +28,14 @@ type RegisterFormData = {
 
 export default function RegisterPage() {
   const navigate = useNavigate();
-  const authStore = useAuthStore();
 
   const mutation = useMutation({
     mutationFn: async (data: RegisterFormData) => {
       return api.post("/auth/register", data);
     },
     onSuccess: (response) => {
-      // TODO: voir si redirection vers login et login gère l'auth
-      authStore.login(response.data);
-      navigate({ to: "/" })
+      // TODO: envoi un message pour indiquer que l'inscription à fonctionner 
+      navigate({ to: "/login" })
     },
     onError: (error: AxiosError<{ message?: string }>) => {
       console.error("Erreur serveur: ", error.message);
@@ -57,6 +55,7 @@ export default function RegisterPage() {
       mutation.mutate(value)
     },
     validators: {
+      // TODO: corriger le comportement du formulaire (efface l'input, cela conserve le state en erreur et il faut le reset)
       onChange: schema
     }
   })
