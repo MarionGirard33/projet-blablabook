@@ -17,6 +17,7 @@ const rootRoute = createRootRoute({
   notFoundComponent: () => <NotFound />,
 });
 
+// HOME ROUTE
 const homeRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/",
@@ -37,11 +38,12 @@ const libraryRoute = createRoute({
   component: () => <LibraryPage />,
 });
 
+// LOGIN ROUTE
 const loginPage = createRoute({
   getParentRoute: () => rootRoute,
   path: "/login",
-  component: () => <LoginPage />
-})
+  component: () => <LoginPage />,
+});
 // =====================================
   component: () => <RegisterPage />
 })
@@ -56,6 +58,8 @@ const bookDetailsRoute = createRoute({
 const routeTree = rootRoute.addChildren([
   homeRoute,
   registerPage,
+  loginPage,
+  libraryRoute,
   loginPage
   bookDetailsRoute,
 ]);

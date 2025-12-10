@@ -1,6 +1,6 @@
 import { z } from "zod";
-import { useNavigate } from "@tanstack/react-router";
 import { useMutation } from "@tanstack/react-query";
+import { useNavigate, Link } from "@tanstack/react-router";
 import api from "@/api/axios";
 import type { AxiosError } from "axios";
 import { useForm } from "@tanstack/react-form";
@@ -11,41 +11,54 @@ import type { BackendErrorResponse } from "@/components/Form/Types/form.type";
 import { useState } from "react";
 import FormGlobalError from "@/components/Form/FormGlobalError";
 
-const schema = z.object({
-  email: z.email("Email invalide").trim(),
-  username: z.string().min(2, "Le nom d'utilisateur doit contenir au moins 2 caractères").trim(),
-  password: z.string().min(8, "Le mot de passe doit contenir au moins 8 caractères").trim(),
-  confirmPassword: z.string().min(1, "Veuillez confirmer votre mot de passe").trim(),
-}).refine((data) => data.password === data.confirmPassword, {
-  message: "La confirmation du mot de passe a échouée",
-  path: ['confirmPassword'],
-});
+const schema = z
+  .object({
+    email: z.email("Email invalide").trim(),
+    username: z
+      .string()
+      .min(2, "Le nom d'utilisateur doit contenir au moins 2 caractères")
+      .trim(),
+    password: z
+      .string()
+      .min(8, "Le mot de passe doit contenir au moins 8 caractères")
+      .trim(),
+    confirmPassword: z
+      .string()
+      .min(1, "Veuillez confirmer votre mot de passe")
+      .trim(),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "La confirmation du mot de passe a échouée",
+    path: ["confirmPassword"],
+  });
 
 type RegisterFormData = {
   email: string;
   username: string;
   password: string;
-  confirmPassword: string
-}
-
-
+  confirmPassword: string;
+};
 
 export default function RegisterPage() {
   const navigate = useNavigate();
-  const [globalError, setGlobalError] = useState<string | null>(null)
+  const [globalError, setGlobalError] = useState<string | null>(null);
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const mutation = useMutation<any, AxiosError<BackendErrorResponse>, RegisterFormData>({
+  const mutation = useMutation<
+    any,
+    AxiosError<BackendErrorResponse>,
+    RegisterFormData
+  >({
     mutationFn: async (data: RegisterFormData) => {
       return api.post("/auth/register", data);
     },
     onSuccess: () => {
-      // TODO: envoi un message pour indiquer que l'inscription à fonctionner 
-      navigate({ to: "/login" })
+      // TODO: envoi un message pour indiquer que l'inscription à fonctionner
+      navigate({ to: "/login" });
     },
     onError: (error) => {
       console.error("Erreur serveur: ", error.message);
-    }
+    },
   });
 
   const defaultValues = {
@@ -53,7 +66,7 @@ export default function RegisterPage() {
     username: "",
     password: "",
     confirmPassword: "",
-  }
+  };
 
   const form = useForm({
     defaultValues,
@@ -61,28 +74,29 @@ export default function RegisterPage() {
       setGlobalError(null);
       mutation.mutate(value, {
         onError: (error) => {
-          const errorMessage = error.response?.data.message || "Une erreur est survenue";
+          const errorMessage =
+            error.response?.data.message || "Une erreur est survenue";
           setGlobalError(errorMessage);
 
-          form.setFieldValue('password', '');
-          form.setFieldValue('confirmPassword', '');
+          form.setFieldValue("password", "");
+          form.setFieldValue("confirmPassword", "");
 
-          form.setFieldMeta('password', (prev) => ({
+          form.setFieldMeta("password", (prev) => ({
             ...prev,
-            isTouched: false
-          }))
+            isTouched: false,
+          }));
 
-          form.setFieldMeta('confirmPassword', (prev) => ({
+          form.setFieldMeta("confirmPassword", (prev) => ({
             ...prev,
-            isTouched: false
-          }))
-        }
-      })
+            isTouched: false,
+          }));
+        },
+      });
     },
     validators: {
-      onChange: schema
-    }
-  })
+      onChange: schema,
+    },
+  });
 
   return (
     <form
@@ -93,41 +107,76 @@ export default function RegisterPage() {
         form.handleSubmit();
       }}
     >
-
       <FormTitle title="Inscription" />
 
-      {globalError && (
-        <FormGlobalError message={globalError} />
-      )}
+      {globalError && <FormGlobalError message={globalError} />}
 
       <form.Field name="email">
         {(field) => {
-          return <FormField field={field} type={"email"} label={"Email"} placeholder={""} />
+          return (
+            <FormField
+              field={field}
+              type={"email"}
+              label={"Email"}
+              placeholder={""}
+            />
+          );
         }}
       </form.Field>
 
       <form.Field name="username">
         {(field) => {
-          return <FormField field={field} type={"string"} label={"Nom d'utilisateur"} placeholder={""} />
+          return (
+            <FormField
+              field={field}
+              type={"string"}
+              label={"Nom d'utilisateur"}
+              placeholder={""}
+            />
+          );
         }}
       </form.Field>
 
       <form.Field name="password">
         {(field) => {
-          return <FormField field={field} type={"password"} label={"Mot de passe"} placeholder={""} />
+          return (
+            <FormField
+              field={field}
+              type={"password"}
+              label={"Mot de passe"}
+              placeholder={""}
+            />
+          );
         }}
       </form.Field>
 
       <form.Field name="confirmPassword">
         {(field) => {
-          return <FormField field={field} type={"password"} label={"Confirmation du mot de passe"} placeholder={""} />
+          return (
+            <FormField
+              field={field}
+              type={"password"}
+              label={"Confirmation du mot de passe"}
+              placeholder={""}
+            />
+          );
         }}
       </form.Field>
+
+      <p className="text-sm text-center mt-4">
+        Vous avez déjà un compte ?{" "}
+        <Link
+          to="/login"
+          className="text-blue-600 underline hover:text-blue-800"
+        >
+          Connectez-vous
+        </Link>
+      </p>
 
       <form.Subscribe
         selector={(state) => ({
           canSubmit: state.canSubmit,
-          isSubmitting: state.isSubmitting
+          isSubmitting: state.isSubmitting,
         })}
       >
         {({ canSubmit, isSubmitting }) => (
@@ -139,5 +188,5 @@ export default function RegisterPage() {
         )}
       </form.Subscribe>
     </form>
-  )
+  );
 }

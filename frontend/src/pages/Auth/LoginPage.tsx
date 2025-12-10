@@ -7,7 +7,7 @@ import type { BackendErrorResponse } from "@/components/Form/Types/form.type";
 import { useAuthStore } from "@/stores/authStore";
 import { useForm } from "@tanstack/react-form";
 import { useMutation } from "@tanstack/react-query";
-import { useNavigate } from "@tanstack/react-router";
+import { useNavigate, Link } from "@tanstack/react-router";
 import type { AxiosError } from "axios";
 import { useState } from "react";
 import { z } from "zod";
@@ -20,7 +20,7 @@ const schema = z.object({
 type LoginFormData = {
   username: string;
   password: string;
-}
+};
 
 export default function LoginPage() {
   const navigate = useNavigate();
@@ -29,23 +29,27 @@ export default function LoginPage() {
   const [globalError, setGlobalError] = useState<string | null>(null);
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const mutation = useMutation<any, AxiosError<BackendErrorResponse>, LoginFormData>({
+  const mutation = useMutation<
+    any,
+    AxiosError<BackendErrorResponse>,
+    LoginFormData
+  >({
     mutationFn: async (data: LoginFormData) => {
       return api.post("/auth/login", data);
     },
     onSuccess: (response) => {
       authStore.login(response.data);
-      navigate({ to: "/" })
+      navigate({ to: "/" });
     },
     onError: (error) => {
-      console.error("Erreur serveur: ", error.message)
-    }
-  })
+      console.error("Erreur serveur: ", error.message);
+    },
+  });
 
   const defaultValues = {
     username: "",
     password: "",
-  }
+  };
 
   const form = useForm({
     defaultValues,
@@ -54,22 +58,23 @@ export default function LoginPage() {
       mutation.mutate(value, {
         // if request failed, we set error message in the state, and reset input password
         onError: (error) => {
-          const errorMessage = error.response?.data?.message || "Une erreur est survenue"
+          const errorMessage =
+            error.response?.data?.message || "Une erreur est survenue";
           setGlobalError(errorMessage); // add error message to the globalError state
 
           // reset input password
-          form.setFieldValue('password', '');
-          form.setFieldMeta('password', (prev) => ({
+          form.setFieldValue("password", "");
+          form.setFieldMeta("password", (prev) => ({
             ...prev,
-            isTouched: false
-          }))
-        }
-      })
+            isTouched: false,
+          }));
+        },
+      });
     },
     validators: {
-      onChange: schema
-    }
-  })
+      onChange: schema,
+    },
+  });
 
   return (
     <form
@@ -80,29 +85,50 @@ export default function LoginPage() {
         form.handleSubmit();
       }}
     >
-
       <FormTitle title="Connexion" />
 
-      {globalError && (
-        <FormGlobalError message={globalError} />
-      )}
+      {globalError && <FormGlobalError message={globalError} />}
 
       <form.Field name="username">
         {(field) => {
-          return <FormField field={field} type={"string"} label={"Nom d'utilisateur"} placeholder={""} />
+          return (
+            <FormField
+              field={field}
+              type={"string"}
+              label={"Nom d'utilisateur"}
+              placeholder={""}
+            />
+          );
         }}
       </form.Field>
 
       <form.Field name="password">
         {(field) => {
-          return <FormField field={field} type={"password"} label={"Mot de passe"} placeholder={""} />
+          return (
+            <FormField
+              field={field}
+              type={"password"}
+              label={"Mot de passe"}
+              placeholder={""}
+            />
+          );
         }}
       </form.Field>
+
+      <p className="text-sm text-center mt-4">
+        Pas encore de compte ?{" "}
+        <Link
+          to="/register"
+          className="text-blue-600 underline hover:text-blue-800"
+        >
+          Créez-en un ici
+        </Link>
+      </p>
 
       <form.Subscribe
         selector={(state) => ({
           canSubmit: state.canSubmit,
-          isSubmitting: state.isSubmitting
+          isSubmitting: state.isSubmitting,
         })}
       >
         {({ canSubmit, isSubmitting }) => (
@@ -114,5 +140,5 @@ export default function LoginPage() {
         )}
       </form.Subscribe>
     </form>
-  )
+  );
 }
