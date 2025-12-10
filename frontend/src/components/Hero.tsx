@@ -3,7 +3,7 @@ import { Button } from "./ui/button";
 
 export default function Hero() {
   return (
-    <section className="w-full mt-6 px-2">
+    <section className="w-full mt-2 px-2">
       <div className="w-full py-8 rounded-xl shadow-xl bg-white flex flex-col items-center">
         <h1 className="text-xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-center mb-4 sm:mb-6">
           Découvrez, lisez, partagez vos lectures
