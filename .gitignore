@@ -42,6 +42,9 @@ Thumbs.db
 coverage/
 .cache/
 
+# Tanstack
+.tanstack/
+
 # Jest
 coverage/
 

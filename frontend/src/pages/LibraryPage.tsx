@@ -30,7 +30,7 @@ export default function LibraryPage() {
   const toReadCount = books?.filter((b) => b.status === "À lire").length || 0;
 
   return (
-    <div className="p-2 max-w-screen-xl mx-auto">
+    <div className="p-2 w-full">
       {/* Banner */}
       <div className="bg-bookcream rounded-xl p-6 shadow-md flex flex-col items-center">
         <h1 className="text-2xl font-bold mb-3 text-bookdark">
