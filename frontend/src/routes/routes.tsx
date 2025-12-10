@@ -16,6 +16,7 @@ const rootRoute = createRootRoute({
   notFoundComponent: () => <NotFound />,
 });
 
+// HOME ROUTE
 const homeRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/",
@@ -36,17 +37,19 @@ const libraryRoute = createRoute({
   component: () => <LibraryPage />,
 });
 
+// LOGIN ROUTE
 const loginPage = createRoute({
   getParentRoute: () => rootRoute,
   path: "/login",
-  component: () => <LoginPage />
-})
+  component: () => <LoginPage />,
+});
 // =====================================
 
 const routeTree = rootRoute.addChildren([
   homeRoute,
   registerPage,
-  loginPage
+  loginPage,
+  libraryRoute,
 ]);
 
 export const router = createRouter({

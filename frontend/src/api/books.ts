@@ -1,3 +1,4 @@
+import type { GetBooksParams } from "@/types/books";
 import api from "./axios";
 
 // -----------------------------
@@ -28,6 +29,15 @@ export interface CreateBookDto {
 // -----------------------------
 // API functions
 // -----------------------------
+
+export function getSearchBooks(params: GetBooksParams) {
+  const query: Record<string, string> = {};
+  if (params.type) query.type = params.type;
+  if (params.categoryName) query.categoryName = params.categoryName;
+  if (params.searchText) query.searchText = params.searchText;
+
+  return api.get(`/books/search`, { params: query });
+}
 
 // Get all books in book table
 export const getBooks = async (): Promise<Book[]> => {
