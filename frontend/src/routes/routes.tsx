@@ -2,7 +2,7 @@ import RootLayout from "@/layouts/RootLayout";
 import RegisterPage from "@/pages/Auth/RegisterPage";
 import HomePage from "@/pages/HomePage";
 import NotFound from "@/pages/NotFound";
-import ProfilePage from "@/pages/ProfilePage.tsx/ProfilePage";
+import ProfilePage from "@/pages/ProfilePage/ProfilePage";
 
 import {
   createRouter,
