@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useDebounce } from "use-debounce";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Search } from "lucide-react";
@@ -9,15 +10,21 @@ export default function SearchBar({
   onSearch: (query: string) => void;
 }) {
   const [query, setQuery] = useState("");
+  const [debouncedQuery] = useDebounce(query, 400);
+
+  useEffect(() => {
+    if (debouncedQuery && debouncedQuery.length >= 3) {
+      onSearch(debouncedQuery);
+    }
+  }, [debouncedQuery, onSearch]);
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
     setQuery(e.target.value);
-    onSearch(e.target.value);
   }
 
   return (
     <form
-      className="w-full max-w-md mx-auto flex items-center gap-2 bg-white rounded-lg shadow px-3 py-2 mt-6 sm:max-w-lg md:max-w-2xl"
+      className="w-full max-w-md mx-auto flex items-center gap-2 bg-white rounded-lg shadow px-3 py-2 mt-10 sm:max-w-lg md:max-w-2xl"
       onSubmit={(e) => {
         e.preventDefault();
         onSearch(query);
