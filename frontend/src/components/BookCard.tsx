@@ -1,10 +1,10 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Trash2 } from "lucide-react";
-import { type Book } from "@/stores/libraryStore";
+import type { InternalBook } from "@/types/books";
 
 type Props = {
-  book: Book;
-  onRemove: () => void;
+  readonly book: InternalBook;
+  readonly onRemove: () => void;
 };
 
 export function BookCard({ book, onRemove }: Props) {

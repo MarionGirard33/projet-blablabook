@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useLibraryStore } from "@/stores/libraryStore";
 import { BookCard } from "@/components/BookCard";
 import { Plus, Search } from "lucide-react";
+import type { InternalBook } from "@/types/books";
 //import { useAuth } from "@/contexts/AuthContext";
 
 export default function LibraryPage() {
@@ -20,14 +21,18 @@ export default function LibraryPage() {
     }
   }, [userId]);
 
-  const filteredBooks =
-    books?.filter((b) => b.name.toLowerCase().includes(search.toLowerCase())) ||
-    [];
+  const filteredBooks: InternalBook[] =
+    books?.filter((b: InternalBook) => {
+      const searchLower = search.toLowerCase();
+      return b.name.toLowerCase().includes(searchLower);
+    }) || [];
 
-  const readCount = books?.filter((b) => b.status === "Lu").length || 0;
+  const readCount =
+    books?.filter((b: InternalBook) => b.status === "Lu").length || 0;
   const readingCount =
-    books?.filter((b) => b.status === "En cours").length || 0;
-  const toReadCount = books?.filter((b) => b.status === "À lire").length || 0;
+    books?.filter((b: InternalBook) => b.status === "En cours").length || 0;
+  const toReadCount =
+    books?.filter((b: InternalBook) => b.status === "À lire").length || 0;
 
   return (
     <div className="p-2 w-full">
@@ -36,7 +41,10 @@ export default function LibraryPage() {
         <h1 className="text-2xl font-bold mb-3 text-bookdark">
           Ma Bibliothèque
         </h1>
-        <button className="px-4 py-2 bg-bookterracotta text-white rounded-lg flex items-center gap-2 text-sm shadow">
+        <button
+          className="px-4 py-2 bg-bookterracotta text-white rounded-lg flex items-center gap-2 text-sm shadow"
+          aria-label="Search books"
+        >
           <Plus size={16} />
           Ajouter
         </button>
@@ -64,7 +72,9 @@ export default function LibraryPage() {
           placeholder="Rechercher un livre, un auteur..."
           className="flex-1 p-2 border border-bookbeige rounded-lg text-sm bg-white text-bookdark"
           value={search}
-          onChange={(e) => setSearch(e.target.value)}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+            setSearch(e.target.value)
+          }
         />
         <button className="p-2 bg-bookochre rounded-lg text-white shadow">
           <Search size={18} />

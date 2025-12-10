@@ -3,19 +3,20 @@ import { db } from '../db';
 import { book, list, listBook } from '../db/schema';
 import { CreateBookDto } from './dto/create-book.dto';
 import { eq, and } from 'drizzle-orm';
+import { BookSelect, ListBookSelect } from './types/books';
 
 @Injectable()
 export class BooksService {
   // -------------------------------------------------------
   // Get all books from the 'book' table
   // -------------------------------------------------------
-  async findAllBooks() {
+  async findAllBooks(): Promise<BookSelect[]> {
     return db.select().from(book);
   }
   // -------------------------------------------------------
   // Get all books from a specific user's list
   // -------------------------------------------------------
-  async findUserBooks(userId: number) {
+  async findUserBooks(userId: number): Promise<BookSelect[]> {
     const rows = await db
       .select({
         id: book.id,
@@ -46,7 +47,10 @@ export class BooksService {
   // -------------------------------------------------------
   // Add a book to a user list
   // -------------------------------------------------------
-  async addToUserList(userId: number, createBookDto: CreateBookDto) {
+  async addToUserList(
+    userId: number,
+    createBookDto: CreateBookDto,
+  ): Promise<BookSelect> {
     // Check if the book already exists
     const found = await db
       .select()
@@ -96,7 +100,7 @@ export class BooksService {
     }
 
     // Add book to list
-    const newEntry = await db
+    await db
       .insert(listBook)
       .values({
         bookId: existingBook.id,
@@ -104,13 +108,16 @@ export class BooksService {
       })
       .returning();
 
-    return newEntry[0];
+    return existingBook;
   }
 
   // -------------------------------------------------------
   // Remove a book from user list
   // -------------------------------------------------------
-  async removeFromUserList(userId: number, bookId: number) {
+  async removeFromUserList(
+    userId: number,
+    bookId: number,
+  ): Promise<ListBookSelect[] | null> {
     // Retrieve user list
     const userListFound = await db
       .select()
