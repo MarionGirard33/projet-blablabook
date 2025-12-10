@@ -7,6 +7,9 @@ import { useForm } from "@tanstack/react-form";
 import FormTitle from "@/components/Form/FormTitle";
 import FormField from "@/components/Form/FormFields/FormField";
 import FormAction from "@/components/Form/FormAction/FormAction";
+import type { BackendErrorResponse } from "@/components/Form/Types/form.type";
+import { useState } from "react";
+import FormGlobalError from "@/components/Form/FormGlobalError";
 
 const schema = z.object({
   email: z.email("Email invalide").trim(),
@@ -25,10 +28,14 @@ type RegisterFormData = {
   confirmPassword: string
 }
 
+
+
 export default function RegisterPage() {
   const navigate = useNavigate();
+  const [globalError, setGlobalError] = useState<string | null>(null)
 
-  const mutation = useMutation({
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const mutation = useMutation<any, AxiosError<BackendErrorResponse>, RegisterFormData>({
     mutationFn: async (data: RegisterFormData) => {
       return api.post("/auth/register", data);
     },
@@ -36,7 +43,7 @@ export default function RegisterPage() {
       // TODO: envoi un message pour indiquer que l'inscription à fonctionner 
       navigate({ to: "/login" })
     },
-    onError: (error: AxiosError<{ message?: string }>) => {
+    onError: (error) => {
       console.error("Erreur serveur: ", error.message);
     }
   });
@@ -51,10 +58,28 @@ export default function RegisterPage() {
   const form = useForm({
     defaultValues,
     onSubmit: async ({ value }) => {
-      mutation.mutate(value)
+      setGlobalError(null);
+      mutation.mutate(value, {
+        onError: (error) => {
+          const errorMessage = error.response?.data.message || "Une erreur est survenue";
+          setGlobalError(errorMessage);
+
+          form.setFieldValue('password', '');
+          form.setFieldValue('confirmPassword', '');
+
+          form.setFieldMeta('password', (prev) => ({
+            ...prev,
+            isTouched: false
+          }))
+
+          form.setFieldMeta('confirmPassword', (prev) => ({
+            ...prev,
+            isTouched: false
+          }))
+        }
+      })
     },
     validators: {
-      // TODO: corriger le comportement du formulaire (efface l'input, cela conserve le state en erreur et il faut le reset)
       onChange: schema
     }
   })
@@ -70,6 +95,10 @@ export default function RegisterPage() {
     >
 
       <FormTitle title="Inscription" />
+
+      {globalError && (
+        <FormGlobalError message={globalError} />
+      )}
 
       <form.Field name="email">
         {(field) => {
