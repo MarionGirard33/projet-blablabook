@@ -1,23 +1,57 @@
 import BookCarousel from "@/components/CarouselDisplay";
 import Hero from "@/components/Hero";
 import SearchBar from "@/components/SearchBar";
-import booksData from "@/books.json";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { getBooks } from "@/api/getBooks";
 
 export default function HomePage() {
   const [search, setSearch] = useState("");
 
-  const randomBooks = booksData.random;
-  const horrorBooks = booksData.horror;
-  const featuredBooks = booksData.featured;
+  const [randomResults, setRandomResults] = useState([]);
+  const [searchResults, setSearchResults] = useState([]);
+  const [categoryResults, setCategoryResults] = useState([]);
+  const [bestsellersResults, setBestsellersResults] = useState([]);
+
+  useEffect(() => {
+    if (search.length >= 3) {
+      getBooks({ type: "search", searchText: search }).then((response) =>
+        setSearchResults(response.data)
+      );
+    } else {
+      setSearchResults([]);
+    }
+  }, [search]);
+
+  useEffect(() => {
+    if (!search) {
+      getBooks({ type: "random" }).then((response) =>
+        setRandomResults(response.data)
+      );
+      getBooks({ type: "category", categoryName: "horror" }).then((response) =>
+        setCategoryResults(response.data)
+      );
+      getBooks({ type: "category", categoryName: "bestsellers" }).then(
+        (response) => setBestsellersResults(response.data)
+      );
+    }
+  }, [search]);
 
   return (
     <div className="flex-col w-full">
       <Hero />
       <SearchBar onSearch={setSearch} />
-      <BookCarousel title={"A la une"} books={featuredBooks} />
-      <BookCarousel title={"Selection Aléatoire"} books={randomBooks} />
-      <BookCarousel title={"Horreur"} books={horrorBooks} />
+      {search.length >= 3 && searchResults.length > 0 ? (
+        <BookCarousel
+          title={`Résultats pour "${search}"`}
+          books={searchResults}
+        />
+      ) : (
+        <>
+          <BookCarousel title={"Sélection Aléatoire"} books={randomResults} />
+          <BookCarousel title={"À la une"} books={bestsellersResults} />
+          <BookCarousel title={"Horreur"} books={categoryResults} />
+        </>
+      )}
     </div>
   );
 }
