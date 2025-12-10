@@ -1,3 +1,66 @@
+import api from "./axios";
+
+// -----------------------------
+// Types
+// -----------------------------
+export interface Book {
+  id: number;
+  name: string;
+  coverId: string;
+  author: string;
+  description: string;
+  isbn: string;
+  publishingHouse: string;
+  publishedAt: string;
+  listName?: string;
+}
+
+export interface CreateBookDto {
+  name: string;
+  coverId: string;
+  author: string;
+  description: string;
+  isbn: string;
+  publishingHouse: string;
+  publishedAt: string; // YYYY-MM-DD
+}
+
+// -----------------------------
+// API functions
+// -----------------------------
+
+// Get all books in book table
+export const getBooks = async (): Promise<Book[]> => {
+  const response = await api.get<Book[]>("/books");
+  return response.data;
+};
+
+// Get all books from a specific user's list
+export const getUserBooks = async (userId: number): Promise<Book[]> => {
+  const response = await api.get<Book[]>(`/books/user/${userId}`);
+  return response.data;
+};
+
+// Add a book to a user's list
+export const addBookToUserList = async (
+  userId: number,
+  bookData: CreateBookDto
+): Promise<Book> => {
+  const response = await api.post<Book>(`/books/user/${userId}`, bookData);
+  return response.data;
+};
+
+// Remove a book from a user's list
+export const removeBookFromUserList = async (
+  userId: number,
+  bookId: number
+): Promise<{ id: number }[]> => {
+  const response = await api.delete<{ id: number }[]>(
+    `/books/user/${userId}/book/${bookId}`
+  );
+  return response.data;
+};
+
 import axios from "axios";
 import { getMockBookDetails } from "./mockBooks";
 import type { Book } from "../types/Book";

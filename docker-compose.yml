@@ -33,10 +33,11 @@ services:
       # Drizzle url
       - DATABASE_URL=${DATABASE_URL}
       - JWT_SECRET=${JWT_SECRET}
+      - FRONTEND_URL_CORS=${FRONTEND_URL_CORS}
       # - REDIS_HOST=${REDIS_HOST}
       # - REDIS_PORT=${REDIS_PORT}
-      # test hot reload
       - CHOKIDAR_USEPOLLING=true
+      - FRONTEND_URL_CORS=${FRONTEND_URL_CORS}
     ports:
       # Publish backend port to host for direct access
       - "3000:3000"

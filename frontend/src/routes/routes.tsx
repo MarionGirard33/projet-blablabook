@@ -1,7 +1,9 @@
 import RootLayout from "@/layouts/RootLayout";
+import LoginPage from "@/pages/Auth/LoginPage";
 import RegisterPage from "@/pages/Auth/RegisterPage";
 import HomePage from "@/pages/HomePage";
 import NotFound from "@/pages/NotFound";
+import LibraryPage from "@/pages/LibraryPage";
 import BookDetails from "@/pages/BookDetails";
 
 import {
@@ -21,10 +23,26 @@ const homeRoute = createRoute({
   component: () => <HomePage />,
 });
 
-// AUTH ROUTE 
+// AUTH ROUTE
 const registerPage = createRoute({
   getParentRoute: () => rootRoute,
   path: "/register",
+  component: () => <RegisterPage />,
+});
+
+// LIBRARY ROUTE
+const libraryRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/library",
+  component: () => <LibraryPage />,
+});
+
+const loginPage = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/login",
+  component: () => <LoginPage />
+})
+// =====================================
   component: () => <RegisterPage />
 })
 
@@ -38,6 +56,7 @@ const bookDetailsRoute = createRoute({
 const routeTree = rootRoute.addChildren([
   homeRoute,
   registerPage,
+  loginPage
   bookDetailsRoute,
 ]);
 
