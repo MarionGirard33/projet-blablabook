@@ -1,60 +1,52 @@
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-  CardContent,
-} from "@/components/ui/card";
-import type { BookType } from "@/types/books";
+import { Card, CardContent } from "@/components/ui/card";
+import { Trash2 } from "lucide-react";
+import type { InternalBook } from "@/types/books";
 
-export default function BookCard({ book }: { readonly book: BookType }) {
-  const cover = book.cover_id || book.cover_i;
+type Props = {
+  readonly book: InternalBook;
+  readonly onRemove: () => void;
+};
 
-  let languageLabel = "Langue inconnue";
-  if (Array.isArray(book.language) && book.language.length > 0) {
-    if (book.language.includes("fre")) {
-      languageLabel = "Français";
-    } else if (book.language.includes("eng")) {
-      languageLabel = "Anglais";
-    } else {
-      languageLabel = "Autre langue";
-    }
-  }
-
+export function BookCard({ book, onRemove }: Props) {
   return (
-    <Card className="flex flex-col items-center rounded-xl gap-0 overflow-hidden shadow w-full h-full p-0 min-h-96">
-      <CardHeader className="w-full flex flex-col items-center p-4">
-        {cover ? (
+    <Card className="w-full max-w-md shadow-lg relative rounded-xl overflow-hidden p-0">
+      {/* Book cover */}
+      <div className="relative">
+        {book.coverId ? (
           <img
-            src={`https://covers.openlibrary.org/b/id/${cover}-M.jpg`}
-            alt={book.title}
-            className="h-48 w-32 object-cover mb-2 rounded shadow"
-            style={{ maxHeight: "12rem", minHeight: "12rem" }}
+            //src={`https://covers.openlibrary.org/b/id/${book.coverId}-M.jpg`}
+            src={book.coverId} // dev
+            alt={book.name}
+            className="w-full h-70 object-cover"
           />
         ) : (
-          <div className="h-48 w-32 bg-gray-200 flex items-center justify-center rounded mb-1">
-            <span className="text-xs text-gray-500">No cover</span>
-          </div>
+          <div className="bg-gray-200 w-full h-56 animate-pulse" />
         )}
-        <CardTitle className="font-bold text-base mb-1 text-center line-clamp-2">
-          {book.title}
-        </CardTitle>
-        <CardDescription className="text-sm text-gray-700 text-center line-clamp-1">
-          {book.author_name ? book.author_name.join(", ") : "Auteur inconnu"}
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="w-full flex flex-col items-center px-4 pb-0">
-        <p className="text-xs text-gray-500 mb-1 text-center">
-          {languageLabel}
-        </p>
-        <p className="text-xs text-gray-500 mb-1 text-center">
-          {book.first_publish_year
-            ? `Première publication : ${book.first_publish_year}`
-            : ""}
-        </p>
-        <p className="text-xs text-gray-500 mb-0 text-center">
-          {book.edition_count ? `${book.edition_count} édition(s)` : ""}
-        </p>
+
+        {/* Status badge */}
+        {book.status && (
+          <span className="absolute top-3 left-3 px-3 py-1 text-xs font-semibold rounded-full shadow bg-bookcream text-bookdark">
+            {book.status}
+          </span>
+        )}
+
+        {/* Delete button */}
+        <button
+          onClick={onRemove}
+          className="absolute top-3 right-3 p-1 bg-white/80 rounded-full shadow hover:bg-white transition"
+        >
+          <Trash2 size={16} className="text-red-600" />
+        </button>
+      </div>
+
+      <CardContent className="p-4 flex flex-col gap-3 items-start">
+        <div className="text-left">
+          <h3 className="font-semibold text-lg">{book.name}</h3>
+          <p className="text-sm text-gray-600">{book.author}</p>
+          {book.description && (
+            <p className="text-sm text-gray-700 mt-1">{book.description}</p>
+          )}
+        </div>
       </CardContent>
     </Card>
   );

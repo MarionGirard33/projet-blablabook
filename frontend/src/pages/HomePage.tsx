@@ -1,8 +1,8 @@
+import { getSearchBooks } from "@/api/books";
 import BookCarousel from "@/components/CarouselDisplay";
 import Hero from "@/components/Hero";
 import SearchBar from "@/components/SearchBar";
 import { useState, useEffect } from "react";
-import { getBooks } from "@/api/getBooks";
 
 export default function HomePage() {
   const [search, setSearch] = useState("");
@@ -14,7 +14,7 @@ export default function HomePage() {
 
   useEffect(() => {
     if (search.length >= 3) {
-      getBooks({ type: "search", searchText: search }).then((response) =>
+      getSearchBooks({ type: "search", searchText: search }).then((response) =>
         setSearchResults(response.data)
       );
     } else {
@@ -24,13 +24,13 @@ export default function HomePage() {
 
   useEffect(() => {
     if (!search) {
-      getBooks({ type: "random" }).then((response) =>
+      getSearchBooks({ type: "random" }).then((response) =>
         setRandomResults(response.data)
       );
-      getBooks({ type: "category", categoryName: "horror" }).then((response) =>
-        setCategoryResults(response.data)
+      getSearchBooks({ type: "category", categoryName: "horror" }).then(
+        (response) => setCategoryResults(response.data)
       );
-      getBooks({ type: "category", categoryName: "bestsellers" }).then(
+      getSearchBooks({ type: "category", categoryName: "bestsellers" }).then(
         (response) => setBestsellersResults(response.data)
       );
     }

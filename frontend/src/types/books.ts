@@ -19,3 +19,18 @@ export type GetBooksParams = {
   categoryName?: string;
   searchText?: string;
 };
+
+export type InternalBook = {
+  id: number;
+  name: string;
+  author: string;
+  coverId: string;
+  description: string;
+  isbn: string;
+  publishingHouse: string;
+  publishedAt: string;
+  listName?: string;
+  status?: "Lu" | "En cours" | "À lire";
+  readStart?: string;
+  readEnd?: string;
+};

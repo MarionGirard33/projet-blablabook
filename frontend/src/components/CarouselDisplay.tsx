@@ -6,11 +6,11 @@ import {
   CarouselPrevious,
 } from "@/components/ui/carousel";
 import { Link } from "@tanstack/react-router";
-import BookCard from "./BookCard";
 import type { BookCarouselProps } from "@/types/books";
 import { Button } from "./ui/button";
 import { ArrowRight } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
+import BookCardCarousel from "./BookCardCarousel";
 
 function BookCardSkeleton() {
   return (
@@ -72,7 +72,7 @@ export default function CarouselDisplay({
                   key={book.key}
                   className="basis-full md:basis-1/3 lg:basis-1/4"
                 >
-                  <BookCard book={book} />
+                  <BookCardCarousel book={book} />
                 </CarouselItem>
               ))}
         </CarouselContent>
