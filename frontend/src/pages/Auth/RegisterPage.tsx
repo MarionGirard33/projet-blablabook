@@ -1,4 +1,3 @@
-import FormTitle from "./Components/FormTitle";
 import { z } from "zod";
 import { useNavigate } from "@tanstack/react-router";
 import { useAuthStore } from "@/stores/authStore";
@@ -6,8 +5,9 @@ import { useMutation } from "@tanstack/react-query";
 import api from "@/api/axios";
 import type { AxiosError } from "axios";
 import { useForm } from "@tanstack/react-form";
-import FormField from "./Components/FormFields/FormField";
-import FormAction from "./Components/FormAction/FormAction";
+import FormTitle from "@/components/Form/FormTitle";
+import FormField from "@/components/Form/FormFields/FormField";
+import FormAction from "@/components/Form/FormAction/FormAction";
 
 const schema = z.object({
   email: z.email("Email invalide").trim(),
@@ -27,18 +27,17 @@ type RegisterFormData = {
 }
 
 export default function RegisterPage() {
-  // const navigate = useNavigate();
-  // const authStore = useAuthStore();
+  const navigate = useNavigate();
+  const authStore = useAuthStore();
 
   const mutation = useMutation({
     mutationFn: async (data: RegisterFormData) => {
       return api.post("/auth/register", data);
     },
     onSuccess: (response) => {
-      console.log(response);
-      // TODO: implémenter lorsque le back sera OK
-      // authStore.login(response.data);
-      // navigate({ to: "/" })
+      // TODO: voir si redirection vers login et login gère l'auth
+      authStore.login(response.data);
+      navigate({ to: "/" })
     },
     onError: (error: AxiosError<{ message?: string }>) => {
       console.error("Erreur serveur: ", error.message);
@@ -64,7 +63,7 @@ export default function RegisterPage() {
 
   return (
     <form
-      className="border w-150"
+      className="w-150 flex flex-col items-center"
       onSubmit={(e) => {
         e.preventDefault();
         e.stopPropagation();

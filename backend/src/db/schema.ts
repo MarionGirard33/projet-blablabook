@@ -17,7 +17,7 @@ export const users = pgTable('user', {
   id: serial().primaryKey(),
   email: varchar().unique().notNull(),
   password: varchar().notNull(),
-  username: varchar({ length: 50 }),
+  username: varchar({ length: 50 }).notNull().unique(),
   image: varchar(),
   role: userRoleEnum().default('USER').notNull(),
   createdAt: timestamp('created_at').defaultNow().notNull(),
@@ -115,6 +115,15 @@ export const review = pgTable('review', {
   bookId: integer('book_id')
     .references(() => book.id)
     .notNull(),
+  userId: integer('user_id')
+    .references(() => users.id)
+    .notNull(),
+});
+
+export const refreshToken = pgTable('refresh_token', {
+  id: serial().primaryKey(),
+  token: varchar().notNull(),
+  createdAt: timestamp().defaultNow().notNull(),
   userId: integer('user_id')
     .references(() => users.id)
     .notNull(),
