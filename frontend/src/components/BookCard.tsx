@@ -1,35 +1,53 @@
 import {
   Card,
-  CardContent,
   CardHeader,
   CardTitle,
   CardDescription,
+  CardContent,
 } from "@/components/ui/card";
 import type { BookType } from "@/types";
 
 export default function BookCard({ book }: { book: BookType }) {
+  const cover = book.cover_id || book.cover_i;
+
   return (
-    <Card className="cursor-pointer flex flex-col p-0 h-full transition-transform duration-200 hover:scale-105 hover:shadow-xl bg-orange-100 rounded-xl overflow-hidden">
-      <img
-        src={book.cover}
-        alt={book.title}
-        className="w-full h-40 object-cover rounded-t-xl"
-      />
-      <CardHeader className="flex-1">
-        <CardTitle className="text-base mb-1">{book.title}</CardTitle>
-        <CardDescription className="text-sm text-gray-600 mb-2">
-          {book.author}
+    <Card className="flex flex-col items-center bg-orange-100 rounded-xl overflow-hidden shadow w-full h-full p-0 min-h-96">
+      <CardHeader className="w-full flex flex-col items-center p-4">
+        {cover ? (
+          <img
+            src={`https://covers.openlibrary.org/b/id/${cover}-M.jpg`}
+            alt={book.title}
+            className="h-48 w-32 object-cover mb-2 rounded shadow"
+            style={{ maxHeight: "12rem", minHeight: "12rem" }}
+          />
+        ) : (
+          <div className="h-48 w-32 bg-gray-200 flex items-center justify-center rounded mb-1">
+            <span className="text-xs text-gray-500">No cover</span>
+          </div>
+        )}
+        <CardTitle className="font-bold text-base mb-1 text-center line-clamp-2">
+          {book.title}
+        </CardTitle>
+        <CardDescription className="text-sm text-gray-700 text-center line-clamp-1">
+          {book.author_name ? book.author_name.join(", ") : "Auteur inconnu"}
         </CardDescription>
-        <p className="text-xs text-gray-500 mb-2">
-          {book.genre} • {book.year}
-        </p>
-        <p className="text-xs text-gray-700 mb-2 line-clamp-2">
-          {book.description}
-        </p>
       </CardHeader>
-      <CardContent className="flex items-center justify-between px-4 pb-4">
-        <span className="text-yellow-500 font-semibold">★ {book.rating}</span>
-        <span className="text-xs text-gray-400">{book.pages} pages</span>
+      <CardContent className="w-full flex flex-col items-center px-4 pb-0">
+        <p className="text-xs text-gray-500 mb-1 text-center">
+          {book.language?.includes("fre")
+            ? "Français"
+            : book.language?.includes("eng")
+              ? "Anglais"
+              : "Autre langue"}
+        </p>
+        <p className="text-xs text-gray-500 mb-1 text-center">
+          {book.first_publish_year
+            ? `Première publication : ${book.first_publish_year}`
+            : ""}
+        </p>
+        <p className="text-xs text-gray-500 mb-0 text-center">
+          {book.edition_count ? `${book.edition_count} édition(s)` : ""}
+        </p>
       </CardContent>
     </Card>
   );
