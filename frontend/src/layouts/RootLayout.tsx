@@ -1,6 +1,6 @@
+import { Link, Outlet } from "@tanstack/react-router";
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
-import { Outlet } from "@tanstack/react-router";
 
 export default function RootLayout() {
   return (
