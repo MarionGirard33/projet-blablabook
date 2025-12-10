@@ -3,6 +3,7 @@ import { useLibraryStore } from "@/stores/libraryStore";
 import { BookCard } from "@/components/BookCard";
 import { Plus, Search } from "lucide-react";
 import type { InternalBook } from "@/types/books";
+import { AddBookModal } from "../components/AddBookModal";
 //import { useAuth } from "@/contexts/AuthContext";
 
 export default function LibraryPage() {
@@ -13,6 +14,7 @@ export default function LibraryPage() {
   const removeBook = useLibraryStore((s) => s.removeBook);
 
   const [search, setSearch] = useState("");
+  const [open, setOpen] = useState(false);
 
   // Load books
   useEffect(() => {
@@ -42,12 +44,19 @@ export default function LibraryPage() {
           Ma Bibliothèque
         </h1>
         <button
+          onClick={() => setOpen(true)}
           className="px-4 py-2 bg-bookterracotta text-white rounded-lg flex items-center gap-2 text-sm shadow"
           aria-label="Search books"
         >
           <Plus size={16} />
           Ajouter
         </button>
+        {/* Modale */}
+        <AddBookModal
+          isOpen={open}
+          onClose={() => setOpen(false)}
+          userId={userId}
+        />
       </div>
 
       {/* Status */}
