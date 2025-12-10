@@ -33,6 +33,7 @@ services:
       # Drizzle url
       - DATABASE_URL=${DATABASE_URL}
       - JWT_SECRET=${JWT_SECRET}
+      - FRONTEND_URL_CORS=${FRONTEND_URL_CORS}
       # - REDIS_HOST=${REDIS_HOST}
       # - REDIS_PORT=${REDIS_PORT}
       - CHOKIDAR_USEPOLLING=true

@@ -3,6 +3,7 @@ import LoginPage from "@/pages/Auth/LoginPage";
 import RegisterPage from "@/pages/Auth/RegisterPage";
 import HomePage from "@/pages/HomePage";
 import NotFound from "@/pages/NotFound";
+import LibraryPage from "@/pages/LibraryPage";
 
 import {
   createRouter,
@@ -21,12 +22,19 @@ const homeRoute = createRoute({
   component: () => <HomePage />,
 });
 
-// AUTH ROUTE =======================
+// AUTH ROUTE
 const registerPage = createRoute({
   getParentRoute: () => rootRoute,
   path: "/register",
-  component: () => <RegisterPage />
-})
+  component: () => <RegisterPage />,
+});
+
+// LIBRARY ROUTE
+const libraryRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/library",
+  component: () => <LibraryPage />,
+});
 
 const loginPage = createRoute({
   getParentRoute: () => rootRoute,
