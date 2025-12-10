@@ -7,7 +7,6 @@ import { useForm } from "@tanstack/react-form";
 import { useMutation } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
 import type { AxiosError } from "axios";
-import { validators } from "tailwind-merge";
 import { z } from "zod";
 
 const schema = z.object({
@@ -21,17 +20,16 @@ type LoginFormData = {
 }
 
 export default function LoginPage() {
-  // const navigate = useNavigate();
-  // const authStore = useAuthStore();
+  const navigate = useNavigate();
+  const authStore = useAuthStore();
 
   const mutation = useMutation({
     mutationFn: async (data: LoginFormData) => {
       return api.post("/auth/login", data);
     },
     onSuccess: (response) => {
-      console.log(response);
-      // authStore.login(response.data);
-      // navigate({ to: "/"})
+      authStore.login(response.data);
+      navigate({ to: "/" })
     },
     onError: (error: AxiosError<{ message?: string }>) => {
       console.error("Erreur serveur: ", error.message)

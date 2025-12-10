@@ -1,6 +1,5 @@
 import { z } from "zod";
 import { useNavigate } from "@tanstack/react-router";
-import { useAuthStore } from "@/stores/authStore";
 import { useMutation } from "@tanstack/react-query";
 import api from "@/api/axios";
 import type { AxiosError } from "axios";
@@ -33,7 +32,7 @@ export default function RegisterPage() {
     mutationFn: async (data: RegisterFormData) => {
       return api.post("/auth/register", data);
     },
-    onSuccess: (response) => {
+    onSuccess: () => {
       // TODO: envoi un message pour indiquer que l'inscription à fonctionner 
       navigate({ to: "/login" })
     },

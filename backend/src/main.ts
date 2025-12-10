@@ -8,8 +8,8 @@ async function bootstrap() {
 
   // enabled CORS
   app.enableCors({
-    origin: process.env.FRONTEND_URL_CORS,
-    // origin: 'http://localhost:5173', //TODO: passer sur la variable .env
+    // origin: process.env.FRONTEND_URL_CORS,
+    origin: 'http://localhost:5173', //TODO: passer sur la variable .env => pas encore réussis à faire fonctionner
     credentials: true,
   });
 
