@@ -46,7 +46,7 @@ const loginPage = createRoute({
 });
 
 // DETAILS BOOK ROUTE
-export const bookDetailsRoute = createRoute({
+const bookDetailsRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/books/:id",
   component: () => <BookDetails />,

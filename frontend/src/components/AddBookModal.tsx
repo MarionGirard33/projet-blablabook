@@ -10,10 +10,11 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Search, X } from "lucide-react";
+import { Check, Search, X } from "lucide-react";
 
 import { useQuery } from "@tanstack/react-query";
 import { searchExternalBooks } from "@/api/books";
+import { useLibraryStore } from "@/stores/libraryStore";
 
 import type { BookType } from "@/types/books";
 
@@ -24,6 +25,7 @@ type AddBookModalProps = {
 
 export function AddBookModal({ isOpen, onClose }: AddBookModalProps) {
   const [query, setQuery] = useState("");
+  const userBooks = useLibraryStore((state) => state.books);
 
   // Reset query and results when modal closes
   const handleClose = () => {
@@ -55,6 +57,13 @@ export function AddBookModal({ isOpen, onClose }: AddBookModalProps) {
     const id = rawKey.includes("/") ? rawKey.split("/").pop() : rawKey;
     if (!id) return;
     navigate({ to: `/books/${id}` });
+  };
+
+  // Check if a book result is already in the library
+  const isInLibrary = (externalBook: BookType) => {
+    if (!externalBook.isbn?.length) return false;
+
+    return userBooks.some((b) => externalBook.isbn!.includes(b.isbn));
   };
 
   return (
@@ -107,44 +116,52 @@ export function AddBookModal({ isOpen, onClose }: AddBookModalProps) {
         {isFetching && <p>Chargement...</p>}
 
         <div className="max-h-[500px] overflow-y-auto mt-4">
-          {results.map((book) => (
-            <button
-              key={book.key}
-              onClick={() => handleCardClick(book)}
-              className="
-                w-full 
-                bg-bookcream
-                flex items-center gap-4
-                mb-4 p-3
-                border rounded-lg
-                hover:bg-gray-50
-                text-left
-              "
-            >
-              {book.cover_i ? (
-                <img
-                  src={`https://covers.openlibrary.org/b/id/${book.cover_i}-M.jpg`}
-                  alt={book.title}
-                  className="w-16 h-24 object-cover rounded"
-                />
-              ) : (
-                <div className="w-16 h-24 bg-gray-200 rounded" />
-              )}
+          {results.map((book) => {
+            const alreadyInLibrary = isInLibrary(book);
 
-              <div>
-                <p className="font-semibold text-lg">{book.title}</p>
-                <p className="text-sm text-gray-600">
-                  {book.author_name?.[0] || "Unknown"}
-                </p>
-
-                {book.first_publish_year && (
-                  <p className="text-xs text-gray-500">
-                    {book.first_publish_year}
-                  </p>
+            return (
+              <button
+                key={book.key}
+                onClick={() => !alreadyInLibrary && handleCardClick(book)}
+                disabled={alreadyInLibrary}
+                className={`
+                  relative w-full bg-bookcream flex items-center gap-4
+                  mb-4 p-3 border rounded-lg text-left
+                  ${alreadyInLibrary ? "opacity-50 cursor-not-allowed" : "hover:bg-gray-50"}
+                `}
+              >
+                {alreadyInLibrary && (
+                  <Check
+                    className="absolute top-2 right-2 text-green-600"
+                    size={22}
+                  />
                 )}
-              </div>
-            </button>
-          ))}
+
+                {book.cover_i ? (
+                  <img
+                    src={`https://covers.openlibrary.org/b/id/${book.cover_i}-M.jpg`}
+                    alt={book.title}
+                    className="w-16 h-24 object-cover rounded"
+                  />
+                ) : (
+                  <div className="w-16 h-24 bg-gray-200 rounded" />
+                )}
+
+                <div>
+                  <p className="font-semibold text-lg">{book.title}</p>
+                  <p className="text-sm text-gray-600">
+                    {book.author_name?.[0] || "Unknown"}
+                  </p>
+
+                  {book.first_publish_year && (
+                    <p className="text-xs text-gray-500">
+                      {book.first_publish_year}
+                    </p>
+                  )}
+                </div>
+              </button>
+            );
+          })}
         </div>
       </DialogContent>
     </Dialog>

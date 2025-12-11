@@ -12,6 +12,7 @@ export type BookType = {
   cover_id?: number;
   cover_i?: number;
   edition_count?: number;
+  isbn?: string[];
 };
 
 export type GetBooksParams = {
