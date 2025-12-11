@@ -1,6 +1,5 @@
 import type { GetBooksParams, BookType, InternalBook } from "@/types/books";
-import { api } from "./axios";
-import { openLibraryApi } from "./axios";
+import { api, externalApi } from "./axios";
 
 // -----------------------------
 // Types
@@ -70,7 +69,7 @@ export const removeBookFromUserList = async (
 export const searchExternalBooks = async (
   searchText: string
 ): Promise<BookType[]> => {
-  const response = await openLibraryApi.get("/search.json", {
+  const response = await externalApi.get("/search.json", {
     params: { q: searchText, limit: 30 },
   });
 
@@ -89,7 +88,7 @@ export const searchExternalBooks = async (
 export const getExternalBooksByCategory = async (
   categoryName: string
 ): Promise<BookType[]> => {
-  const response = await openLibraryApi.get(`/subjects/${categoryName}.json`, {
+  const response = await externalApi.get(`/subjects/${categoryName}.json`, {
     params: { limit: 30 },
   });
 

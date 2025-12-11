@@ -5,6 +5,6 @@ export const api = axios.create({
   withCredentials: true,
 });
 
-export const openLibraryApi = axios.create({
+export const externalApi = axios.create({
   baseURL: "https://openlibrary.org",
 });

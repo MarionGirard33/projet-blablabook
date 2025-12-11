@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "@tanstack/react-router";
 import {
   Dialog,
   DialogContent,
@@ -44,6 +45,16 @@ export function AddBookModal({ isOpen, onClose }: AddBookModalProps) {
   const handleSearch = () => {
     if (!query.trim()) return;
     refetch();
+  };
+
+  const navigate = useNavigate();
+
+  const handleCardClick = (book: BookType) => {
+    // Extract the last segment of the key (e.g., “works/OL82586W” -> “OL82586W”)
+    const rawKey = book.key?.toString() ?? "";
+    const id = rawKey.includes("/") ? rawKey.split("/").pop() : rawKey;
+    if (!id) return;
+    navigate({ to: `/books/${id}` });
   };
 
   return (
@@ -97,14 +108,17 @@ export function AddBookModal({ isOpen, onClose }: AddBookModalProps) {
 
         <div className="max-h-[500px] overflow-y-auto mt-4">
           {results.map((book) => (
-            <div
+            <button
               key={book.key}
+              onClick={() => handleCardClick(book)}
               className="
+                w-full 
                 bg-bookcream
                 flex items-center gap-4
                 mb-4 p-3
                 border rounded-lg
                 hover:bg-gray-50
+                text-left
               "
             >
               {book.cover_i ? (
@@ -129,7 +143,7 @@ export function AddBookModal({ isOpen, onClose }: AddBookModalProps) {
                   </p>
                 )}
               </div>
-            </div>
+            </button>
           ))}
         </div>
       </DialogContent>
