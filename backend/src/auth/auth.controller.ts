@@ -6,7 +6,9 @@ import {
   Body,
   HttpCode,
   HttpStatus,
+  Res,
 } from '@nestjs/common';
+import type { Response } from 'express';
 import { AuthService } from './auth.service';
 import {
   ApiCreatedResponse,
@@ -17,6 +19,7 @@ import { RegisterResponseDto } from './dto/register-response.dto';
 import { RegisterRequestDto } from './dto/register-request.dto';
 import { LoginRequestDto } from './dto/login-request.dto';
 import { LoginResponseDto } from './dto/login-response.dto';
+import { plainToInstance } from 'class-transformer';
 
 @ApiTags('auth') // annotation swagger => permet de grouper la classe sous l'étiquette auth dans la documentation
 @UseInterceptors(ClassSerializerInterceptor) // permet de gérer l'exclude du DTO response => retirer les field avec @Exclude dans le dto de reponse
@@ -48,8 +51,37 @@ export class AuthController {
   // HttpCode permet de définir son propre code statut
   @HttpCode(HttpStatus.OK)
   // TOOD: add doc swagger
-  async login(@Body() payload: LoginRequestDto): Promise<LoginResponseDto> {
-    // TODO: ajouter les cookie refreshToken & JWTToken sur la response
-    return this.authService.login(payload);
+  async login(
+    @Body() payload: LoginRequestDto,
+    // passthrough allow use cookie and return it
+    @Res({ passthrough: true }) response: Response,
+  ): Promise<LoginResponseDto> {
+    // get user if credentials is valid
+    const user = await this.authService.login(payload);
+
+    // generate jwt token and refresh token
+    const jwtToken = await this.authService.generateJWTToken(
+      user.id,
+      user.role,
+    );
+    const refreshToken = await this.authService.generateRefreshToken(user.id);
+
+    // config and add cookie to response
+    const cookieConfig = this.authService.generateCookiesConfig();
+    response.cookie('jwt_cookie', jwtToken, cookieConfig.jwtCookieConfig);
+    response.cookie(
+      'refresh_cookie',
+      refreshToken,
+      cookieConfig.refreshCookieConfig,
+    );
+
+    // return response with user data
+    return plainToInstance(LoginResponseDto, user, {
+      excludeExtraneousValues: true,
+    });
   }
+
+  // TODO: implémenter le logout => il doit supprimer les token + envoyer les cookie de suppression pour le front
+  @Post('/logout')
+  async logout() {}
 }

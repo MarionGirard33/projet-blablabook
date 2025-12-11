@@ -11,12 +11,20 @@ import argon2 from 'argon2';
 import { UserInsert } from 'src/users/types/users';
 import { RegisterResponseDto } from './dto/register-response.dto';
 import { LoginRequestDto } from './dto/login-request.dto';
-import { LoginResponseDto } from './dto/login-response.dto';
+import { JwtService } from '@nestjs/jwt';
+import { randomBytes } from 'crypto';
+import { JwtPayload, TokenInsert, TokenSelect } from './types/token.type';
+import { db } from 'src/db';
+import { refreshToken } from 'src/db/schema';
+import { CookieOptions } from 'express';
 
 @Injectable()
 export class AuthService {
   // injection de dépendances pour accéder aux méthodes
-  constructor(private readonly userService: UsersService) {}
+  constructor(
+    private readonly userService: UsersService,
+    private readonly jwtService: JwtService,
+  ) {}
 
   async login(payload: LoginRequestDto) {
     const user = await this.userService.getUserByUsername(payload.username);
@@ -42,13 +50,84 @@ export class AuthService {
       throw new UnauthorizedException('invalid credentials');
     }
 
-    // TODO: créer le token JWT
-    // TODO: créer le refresh token
-    return plainToInstance(LoginResponseDto, user, {
-      excludeExtraneousValues: true,
-    });
+    return user;
   }
 
+  generateCookiesConfig() {
+    // if we set TRUE, we need to be on HTTPS, so for the dev we use false for save the cookie
+    const secureProps = process.env.NODE_ENV === 'prod';
+
+    const jwtCookieConfig: CookieOptions = {
+      httpOnly: true,
+      secure: secureProps,
+      sameSite: 'strict',
+      maxAge: 15 * 60 * 1000, // 15min
+    };
+
+    const refreshCookieConfig: CookieOptions = {
+      httpOnly: true,
+      secure: secureProps,
+      sameSite: 'strict',
+      path: '/',
+      maxAge: 30 * 24 * 60 * 60 * 1000, // 30 day
+    };
+
+    return {
+      refreshCookieConfig,
+      jwtCookieConfig,
+    };
+  }
+
+  async generateJWTToken(userId: number, userRole: string) {
+    const payload: JwtPayload = {
+      sub: userId,
+      userRole,
+    };
+
+    let jwtToken: string;
+    try {
+      jwtToken = await this.jwtService.signAsync(payload);
+    } catch (err) {
+      let errorMessage = 'failed to sign JWT token';
+      if (err instanceof Error) {
+        errorMessage = err.message;
+      }
+      console.error('failed to sign JWT token: ', errorMessage);
+      throw new InternalServerErrorException(errorMessage);
+    }
+
+    return jwtToken;
+  }
+
+  async generateRefreshToken(userId: number): Promise<string> {
+    // generate random string for the refresh token
+    const refreshToken = randomBytes(32).toString('hex');
+    // hash token
+    const hashedRefreshToken = await argon2.hash(refreshToken);
+
+    const tokenData: TokenInsert = {
+      token: hashedRefreshToken,
+      userId,
+    };
+
+    // store token in db
+    const token = await this.storeRefreshToken(tokenData);
+    if (!token) {
+      console.error('Failed to store new refresh token');
+      throw new InternalServerErrorException(
+        'failed to store new refresh token',
+      );
+    }
+
+    return refreshToken;
+  }
+
+  async storeRefreshToken(payload: TokenInsert): Promise<TokenSelect | null> {
+    const result = await db.insert(refreshToken).values(payload).returning();
+    return result[0] ?? null;
+  }
+
+  // REGISTER ====================================================================
   async register(payload: RegisterRequestDto) {
     if (payload.password !== payload.confirmPassword) {
       throw new UnprocessableEntityException('password is not confirmed');

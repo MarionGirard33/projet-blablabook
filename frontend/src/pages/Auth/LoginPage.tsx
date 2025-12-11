@@ -28,8 +28,8 @@ export default function LoginPage() {
   // state for global error if request is failed
   const [globalError, setGlobalError] = useState<string | null>(null);
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const mutation = useMutation<
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     any,
     AxiosError<BackendErrorResponse>,
     LoginFormData
