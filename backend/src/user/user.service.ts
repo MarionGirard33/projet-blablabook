@@ -1,38 +1,48 @@
-import * as bcrypt from 'bcrypt';
+import * as argon2 from 'argon2';
 import { eq } from 'drizzle-orm';
 import { users } from '../db/schema';
-import { UpdateUserDto } from './dto/update-user.dto';
 import { NotFoundException } from '@nestjs/common';
 import { db } from 'src/db';
+import { plainToInstance } from 'class-transformer';
+import { UpdateUserResponseDto } from './dto/update-user.response.dto';
+import { UpdateUserRequestDto } from './dto/update-user.request.dto';
 
 export class UserService {
-
-  async update(id: number, data: UpdateUserDto) {
+  async update(id: number, data: UpdateUserRequestDto) {
     const updateData = { ...data };
 
     if (updateData.password) {
-      updateData.password = await bcrypt.hash(updateData.password, 10);
+      updateData.password = await argon2.hash(updateData.password);
     }
 
-    const [updatedUser] = await db.update(users)
+    const [updatedUser] = await db
+      .update(users)
       .set(updateData)
       .where(eq(users.id, id))
       .returning();
 
     if (!updatedUser) {
-      throw new NotFoundException(`User with id ${id} not found`);
+      throw new NotFoundException(`User not found`);
     }
 
-    const { password, ...safeUser } = updatedUser;
-    return safeUser;
+    return plainToInstance(UpdateUserResponseDto, updatedUser, {
+      excludeExtraneousValues: true,
+    });
   }
 
   async findById(id: number) {
-    const [user] = await db.select().from(users).where(eq(users.id, id)).limit(1);
+    const [user] = await db
+      .select()
+      .from(users)
+      .where(eq(users.id, id))
+      .limit(1);
+
     if (!user) {
       throw new NotFoundException(`User with id ${id} not found`);
     }
-    const { password, ...safeUser } = user;
-    return safeUser;
+
+    return plainToInstance(UpdateUserResponseDto, user, {
+      excludeExtraneousValues: true,
+    });
   }
 }

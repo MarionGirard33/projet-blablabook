@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { Button } from "@/components/ui/button"
+import api from "@/api/axios";
 
 type UpdateUserFormProps = {
   userId: number;
@@ -26,6 +28,7 @@ export default function UpdateUserForm({ userId, initialData, onClose, onUpdate 
     e.preventDefault();
 
     if (formData.password !== formData.confirmPassword) {
+      //TODO créer une modale
       alert("Les mots de passe ne correspondent pas !");
       return;
     }
@@ -38,22 +41,20 @@ export default function UpdateUserForm({ userId, initialData, onClose, onUpdate 
 
     if (formData.password) body.password = formData.password;
 
-    const res = await fetch(`http://localhost:3000/user/${userId}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(body),
-    });
-
-    if (res.ok) {
+    try {
+      await api.patch(`/user/${userId}`, body); 
+      //TODO créer une modale
       alert("Profil mis à jour !");
       const updatedUser = { username: formData.username, email: formData.email, image: formData.image };
       if (onUpdate) onUpdate(updatedUser);
       if (onClose) onClose();
-    } else {
+    } catch (error) {
+      console.error(error);
+      //TODO créer une modale
       alert("Erreur lors de la mise à jour.");
     }
-  };
-
+  }
+  
   return (
     <form onSubmit={handleSubmit} className="max-w-md mx-auto p-6 bg-white shadow rounded space-y-4">
 
@@ -139,9 +140,9 @@ export default function UpdateUserForm({ userId, initialData, onClose, onUpdate 
       </div>
 
       {/* valider */}   
-      <button type="submit" className="w-full mt-4 bg-blue-600 text-white py-2 rounded hover:bg-blue-700 cursor-pointer">
+      <Button type="submit" className="w-full mt-4 cursor-pointer">
         Enregistrer
-      </button>
+      </Button>
     </form>
   );
 }

@@ -1,3 +1,4 @@
+import type { User } from "./interface/user.interface";
 import UpdateUserForm from "./UpdateUserForm";
 import { X } from "lucide-react";
 
@@ -5,7 +6,7 @@ type ProfileModalProps = {
   userId: number;
   userData: { email: string; username: string; image: string };
   onClose: () => void;
-  onUpdate?: (updatedUser: { email: string; username: string; image: string }) => void;
+  onUpdate: (updatedUser: User) => void
 };
 
 export default function ProfileModal({ userId, userData, onClose, onUpdate }: ProfileModalProps) {
@@ -16,7 +17,14 @@ export default function ProfileModal({ userId, userData, onClose, onUpdate }: Pr
         <X size={20} color="black" />
       </button>
       <h2 className="text-xl flex justify-center font-semibold my-6">Modifier mon profil</h2>
-      <UpdateUserForm userId={userId} initialData={userData} onClose={onClose} onUpdate={onUpdate}  />
+      <UpdateUserForm
+        userId={userId}
+        initialData={userData}
+        onClose={onClose}
+        onUpdate={(updatedFields) => {
+          onUpdate({ id: userId, ...updatedFields });
+        }}
+      />
     </div>
   </div>
   );
