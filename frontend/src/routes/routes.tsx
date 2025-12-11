@@ -16,6 +16,7 @@ const rootRoute = createRootRoute({
   notFoundComponent: () => <NotFound />,
 });
 
+// HOME ROUTE
 const homeRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/",
@@ -36,6 +37,7 @@ const libraryRoute = createRoute({
   component: () => <LibraryPage />,
 });
 
+// LOGIN ROUTE
 const loginPage = createRoute({
   getParentRoute: () => rootRoute,
   path: "/login",
