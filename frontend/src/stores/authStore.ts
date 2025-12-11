@@ -1,3 +1,4 @@
+import api from "@/api/axios";
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 
@@ -26,8 +27,22 @@ export const useAuthStore = create<AuthStoreProps>()(
       login: (user) => {
         set({ user, isAuthenticated: true });
       },
-      logout: () => {
-        set({ user: null, isAuthenticated: false });
+      logout: async () => {
+        try {
+          await api.post("/auth/logout"); // back end is only one who can destroy cookie
+          // if promise failed, auto go to the catch
+        } catch (err) {
+          console.error("erreur server: ", err);
+        } finally {
+          // if request failed, we cleared the user's data but cookie is not deleted
+          // with finally bloc, user is not stopped when serveur is down
+          // reset the global state
+          set({ user: null, isAuthenticated: false });
+          // delete the local storage
+          localStorage.removeItem("auth_storage");
+          // redirect user to homepage and reload all state
+          window.location.href = "/";
+        }
       },
     }),
     {

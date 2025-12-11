@@ -83,5 +83,13 @@ export class AuthController {
 
   // TODO: implémenter le logout => il doit supprimer les token + envoyer les cookie de suppression pour le front
   @Post('/logout')
-  async logout() {}
+  async logout(@Res({ passthrough: true }) response: Response) {
+    // TODO: aller supprimer le refresh token lié à l'user => récupérer le token via le cookie après avoir implémenter le guard
+    const isDestoyToken = await this.authService.destoyToken(token);
+
+    const cookieConfig = this.authService.generateCookiesConfig();
+
+    response.clearCookie('jwt_cookie', cookieConfig.jwtCookieConfig);
+    response.clearCookie('refresh_cookie', cookieConfig.refreshCookieConfig);
+  }
 }

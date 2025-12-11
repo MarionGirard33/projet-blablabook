@@ -39,9 +39,9 @@ export default function Header() {
                 <DropdownMenu>
                   <DropdownMenuTrigger className="cursor-pointer" asChild>
                     <Avatar>
-                      {user.avatarUrl ? (
+                      {user.image ? (
                         <img
-                          src={user.avatarUrl}
+                          src={user.image}
                           alt={user.username}
                           className="w-8 h-8 rounded-full"
                         />

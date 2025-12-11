@@ -26,6 +26,7 @@ export class AuthService {
     private readonly jwtService: JwtService,
   ) {}
 
+  // LOGIN ================================================
   async login(payload: LoginRequestDto) {
     const user = await this.userService.getUserByUsername(payload.username);
     if (!user) {
