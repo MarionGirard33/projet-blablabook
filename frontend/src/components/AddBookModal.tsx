@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -10,61 +10,44 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Search, X } from "lucide-react";
-import axios from "axios";
+
+import { useQuery } from "@tanstack/react-query";
+import { searchExternalBooks } from "@/api/books";
 
 import type { BookType } from "@/types/books";
 
-type SearchExternalBookModalProps = {
+type AddBookModalProps = {
   readonly isOpen: boolean;
   readonly onClose: () => void;
 };
 
-export function AddBookModal({
-  isOpen,
-  onClose,
-}: SearchExternalBookModalProps) {
+export function AddBookModal({ isOpen, onClose }: AddBookModalProps) {
   const [query, setQuery] = useState("");
-  const [results, setResults] = useState<BookType[]>([]);
-  const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    if (!isOpen) {
-      setQuery("");
-      setResults([]);
-      setLoading(false);
-    }
-  }, [isOpen]);
+  // Reset query and results when modal closes
+  const handleClose = () => {
+    setQuery("");
+    onClose();
+  };
 
-  const handleSearch = async () => {
+  // TanStack Query to look for books
+  const {
+    data: results = [],
+    isFetching,
+    refetch,
+  } = useQuery<BookType[]>({
+    enabled: false, // don't fetch on mount
+    queryKey: ["externalBooks", query],
+    queryFn: () => searchExternalBooks(query),
+  });
+
+  const handleSearch = () => {
     if (!query.trim()) return;
-
-    setLoading(true);
-    try {
-      const res = await axios.get("https://openlibrary.org/search.json", {
-        params: { q: query, limit: 10 },
-      });
-
-      const books: BookType[] = res.data.docs.map((doc: any) => ({
-        key: doc.key,
-        author_name: doc.author_name || [],
-        first_publish_year: doc.first_publish_year,
-        language: doc.language || [],
-        title: doc.title,
-        cover_id: doc.cover_id,
-        cover_i: doc.cover_i,
-        edition_count: doc.edition_count,
-      }));
-
-      setResults(books);
-    } catch (err) {
-      console.error("Error searching external books:", err);
-    } finally {
-      setLoading(false);
-    }
+    refetch();
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
+    <Dialog open={isOpen} onOpenChange={handleClose}>
       <DialogContent
         className="
           w-full
@@ -80,6 +63,7 @@ export function AddBookModal({
         <DialogDescription className="sr-only">
           Rechercher un livre.
         </DialogDescription>
+
         <DialogHeader>
           <DialogTitle className="text-2xl font-semibold">
             Rechercher un livre
@@ -109,7 +93,7 @@ export function AddBookModal({
           </Button>
         </div>
 
-        {loading && <p>Chargement...</p>}
+        {isFetching && <p>Chargement...</p>}
 
         <div className="max-h-[500px] overflow-y-auto mt-4">
           {results.map((book) => (

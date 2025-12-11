@@ -1,21 +1,10 @@
-import type { GetBooksParams } from "@/types/books";
-import api from "./axios";
+import type { GetBooksParams, BookType, InternalBook } from "@/types/books";
+import { api } from "./axios";
+import { openLibraryApi } from "./axios";
 
 // -----------------------------
 // Types
 // -----------------------------
-export interface Book {
-  id: number;
-  name: string;
-  coverId: string;
-  author: string;
-  description: string;
-  isbn: string;
-  publishingHouse: string;
-  publishedAt: string;
-  listName?: string;
-}
-
 export interface CreateBookDto {
   name: string;
   coverId: string;
@@ -27,7 +16,7 @@ export interface CreateBookDto {
 }
 
 // -----------------------------
-// API functions
+// Internal API functions
 // -----------------------------
 
 export function getSearchBooks(params: GetBooksParams) {
@@ -40,14 +29,14 @@ export function getSearchBooks(params: GetBooksParams) {
 }
 
 // Get all books in book table
-export const getBooks = async (): Promise<Book[]> => {
-  const response = await api.get<Book[]>("/books");
+export const getBooks = async (): Promise<InternalBook[]> => {
+  const response = await api.get<InternalBook[]>("/books");
   return response.data;
 };
 
 // Get all books from a specific user's list
-export const getUserBooks = async (userId: number): Promise<Book[]> => {
-  const response = await api.get<Book[]>(`/books/user/${userId}`);
+export const getUserBooks = async (userId: number): Promise<InternalBook[]> => {
+  const response = await api.get<InternalBook[]>(`/books/user/${userId}`);
   return response.data;
 };
 
@@ -55,8 +44,11 @@ export const getUserBooks = async (userId: number): Promise<Book[]> => {
 export const addBookToUserList = async (
   userId: number,
   bookData: CreateBookDto
-): Promise<Book> => {
-  const response = await api.post<Book>(`/books/user/${userId}`, bookData);
+): Promise<InternalBook> => {
+  const response = await api.post<InternalBook>(
+    `/books/user/${userId}`,
+    bookData
+  );
   return response.data;
 };
 
@@ -69,4 +61,46 @@ export const removeBookFromUserList = async (
     `/books/user/${userId}/book/${bookId}`
   );
   return response.data;
+};
+
+// -----------------------------
+// External API (OpenLibrary)
+// -----------------------------
+
+export const searchExternalBooks = async (
+  searchText: string
+): Promise<BookType[]> => {
+  const response = await openLibraryApi.get("/search.json", {
+    params: { q: searchText, limit: 30 },
+  });
+
+  return response.data.docs.map((item: BookType) => ({
+    key: item.key,
+    author_name: item.author_name || [],
+    first_publish_year: item.first_publish_year,
+    language: item.language || [],
+    title: item.title,
+    cover_id: item.cover_id,
+    cover_i: item.cover_i,
+    edition_count: item.edition_count,
+  }));
+};
+
+export const getExternalBooksByCategory = async (
+  categoryName: string
+): Promise<BookType[]> => {
+  const response = await openLibraryApi.get(`/subjects/${categoryName}.json`, {
+    params: { limit: 30 },
+  });
+
+  return response.data.works.map((work: BookType) => ({
+    key: work.key,
+    author_name: work.author_name || [],
+    first_publish_year: work.first_publish_year,
+    language: work.language || [],
+    title: work.title,
+    cover_id: work.cover_id,
+    cover_i: work.cover_id, // OpenLibrary uses cover_id
+    edition_count: work.edition_count,
+  }));
 };

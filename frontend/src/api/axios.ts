@@ -1,8 +1,10 @@
 import axios from "axios";
 
-const api = axios.create({
+export const api = axios.create({
   baseURL: "http://localhost:3000",
   withCredentials: true,
 });
 
-export default api;
+export const openLibraryApi = axios.create({
+  baseURL: "https://openlibrary.org",
+});
