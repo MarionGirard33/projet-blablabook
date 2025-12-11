@@ -1,12 +1,23 @@
 import { useState } from "react";
-import { Link } from "@tanstack/react-router";
-import { useAuthStore } from "@/stores/authStore";
+import { Link, useNavigate } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import { Menu, X, Book } from "lucide-react";
+import { Avatar } from "@/components/ui/avatar";
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+} from "@/components/ui/dropdown-menu";
+import { useAuthStore } from "@/stores/authStore";
 
 export default function Header() {
   const user = useAuthStore((state) => state.user);
+  const logout = useAuthStore((state) => state.logout);
+  // const user = true;
   const [open, setOpen] = useState(false);
+
+  const navigate = useNavigate();
 
   return (
     <header className=" px-4 py-4 bg-white shadow relative">
@@ -20,7 +31,45 @@ export default function Header() {
             Accueil
           </Link>
           {user ? (
-            <Link to="/profile">{user.username}</Link>
+            <>
+              <Link to="/library" className="hover:underline">
+                Librairie
+              </Link>
+              <div className="hidden md:flex items-center">
+                <DropdownMenu>
+                  <DropdownMenuTrigger className="cursor-pointer" asChild>
+                    <Avatar>
+                      {user.avatarUrl ? (
+                        <img
+                          src={user.avatarUrl}
+                          alt={user.username}
+                          className="w-8 h-8 rounded-full"
+                        />
+                      ) : (
+                        <img
+                          src="https://cdn-icons-png.flaticon.com/512/29/29302.png"
+                          alt="Book avatar"
+                          className="w-8 h-8 rounded-full bg-gray-200"
+                        />
+                      )}
+                    </Avatar>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuItem
+                      onClick={() => navigate({ to: "/profile" })}
+                    >
+                      Profil
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      className="text-red-500"
+                      onClick={() => logout()}
+                    >
+                      Déconnexion
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
+            </>
           ) : (
             <Link to="/login">
               <Button>Se connecter</Button>
@@ -44,15 +93,34 @@ export default function Header() {
                 Accueil
               </Link>
               {user ? (
-                <Link
-                  to={{ to: "/profile" }}
-                  className="text-white text-xl"
-                  onClick={() => setOpen(false)}
-                >
-                  {user.username}
-                </Link>
+                <>
+                  <Link
+                    to="/library"
+                    className="text-white text-xl"
+                    onClick={() => setOpen(false)}
+                  >
+                    Librairie
+                  </Link>
+                  <Link
+                    to="/profile"
+                    className="text-white text-xl"
+                    onClick={() => setOpen(false)}
+                  >
+                    {user.username ?? "Profil"}
+                  </Link>
+                  <Button
+                    variant="destructive"
+                    className="text-white"
+                    onClick={() => {
+                      logout();
+                      setOpen(false);
+                    }}
+                  >
+                    Déconnexion
+                  </Button>
+                </>
               ) : (
-                <Link to={{ to: "/login" }} onClick={() => setOpen(false)}>
+                <Link to="/login" onClick={() => setOpen(false)}>
                   <Button>Se connecter</Button>
                 </Link>
               )}
