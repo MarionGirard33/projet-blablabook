@@ -7,3 +7,8 @@ export type JwtPayload = {
   sub: number;
   userRole: string;
 };
+
+export type TokenExtractorData = {
+  jwtCookie: string | null;
+  refreshTokenCookie: string | null;
+};
