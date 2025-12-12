@@ -1,16 +1,12 @@
 import { useEffect, useState } from "react";
-import { useLibraryStore } from "@/stores/libraryStore";
 import { BookCard } from "@/components/BookCard";
 import { Plus, Search } from "lucide-react";
-import type { InternalBook } from "@/types/books";
+import type { Book } from "../@types/books";
 //import { useAuth } from "@/contexts/AuthContext";
 
 export default function LibraryPage() {
   //const { userId } = useAuth();
   const userId = 1; // dev
-  const books = useLibraryStore((s) => s.books);
-  const loadBooks = useLibraryStore((s) => s.loadBooks);
-  const removeBook = useLibraryStore((s) => s.removeBook);
 
   const [search, setSearch] = useState("");
 
@@ -21,18 +17,18 @@ export default function LibraryPage() {
     }
   }, [userId]);
 
-  const filteredBooks: InternalBook[] =
-    books?.filter((b: InternalBook) => {
+  const filteredBooks: Book[] =
+    books?.filter((b: Book) => {
       const searchLower = search.toLowerCase();
       return b.name.toLowerCase().includes(searchLower);
     }) || [];
 
   const readCount =
-    books?.filter((b: InternalBook) => b.status === "Lu").length || 0;
+    books?.filter((b: Book) => b.status === "Lu").length || 0;
   const readingCount =
-    books?.filter((b: InternalBook) => b.status === "En cours").length || 0;
+    books?.filter((b: Book) => b.status === "En cours").length || 0;
   const toReadCount =
-    books?.filter((b: InternalBook) => b.status === "À lire").length || 0;
+    books?.filter((b: Book) => b.status === "À lire").length || 0;
 
   return (
     <div className="p-2 w-full">
