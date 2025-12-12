@@ -6,7 +6,7 @@ import {
   CarouselPrevious,
 } from "@/components/ui/carousel";
 import { Link } from "@tanstack/react-router";
-import type { BookCarouselProps } from "@/types/books";
+import type { ExternalBookCarouselProps } from "../@types/externalBooks";
 import { Button } from "./ui/button";
 import { ArrowRight } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -32,7 +32,7 @@ function BookCardSkeleton() {
 export default function CarouselDisplay({
   title,
   books,
-}: Readonly<BookCarouselProps>) {
+}: Readonly<ExternalBookCarouselProps>) {
   const isLoading = books.length === 0;
 
   return (
