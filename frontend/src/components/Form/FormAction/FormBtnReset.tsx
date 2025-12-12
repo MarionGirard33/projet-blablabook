@@ -1,9 +1,6 @@
 import { Button } from "@/components/ui/button";
-import type { AnyFormApi } from "@tanstack/react-form";
+import type { FormBtnReset } from "@/@types/form";
 
-type FormBtnReset = {
-  readonly form: AnyFormApi;
-}
 
 export default function FormBtnReset({ form }: FormBtnReset) {
   return (

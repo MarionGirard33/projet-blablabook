@@ -1,6 +1,4 @@
-type FormTitleProps = {
-  readonly title: string;
-}
+import type { FormTitleProps } from "@/@types/form";
 
 export default function FormTitle({ title }: FormTitleProps) {
   return (
