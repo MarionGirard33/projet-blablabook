@@ -8,10 +8,6 @@ export type FormGlobalErrorProps = {
   message: string;
 };
 
-export type BackendErrorResponse = {
-  message: string;
-};
-
 export type FormFieldProps = {
   readonly field: AnyFieldApi;
   readonly type: string;
@@ -42,4 +38,9 @@ export type FormBtnReset = {
 export type FormBtnSubmit = {
   readonly canSubmit: boolean;
   readonly isSubmitting: boolean;
+};
+
+// type axios error
+export type BackendErrorResponse = {
+  message: string;
 };
