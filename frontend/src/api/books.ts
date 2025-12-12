@@ -1,36 +1,12 @@
-import type { GetBooksParams } from "@/types/books";
+import type { GetExternalBooksParams } from "../@types/externalBooks";
+import type { CreateBookDto , Book } from "../@types/books"
 import api from "./axios";
-
-// -----------------------------
-// Types
-// -----------------------------
-export interface Book {
-  id: number;
-  name: string;
-  coverId: string;
-  author: string;
-  description: string;
-  isbn: string;
-  publishingHouse: string;
-  publishedAt: string;
-  listName?: string;
-}
-
-export interface CreateBookDto {
-  name: string;
-  coverId: string;
-  author: string;
-  description: string;
-  isbn: string;
-  publishingHouse: string;
-  publishedAt: string; // YYYY-MM-DD
-}
 
 // -----------------------------
 // API functions
 // -----------------------------
 
-export function getSearchBooks(params: GetBooksParams) {
+export function getSearchBooks(params: GetExternalBooksParams) {
   const query: Record<string, string> = {};
   if (params.type) query.type = params.type;
   if (params.categoryName) query.categoryName = params.categoryName;
