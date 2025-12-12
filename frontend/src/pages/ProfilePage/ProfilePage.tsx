@@ -2,15 +2,16 @@
   import { Pencil } from "lucide-react";
   import ProfilePageModal from "./ProfilePageModale";
   import { useQuery, useQueryClient, type UseQueryOptions } from "@tanstack/react-query";
-  import type { User } from "./interface/user.interface";
+  import type { User } from "./@types/user";
   import { Button } from "@/components/ui/button";
   import api from "@/api/axios";
+  import { useDeleteUser } from "./mutation/deleteUser.mutation";
 
-  
   export default function ProfilePage({ userId }: { userId: number }) {
     const [isModalOpen, setIsModalOpen] = useState(false);
 
     const queryClient = useQueryClient();
+    
     const queryOptions: UseQueryOptions<User, Error> = {
       queryKey: ["user", userId],
       queryFn: async (): Promise<User> => {
@@ -21,11 +22,13 @@
 
     const { data: user, isLoading, isError, error } = useQuery<User, Error>(queryOptions);
 
+    const deleteUserMutation = useDeleteUser(userId);
+
     if (isLoading) return <div>Loading...</div>;
     if (isError) return <div>{error?.message}</div>;
 
     return (
-      <div className="w-full max-w-md h-[70vh] mx-auto flex flex-col justify-center p-4">
+      <div className="w-full max-w-md h-[70vh] mx-auto flex flex-col justify-center p-2">
 
         {/* Carré principal */}
         <div className="w-full border border-black rounded-lg bg-gray-50 p-6 flex flex-col justify-between h-[85%] mt-4">
@@ -65,16 +68,11 @@
           </div>
 
           {/* Bouton supprimer en bas */}
-          <Button variant="destructive" 
-            className="cursor-pointer"
-            onClick={async () => {
-              //TODO créer une modale
-              if (confirm("Supprimer votre compte ?")) {
-                await api.delete(`/user/${userId}`);
-              }
-            }}
+          <Button
+            disabled={deleteUserMutation.isPending}
+            onClick={() => deleteUserMutation.mutate()}
           >
-            Supprimer mon compte
+            {deleteUserMutation.isPending ? "Suppression..." : "Supprimer mon compte"}
           </Button>
         </div>
 
