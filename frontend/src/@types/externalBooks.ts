@@ -21,7 +21,6 @@ export type GetExternalBooksParams = {
   searchText?: string;
 };
 
-// Todo revoir type @mohini
 export type ExternalBookDisplayData = {
   title: string;
   authors: string[];

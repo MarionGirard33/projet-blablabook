@@ -1,5 +1,5 @@
 import React from "react";
-import { Globe, Library, FileText, Barcode } from "lucide-react";
+import { Globe, Library, FileText, Barcode, Calendar, Star } from "lucide-react";
 import { BookDataItem } from "./ui/item";
 
 interface BookDataGridProps {
@@ -7,20 +7,38 @@ interface BookDataGridProps {
   publisher: string;
   language: string;
   pages: number | string;
+  publishedAt: string;
+  categories: string[] | string;
+  rating?: number;  
 }
 
-export const BookDataGrid: React.FC<BookDataGridProps> = ({ isbn, publisher, language, pages }) => (
+export const BookDataGrid: React.FC<BookDataGridProps> = ({ isbn, publisher, language, pages, publishedAt, categories, rating }) => (
   <div className="bg-card border border-border rounded-xl p-6 mt-6 shadow-sm">
     {/* BookDataGrid displays book technical details using BookDataItem for each field */}
     <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
       {/* ISBN field */}
-      <BookDataItem icon={<Barcode size={18} />} label="ISBN" value={isbn} />
+      <BookDataItem icon={<Barcode size={18} />} label="code ISBN" value={isbn} />
       {/* Language field */}
-      <BookDataItem icon={<Globe size={18} />} label="Language" value={language} />
+      <BookDataItem icon={<Globe size={18} />} label="Langues" value={language} />
+      {/* Date field */}
+      <BookDataItem icon={<Calendar size={18} />} label="Date de publication" value={publishedAt} />
       {/* Publisher field */}
-      <BookDataItem icon={<Library size={18} />} label="Publisher" value={publisher} />
+      <BookDataItem icon={<Library size={18} />} label="Éditeur" value={publisher} />
       {/* Pages field */}
       <BookDataItem icon={<FileText size={18} />} label="Pages" value={pages} />
+      {/* Categories field */}
+      <BookDataItem
+        icon={<FileText size={18} />}
+        label="Catégories"
+        value={Array.isArray(categories) ? categories.join(", ") : categories}
+      />
+      {/* Only display the rating badge if a rating is provided */}
+      {rating !== undefined && (
+        <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-muted border border-border text-sm font-medium text-foreground shadow-sm">
+          <Star size={16} className="text-bookochre fill-bookochre" aria-hidden="true" /> 
+          <span>{rating}/5</span>
+        </div>
+      )}
     </div>
   </div>
 );
