@@ -1,19 +1,9 @@
-import type { GetExternalBooksParams } from "../@types/externalBooks";
-import type { CreateBookDto , Book } from "../@types/books"
+import type { CreateBookDto, Book } from "../@types/books";
 import api from "./axios";
 
 // -----------------------------
 // API functions
 // -----------------------------
-
-export function getSearchBooks(params: GetExternalBooksParams) {
-  const query: Record<string, string> = {};
-  if (params.type) query.type = params.type;
-  if (params.categoryName) query.categoryName = params.categoryName;
-  if (params.searchText) query.searchText = params.searchText;
-
-  return api.get(`/books/search`, { params: query });
-}
 
 // Get all books in book table
 export const getBooks = async (): Promise<Book[]> => {
