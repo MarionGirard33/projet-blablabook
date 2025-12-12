@@ -1,40 +1,38 @@
-import { getSearchBooks } from "@/api/books";
 import BookCarousel from "@/components/CarouselDisplay";
 import Hero from "@/components/Hero";
 import SearchBar from "@/components/SearchBar";
-import { useState, useEffect } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { useState } from "react";
+import { getExternalBooks } from "@/api/externalBooks";
 
 export default function HomePage() {
   const [search, setSearch] = useState("");
 
-  const [randomResults, setRandomResults] = useState([]);
-  const [searchResults, setSearchResults] = useState([]);
-  const [categoryResults, setCategoryResults] = useState([]);
-  const [bestsellersResults, setBestsellersResults] = useState([]);
+  const { data: searchResults = [] } = useQuery({
+    queryKey: ["search-books", search],
+    queryFn: () =>
+      search.length >= 3
+        ? getExternalBooks({ type: "search", searchText: search }).then(
+            (res) => res.data.docs || []
+          )
+        : [],
+    enabled: search.length >= 3,
+  });
 
-  useEffect(() => {
-    if (search.length >= 3) {
-      getSearchBooks({ type: "search", searchText: search }).then((response) =>
-        setSearchResults(response.data)
-      );
-    } else {
-      setSearchResults([]);
-    }
-  }, [search]);
+  const { data: randomResults = [] } = useQuery({
+    queryKey: ["random-books"],
+    queryFn: () =>
+      getExternalBooks({ type: "random" }).then((res) => res.data.docs || []),
+  });
 
-  useEffect(() => {
-    if (!search) {
-      getSearchBooks({ type: "random" }).then((response) =>
-        setRandomResults(response.data)
-      );
-      getSearchBooks({ type: "category", categoryName: "horror" }).then(
-        (response) => setCategoryResults(response.data)
-      );
-      getSearchBooks({ type: "category", categoryName: "bestsellers" }).then(
-        (response) => setBestsellersResults(response.data)
-      );
-    }
-  }, [search]);
+  const { data: categoryResults = [] } = useQuery({
+    queryKey: ["category-books", "horror"],
+    queryFn: () =>
+      getExternalBooks({
+        type: "category",
+        categoryName: "bestsellers",
+      }).then((res) => res.data.docs || []),
+  });
 
   return (
     <div className="flex-col w-full">
@@ -47,8 +45,7 @@ export default function HomePage() {
         />
       ) : (
         <>
-          <BookCarousel title={"Sélection Aléatoire"} books={randomResults} />
-          <BookCarousel title={"À la une"} books={bestsellersResults} />
+          <BookCarousel title={"Suggestions Aléatoire"} books={randomResults} />
           <BookCarousel title={"Horreur"} books={categoryResults} />
         </>
       )}
