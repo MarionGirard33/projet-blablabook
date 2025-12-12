@@ -44,9 +44,6 @@ const loginPage = createRoute({
   path: "/login",
   component: () => <LoginPage />,
 });
-// =====================================
-  component: () => <RegisterPage />
-})
 
 // DETAILS BOOK ROUTE
 const bookDetailsRoute = createRoute({
@@ -54,13 +51,13 @@ const bookDetailsRoute = createRoute({
   path: "/books/:id",
   component: () => <BookDetails />,
 });
+// =====================================
 
 const routeTree = rootRoute.addChildren([
   homeRoute,
   registerPage,
   loginPage,
   libraryRoute,
-  loginPage
   bookDetailsRoute,
 ]);
 

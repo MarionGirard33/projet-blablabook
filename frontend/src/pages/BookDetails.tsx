@@ -1,117 +1,257 @@
-import React from "react";
-import { Link } from "@tanstack/react-router";
-import { ArrowLeft, Loader2, Plus } from "lucide-react";
-import { useQuery } from "@tanstack/react-query";
-import { fetchBookDetails } from "../api/books";
+import { Link, useParams, useNavigate } from "@tanstack/react-router";
+import { ArrowLeft, Loader2, Plus, CheckCircle } from "lucide-react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import externalApi from "../api/axiosExternal"; 
 
+// Composants UI (je suppose qu'ils existent dans ton projet)
 import { BookCover } from "../components/BookCover";
 import { BookHeaderInfo } from "../components/BookHeaderInfo";
 import { BookDataGrid } from "../components/BookDataGrid";
 import { Button } from "../components/ui/button";
-// import Header from "../components/Header";
-// import Footer from "../components/Footer";
 
-// BookDetails page displays all information about a single book
-const BookDetails: React.FC = () => {
-  // TODO: Replace with: const { id } = useParams({ from: '/books/$id' }) when router is ready
-  const id = "OL12345M";
+// --- TYPES ---
+interface BookDisplayData {
+  title: string;
+  authors: string[];
+  cover: string;
+  description: string;
+  isbn: string;
+  publisher: string;
+  publishedAt: string;
+  pages: number;
+  language: string;
+  categories: string[];
+}
 
-  // Fetch book details (mock or API)
-  const { data: book, isLoading, isError } = useQuery({
-    queryKey: ["book", id],
-    queryFn: () => fetchBookDetails(id),
-    enabled: true, 
+interface CreateBookDto {
+  name: string;
+  coverId: string;
+  author: string;
+  description: string;
+  isbn: string;
+  publishingHouse: string;
+  publishedAt: string;
+}
+
+// --- HELPERS ---
+
+const parseDescription = (desc: any): string => {
+  if (!desc) return '';
+  if (typeof desc === 'string') return desc;
+  if (typeof desc === 'object' && desc.value) return desc.value;
+  return '';
+};
+
+const formatDateForDB = (dateString: string): string => {
+  if (!dateString) return new Date().toISOString().split('T')[0];
+  const date = new Date(dateString);
+  // Si la date est invalide (ex: "2004"), on essaie d'extraire l'année
+  if (isNaN(date.getTime())) {
+    const yearMatch = dateString.match(/\d{4}/);
+    return yearMatch ? `${yearMatch[0]}-01-01` : new Date().toISOString().split('T')[0];
+  }
+  return date.toISOString().split('T')[0];
+};
+
+// --- COMPOSANT PRINCIPAL ---
+
+const BookDetails = () => {
+  //const { isbn } = useParams({ strict: false }) as { isbn: string };
+  const isbn = 9780140328721
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
+
+  // 1. QUERY : Récupération depuis OpenLibrary
+  const { data: book, isLoading, isError, error } = useQuery<BookDisplayData>({
+    queryKey: ['book', isbn],
+    queryFn: async () => {
+      if (!isbn) throw new Error('ISBN manquant');
+
+      const resIsbn = await fetch(`https://openlibrary.org/isbn/${isbn}.json`);
+      if (!resIsbn.ok) throw new Error('Livre introuvable sur OpenLibrary');
+      const dataIsbn = await resIsbn.json();
+
+      const workKey = dataIsbn.works?.[0]?.key;
+      const authorKey = dataIsbn.authors?.[0]?.key;
+
+      const [dataWork, dataAuthor] = await Promise.all([
+        workKey 
+          ? fetch(`https://openlibrary.org${workKey}.json`).then(r => r.json()).catch(() => ({})) 
+          : Promise.resolve({}),
+        authorKey 
+          ? fetch(`https://openlibrary.org${authorKey}.json`).then(r => r.json()).catch(() => ({ name: 'Auteur inconnu' }))
+          : Promise.resolve({ name: 'Auteur inconnu' })
+      ]);
+
+      const coverId = dataIsbn.covers?.[0] || dataWork.covers?.[0];
+      
+      return {
+        title: dataIsbn.title,
+        authors: [dataAuthor.name || 'Inconnu'],
+        cover: coverId ? `https://covers.openlibrary.org/b/id/${coverId}-L.jpg` : '', 
+        description: parseDescription(dataWork.description),
+        isbn: isbn,
+        publisher: dataIsbn.publishers?.[0] || 'Éditeur inconnu',
+        publishedAt: dataIsbn.publish_date,
+        pages: dataIsbn.number_of_pages || 0,
+        language: dataIsbn.languages?.[0]?.key?.split('/').pop() || 'en',
+        categories: dataWork.subjects || []
+      };
+    },
+    enabled: !!isbn,
+    staleTime: 1000 * 60 * 60, // Cache 
+    retry: 1,
   });
 
+  // 2. MUTATION : Envoi vers Backend NestJS
+  const addBookMutation = useMutation({
+    mutationFn: async (bookData: BookDisplayData) => {
+      const payload: CreateBookDto = {
+        name: bookData.title,
+        coverId: bookData.cover,
+        author: bookData.authors[0],
+        description: bookData.description || "Pas de description",
+        isbn: bookData.isbn,
+        publishingHouse: bookData.publisher,
+        publishedAt: formatDateForDB(bookData.publishedAt),
+      };
+      // POST BOOK IN LIBRARY
+      const response = await externalApi.post('/books', payload); 
+      return response.data;
+    },
+    onSuccess: () => {
+      // TODO ?
+      // queryClient.invalidateQueries({ queryKey: ['my-library'] });
+      
+      // TODO to delete or modify
+      alert("Succès : Livre ajouté à ta bibliothèque !");
+      
+      // TODO ? Rediriger vers la bibliothèque
+      // navigate({ to: '/library' });
+    },
+    onError: (err: any) => {
+      console.error("Erreur backend:", err);
+      // Gestion d'erreur basique
+      const message = err.response?.data?.message || "Erreur lors de l'ajout.";
+      alert(`Erreur: ${message}`);
+    }
+  });
+
+  // Handler du clic
+  const handleAddToLibrary = () => {
+    if (book) {
+      addBookMutation.mutate(book);
+    }
+  };
+
+  // --- RENDU ---
+
   if (isLoading) {
-    // Loading spinner while fetching data
     return (
-      <div className="flex h-screen items-center justify-center bg-bookcream">
-        <Loader2 className="w-10 h-10 animate-spin text-bookochre" />
+      <div className="flex h-[50vh] w-full items-center justify-center">
+        <Loader2 className="h-10 w-10 animate-spin text-primary" />
+        <span className="ml-3 text-muted-foreground">Recherche des infos...</span>
       </div>
     );
   }
 
   if (isError || !book) {
-    // Error state if book not found
     return (
-      <div className="flex flex-col items-center justify-center h-screen gap-4 bg-bookcream">
-        <p className="text-destructive font-medium">Livre introuvable.</p>
-        <Link to=".." className="text-bookdark underline hover:text-bookochre">Retour à l'accueil</Link>
+      <div className="flex flex-col items-center justify-center h-[50vh] space-y-4">
+        <p className="text-destructive font-semibold text-lg">
+          Oups ! {(error as Error)?.message || "Impossible de charger ce livre."}
+        </p>
+        <Button variant="outline" onClick={() => window.history.back()}>
+          Retour
+        </Button>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-bookcream pb-20 font-serif text-foreground">
-      {/* Header placeholder (TODO) */}
-      {/* <Header /> */}
+    <div className="container mx-auto p-6 max-w-5xl space-y-8 animate-in fade-in zoom-in-95 duration-500">
+      {/* Bouton Retour */}
+      <Link 
+        to="/library" // Adapte selon ta route parente
+        className="inline-flex items-center text-sm font-medium text-muted-foreground hover:text-primary transition-colors"
+      >
+        <ArrowLeft className="mr-2 h-4 w-4" />
+        Retour à la recherche
+      </Link>
 
-      {/* Main container */}
-      <main className="w-full px-4 sm:px-6 py-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
-        
-        {/* Back navigation */}
-        <nav className="mb-8">
-          <Link to=".." className="inline-flex items-center p-2 rounded-full hover:bg-bookbeige transition-colors group">
-            <ArrowLeft className="w-8 h-8 text-bookochre group-hover:text-bookterracotta transition-colors" />
-            <span className="sr-only">Retour à l'accueil</span>
-          </Link>
-        </nav>
-
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-8 lg:gap-16">
+      <div className="flex flex-col md:flex-row gap-10">
+        {/* COLONNE GAUCHE : VISUEL & ACTIONS */}
+        <div className="flex flex-col items-center gap-6 md:w-1/3 min-w-[250px]">
+          <div className="relative group">
+             <BookCover 
+              src={book.cover} 
+              alt={book.title} 
+              className="w-full max-w-[280px] shadow-2xl rounded-lg group-hover:scale-105 transition-transform duration-300"
+            />
+          </div>
           
-          <div className="md:col-span-5 lg:col-span-4">
-             <div className="top-24"> 
-                <BookCover url={book.cover} title={book.name} />
-             </div>
+          <Button 
+            onClick={handleAddToLibrary}
+            disabled={addBookMutation.isPending || addBookMutation.isSuccess}
+            className={`w-full max-w-[280px] h-12 text-base shadow-md transition-all ${
+              addBookMutation.isSuccess ? "bg-green-600 hover:bg-green-700" : ""
+            }`} 
+            size="lg"
+          >
+            {addBookMutation.isPending ? (
+              <>
+                <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                Envoi en cours...
+              </>
+            ) : addBookMutation.isSuccess ? (
+              <>
+                <CheckCircle className="mr-2 h-5 w-5" />
+                Ajouté !
+              </>
+            ) : (
+              <>
+                <Plus className="mr-2 h-5 w-5" />
+                Ajouter à ma bibliothèque
+              </>
+            )}
+          </Button>
+          
+          {addBookMutation.isError && (
+             <p className="text-sm text-red-500 text-center px-4">
+               Une erreur est survenue lors de l'ajout.
+             </p>
+          )}
+        </div>
+
+        {/* COLONNE DROITE : CONTENU */}
+        <div className="flex flex-col flex-1 space-y-8 bg-card rounded-xl p-1 md:p-0">
+          
+          <BookHeaderInfo 
+            title={book.title}
+            author={book.authors[0]}
+            categories={book.categories}
+          />
+
+          <div className="space-y-4">
+            <h3 className="text-xl font-semibold tracking-tight border-b pb-2">Résumé</h3>
+            <div className="prose prose-sm dark:prose-invert max-w-none text-muted-foreground leading-relaxed whitespace-pre-line">
+              {book.description || (
+                <span className="italic opacity-70">Aucune description fournie par l'éditeur.</span>
+              )}
+            </div>
           </div>
 
-          {/* Book information */}
-          <div className="md:col-span-7 lg:col-span-8 flex flex-col gap-8">
-            
-            {/* 1. Header (title, author, rating, etc.) */}
-            {/* Uncomment the following props when available:
-                category={book.categories?.[0] || "Roman"}
-                rating={book.reviews || 0}
-                pages={book.numberOfPages || 0}
-                year={book.publicationYear}
-            */}
-            <BookHeaderInfo 
-                          title={(book as any).title ?? (book as any).name ?? "Titre inconnu"}
-                          author={book.author} pages={0} year={""}            />
-
-            {/* 2. Book summary */}
-            <div className="prose prose-stone max-w-none">
-              <h3 className="font-serif text-2xl font-bold text-bookdark mb-4 border-b border-bookbeige pb-2">
-                Résumé
-              </h3>
-              <p className="text-bookdark/80 text-lg leading-relaxed text-justify whitespace-pre-line font-sans">
-                {book.description || "Aucune description disponible pour ce livre."}
-              </p>
-            </div>
-
-            {/* 3. Technical details grid */}
-            <div>
-                 <h3 className="font-serif text-xl font-bold text-bookdark mb-4">Détails techniques</h3>
-                 {/* Uncomment and pass these props when available: language, pages */}
-                 <BookDataGrid 
-                              isbn={book.ISBN || "-"}
-                              publisher={book.publishing_house || "Not specified"} language={""} pages={""}                />
-            </div>
-
-            {/* Mobile-only button (add to library) */}
-            <div className="mt-4 bottom-4 z-10">
-                <Button className="w-full py-4 text-lg rounded-xl shadow-xl bg-bookochre text-white hover:bg-bookterracotta">
-                    <Plus className="w-5 h-5 mr-2" />
-                    Ajouter à ma bibliothèque
-                </Button>
-            </div>
+          <div className="pt-4">
+             <BookDataGrid 
+              publisher={book.publisher}
+              publishedAt={book.publishedAt}
+              pages={book.pages}
+              isbn={book.isbn}
+              language={book.language}
+            />
           </div>
         </div>
-      </main>
-
-      {/* Footer placeholder (TODO) */}
-      {/* <Footer /> */}
+      </div>
     </div>
   );
 };
