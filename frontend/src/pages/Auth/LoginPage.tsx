@@ -1,4 +1,4 @@
-import { api } from "@/api/axios";
+import api from "@/api/axios";
 import FormAction from "@/components/Form/FormAction/FormAction";
 import FormField from "@/components/Form/FormFields/FormField";
 import FormGlobalError from "@/components/Form/FormGlobalError";

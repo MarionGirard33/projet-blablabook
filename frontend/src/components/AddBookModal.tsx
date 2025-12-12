@@ -13,9 +13,9 @@ import { Input } from "@/components/ui/input";
 import { Check, Search, X } from "lucide-react";
 
 import { useQuery } from "@tanstack/react-query";
-import { searchExternalBooks, getUserBooks } from "@/api/books";
-
-import type { BookType } from "@/types/books";
+import { getUserBooks } from "@/api/books";
+import type { ExternalBook } from "@/@types/externalBooks";
+import { searchExternalBooks } from "@/api/externalBooks";
 
 type AddBookModalProps = {
   readonly isOpen: boolean;
@@ -42,7 +42,7 @@ export function AddBookModal({ isOpen, onClose, userId }: AddBookModalProps) {
     data: results = [],
     isFetching,
     refetch,
-  } = useQuery<BookType[]>({
+  } = useQuery<ExternalBook[]>({
     enabled: false, // don't fetch on mount
     queryKey: ["externalBooks", query],
     queryFn: () => searchExternalBooks(query),
@@ -55,7 +55,7 @@ export function AddBookModal({ isOpen, onClose, userId }: AddBookModalProps) {
 
   const navigate = useNavigate();
 
-  const handleCardClick = (book: BookType) => {
+  const handleCardClick = (book: ExternalBook) => {
     // Extract the last segment of the key (e.g., “works/OL82586W” -> “OL82586W”)
     const rawKey = book.key?.toString() ?? "";
     const id = rawKey.includes("/") ? rawKey.split("/").pop() : rawKey;
@@ -64,7 +64,7 @@ export function AddBookModal({ isOpen, onClose, userId }: AddBookModalProps) {
   };
 
   // Check if a book result is already in the library
-  const isInLibrary = (externalBook: BookType) => {
+  const isInLibrary = (externalBook: ExternalBook) => {
     if (!externalBook.isbn?.length) return false;
 
     return userBooks.some((b) => externalBook.isbn!.includes(b.isbn));

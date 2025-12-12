@@ -16,14 +16,14 @@ export function getSearchBooks(params: GetExternalBooksParams) {
 }
 
 // Get all books in book table
-export const getBooks = async (): Promise<InternalBook[]> => {
-  const response = await api.get<InternalBook[]>("/books");
+export const getBooks = async (): Promise<Book[]> => {
+  const response = await api.get<Book[]>("/books");
   return response.data;
 };
 
 // Get all books from a specific user's list
-export const getUserBooks = async (userId: number): Promise<InternalBook[]> => {
-  const response = await api.get<InternalBook[]>(`/books/user/${userId}`);
+export const getUserBooks = async (userId: number): Promise<Book[]> => {
+  const response = await api.get<Book[]>(`/books/user/${userId}`);
   return response.data;
 };
 
@@ -31,11 +31,8 @@ export const getUserBooks = async (userId: number): Promise<InternalBook[]> => {
 export const addBookToUserList = async (
   userId: number,
   bookData: CreateBookDto
-): Promise<InternalBook> => {
-  const response = await api.post<InternalBook>(
-    `/books/user/${userId}`,
-    bookData
-  );
+): Promise<Book> => {
+  const response = await api.post<Book>(`/books/user/${userId}`, bookData);
   return response.data;
 };
 
@@ -49,74 +46,3 @@ export const removeBookFromUserList = async (
   );
   return response.data;
 };
-
-// -----------------------------
-// External API (OpenLibrary)
-// -----------------------------
-
-export const searchExternalBooks = async (
-  searchText: string
-): Promise<BookType[]> => {
-  const response = await externalApi.get("/search.json", {
-    params: {
-      q: searchText,
-      limit: 20,
-      language: ["fre", "eng"],
-      fields: "key,title,author_name,edition_key",
-    },
-  });
-
-  const docs = response.data.docs;
-  const books: BookType[] = [];
-
-  for (const work of docs) {
-    if (!work.edition_key || work.edition_key.length === 0) continue;
-
-    const editionKey = work.edition_key[0]; // prendre uniquement la première édition
-    try {
-      const editionResponse = await externalApi.get(
-        `/books/${editionKey}.json`
-      );
-      const data = editionResponse.data;
-
-      const languages =
-        data.languages?.map((l: any) => l.key.replace("/languages/", "")) || [];
-      if (!data.isbn_13 || data.isbn_13.length === 0) continue;
-
-      books.push({
-        key: data.key.replace("/books/", ""),
-        title: data.title,
-        author: data.authors?.[0]?.name || work.author_name?.[0] || "Unknown",
-        isbn: data.isbn_13[0],
-        language: languages,
-        publishDate: data.publish_date,
-        cover: data.covers?.[0]
-          ? `https://covers.openlibrary.org/b/id/${data.covers[0]}-L.jpg`
-          : undefined,
-      });
-    } catch (err) {
-      console.warn(`Failed to fetch edition ${editionKey}`, err);
-    }
-  }
-  console.log(books);
-  return books;
-};
-
-// export const getExternalBooksByCategory = async (
-//   categoryName: string
-// ): Promise<BookType[]> => {
-//   const response = await externalApi.get(`/subjects/${categoryName}.json`, {
-//     params: { limit: 30 },
-//   });
-
-//   return response.data.works.map((work: BookType) => ({
-//     key: work.edition_key,
-//     author_name: work.author_name || [],
-//     first_publish_year: work.first_publish_year,
-//     language: work.language || [],
-//     title: work.title,
-//     cover_id: work.cover_id,
-//     cover_i: work.cover_id, // OpenLibrary uses cover_id
-//     edition_count: work.edition_count,
-//   }));
-// };

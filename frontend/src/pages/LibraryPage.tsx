@@ -3,11 +3,13 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { BookCard } from "@/components/BookCard";
 import { Plus, Search } from "lucide-react";
 import type { Book } from "../@types/books";
+import { getUserBooks, removeBookFromUserList } from "@/api/books";
+import { AddBookModal } from "@/components/AddBookModal";
 //import { useAuth } from "@/contexts/AuthContext";
 
 export default function LibraryPage() {
   //const { userId } = useAuth();
-  const userId = 2; // dev (updated to match seeded DB)
+  const userId = 1; // dev (updated to match seeded DB)
   const { data: books = [], refetch } = useQuery({
     queryKey: ["userBooks", userId],
     queryFn: () => getUserBooks(userId),

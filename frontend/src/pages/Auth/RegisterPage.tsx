@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { useMutation } from "@tanstack/react-query";
 import { useNavigate, Link } from "@tanstack/react-router";
-import { api } from "@/api/axios";
+import api from "@/api/axios";
 import type { AxiosError } from "axios";
 import { useForm } from "@tanstack/react-form";
 import FormTitle from "@/components/Form/FormTitle";

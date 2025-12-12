@@ -4,15 +4,13 @@ export type ExternalBookCarouselProps = {
 };
 
 export type ExternalBook = {
-  key: string;
-  author_name: string[];
-  first_publish_year?: number;
-  language: string[];
+  key: string; // book/ ex: "OL55900058M"
   title: string;
-  cover_id?: number;
-  cover_i?: number;
-  edition_count?: number;
-  isbn: string;
+  author: string;
+  isbn: string; // isbn_13
+  language: string[];
+  publishDate?: string;
+  cover?: string;
 };
 
 export type GetExternalBooksParams = {
@@ -33,4 +31,4 @@ export type ExternalBookDisplayData = {
   pages: number;
   language: string;
   categories: string[];
-}
+};
