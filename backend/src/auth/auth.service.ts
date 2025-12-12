@@ -13,10 +13,16 @@ import { RegisterResponseDto } from './dto/register-response.dto';
 import { LoginRequestDto } from './dto/login-request.dto';
 import { JwtService } from '@nestjs/jwt';
 import { randomBytes } from 'crypto';
-import { JwtPayload, TokenInsert, TokenSelect } from './types/token.type';
+import {
+  CookiesConfig,
+  JwtPayload,
+  TokenInsert,
+  TokenSelect,
+} from './types/token.type';
 import { db } from 'src/db';
 import { refreshToken } from 'src/db/schema';
 import { CookieOptions } from 'express';
+import { eq } from 'drizzle-orm';
 
 @Injectable()
 export class AuthService {
@@ -54,7 +60,7 @@ export class AuthService {
     return user;
   }
 
-  generateCookiesConfig() {
+  generateCookiesConfig(): CookiesConfig {
     // if we set TRUE, we need to be on HTTPS, so for the dev we use false for save the cookie
     const secureProps = process.env.NODE_ENV === 'prod';
 
@@ -177,7 +183,7 @@ export class AuthService {
     });
   }
 
-  async destroyRefreshToken(token: string) {
+  async destoyRefreshToken(token: string) {
     const result = await db
       .delete(refreshToken)
       .where(eq(refreshToken.token, token));

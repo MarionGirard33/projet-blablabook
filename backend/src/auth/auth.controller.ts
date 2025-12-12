@@ -7,6 +7,8 @@ import {
   HttpCode,
   HttpStatus,
   Res,
+  UseGuards,
+  Req,
 } from '@nestjs/common';
 import type { Response } from 'express';
 import { AuthService } from './auth.service';
@@ -20,6 +22,7 @@ import { RegisterRequestDto } from './dto/register-request.dto';
 import { LoginRequestDto } from './dto/login-request.dto';
 import { LoginResponseDto } from './dto/login-response.dto';
 import { plainToInstance } from 'class-transformer';
+import { AuthGuard } from './auth.guard';
 
 @ApiTags('auth') // annotation swagger => permet de grouper la classe sous l'étiquette auth dans la documentation
 @UseInterceptors(ClassSerializerInterceptor) // permet de gérer l'exclude du DTO response => retirer les field avec @Exclude dans le dto de reponse
@@ -50,7 +53,7 @@ export class AuthController {
   // par défaut Nest utilise 201 par défaut sur les post
   // HttpCode permet de définir son propre code statut
   @HttpCode(HttpStatus.OK)
-  // TOOD: add doc swagger
+  // TODO: add doc swagger
   async login(
     @Body() payload: LoginRequestDto,
     // passthrough allow use cookie and return it
@@ -81,15 +84,30 @@ export class AuthController {
     });
   }
 
-  // TODO: implémenter le logout => il doit supprimer les token + envoyer les cookie de suppression pour le front
+  // TODO: add doc for swagger
   @Post('/logout')
-  async logout(@Res({ passthrough: true }) response: Response) {
-    // TODO: aller supprimer le refresh token lié à l'user => récupérer le token via le cookie après avoir implémenter le guard
-    const isDestoyToken = await this.authService.destoyToken(token);
+  @UseGuards(AuthGuard) // add the guard for extract cookie
+  @HttpCode(HttpStatus.OK) // code 200 for the logout if success
+  async logout(
+    @Req() request: Request, // allow to use request objet
+    @Res({ passthrough: true }) response: Response,
+  ) {
+    // get refresh token from request with guard
+    const refreshToken = request['refresh_token'] as string;
+    // delete refresh token
+    const isDestoyToken =
+      await this.authService.destoyRefreshToken(refreshToken);
 
+    if (!isDestoyToken) {
+      console.warn('refresh token not found in the db');
+    }
+
+    // generate config config for clear to the front
     const cookieConfig = this.authService.generateCookiesConfig();
-
+    // destroy jwt and refresh cookie
     response.clearCookie('jwt_cookie', cookieConfig.jwtCookieConfig);
     response.clearCookie('refresh_cookie', cookieConfig.refreshCookieConfig);
+
+    return { message: 'Logged out successfully' };
   }
 }

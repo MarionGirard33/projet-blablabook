@@ -1,3 +1,4 @@
+import { CookieOptions } from 'express';
 import { refreshToken } from 'src/db/schema';
 
 export type TokenSelect = typeof refreshToken.$inferSelect;
@@ -11,4 +12,9 @@ export type JwtPayload = {
 export type TokenExtractorData = {
   jwtCookie: string | null;
   refreshTokenCookie: string | null;
+};
+
+export type CookiesConfig = {
+  jwtCookieConfig: CookieOptions;
+  refreshCookieConfig: CookieOptions;
 };
