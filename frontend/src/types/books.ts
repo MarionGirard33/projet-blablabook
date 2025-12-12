@@ -4,15 +4,15 @@ export type BookCarouselProps = {
 };
 
 export type BookType = {
-  key: string;
-  author_name: string[];
+  edition_key: string;
+  author_name: string;
   first_publish_year?: number;
   language: string[];
   title: string;
   cover_id?: number;
   cover_i?: number;
   edition_count?: number;
-  isbn?: string[];
+  isbn?: string;
 };
 
 export type GetBooksParams = {

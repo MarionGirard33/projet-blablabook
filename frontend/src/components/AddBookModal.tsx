@@ -13,19 +13,23 @@ import { Input } from "@/components/ui/input";
 import { Check, Search, X } from "lucide-react";
 
 import { useQuery } from "@tanstack/react-query";
-import { searchExternalBooks } from "@/api/books";
-import { useLibraryStore } from "@/stores/libraryStore";
+import { searchExternalBooks, getUserBooks } from "@/api/books";
 
 import type { BookType } from "@/types/books";
 
 type AddBookModalProps = {
   readonly isOpen: boolean;
   readonly onClose: () => void;
+  readonly userId?: number;
 };
 
-export function AddBookModal({ isOpen, onClose }: AddBookModalProps) {
+export function AddBookModal({ isOpen, onClose, userId }: AddBookModalProps) {
   const [query, setQuery] = useState("");
-  const userBooks = useLibraryStore((state) => state.books);
+  const { data: userBooks = [] } = useQuery({
+    queryKey: ["userBooks", userId],
+    queryFn: () => getUserBooks(userId!),
+    enabled: !!userId,
+  });
 
   // Reset query and results when modal closes
   const handleClose = () => {

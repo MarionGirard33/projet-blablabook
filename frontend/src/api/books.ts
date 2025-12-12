@@ -70,19 +70,27 @@ export const searchExternalBooks = async (
   searchText: string
 ): Promise<BookType[]> => {
   const response = await externalApi.get("/search.json", {
-    params: { q: searchText, limit: 30 },
+    params: {
+      q: searchText,
+      limit: 20,
+      fields:
+        "key,title,author_name,first_publish_year,language,edition_key,cover_i,isbn",
+      editions: true,
+    },
   });
+  console.log(response);
 
-  return response.data.docs.map((item: BookType) => ({
-    key: item.key,
-    author_name: item.author_name || [],
-    first_publish_year: item.first_publish_year,
-    language: item.language || [],
-    title: item.title,
-    cover_id: item.cover_id,
-    cover_i: item.cover_i,
-    edition_count: item.edition_count,
-  }));
+  return response.data.docs
+    .filter((doc: BookType) => doc.edition_key?.length > 0)
+    .map((doc: BookType) => ({
+      key: doc.edition_key[0],
+      title: doc.title,
+      author_name: doc.author_name || [],
+      first_publish_year: doc.first_publish_year,
+      language: doc.language || [],
+      cover_i: doc.cover_i,
+      isbn: doc.isbn,
+    }));
 };
 
 export const getExternalBooksByCategory = async (
@@ -93,7 +101,7 @@ export const getExternalBooksByCategory = async (
   });
 
   return response.data.works.map((work: BookType) => ({
-    key: work.key,
+    key: work.edition_key,
     author_name: work.author_name || [],
     first_publish_year: work.first_publish_year,
     language: work.language || [],

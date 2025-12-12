@@ -1,27 +1,36 @@
 import { useEffect, useState } from "react";
-import { useLibraryStore } from "@/stores/libraryStore";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { BookCard } from "@/components/BookCard";
 import { Plus, Search } from "lucide-react";
 import type { InternalBook } from "@/types/books";
 import { AddBookModal } from "../components/AddBookModal";
+import { getUserBooks, removeBookFromUserList } from "@/api/books";
 //import { useAuth } from "@/contexts/AuthContext";
 
 export default function LibraryPage() {
   //const { userId } = useAuth();
-  const userId = 1; // dev
-  const books = useLibraryStore((s) => s.books);
-  const loadBooks = useLibraryStore((s) => s.loadBooks);
-  const removeBook = useLibraryStore((s) => s.removeBook);
+  const userId = 1; // dev (updated to match seeded DB)
+  const { data: books = [], refetch } = useQuery({
+    queryKey: ["userBooks", userId],
+    queryFn: () => getUserBooks(userId),
+    enabled: !!userId,
+  });
+
+  const queryClient = useQueryClient();
+
+  const removeMutation = useMutation({
+    mutationFn: (bookId: number) => removeBookFromUserList(userId, bookId),
+    onSuccess: () =>
+      queryClient.invalidateQueries({ queryKey: ["userBooks", userId] }),
+  });
 
   const [search, setSearch] = useState("");
   const [open, setOpen] = useState(false);
 
   // Load books
   useEffect(() => {
-    if (userId) {
-      loadBooks(userId);
-    }
-  }, [userId]);
+    if (userId) refetch();
+  }, [userId, refetch]);
 
   const filteredBooks: InternalBook[] =
     books?.filter((b: InternalBook) => {
@@ -101,7 +110,7 @@ export default function LibraryPage() {
             <BookCard
               key={book.id}
               book={book}
-              onRemove={() => removeBook(userId, book.id)}
+              onRemove={() => removeMutation.mutate(book.id)}
             />
           ))
         )}
