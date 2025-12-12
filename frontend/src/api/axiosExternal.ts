@@ -1,7 +1,7 @@
 import axios from "axios";
 
-const apiExternal = axios.create({
+const externalApi = axios.create({
   baseURL: "https://openlibrary.org",
 });
 
-export default apiExternal;
+export default externalApi;
