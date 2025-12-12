@@ -33,3 +33,24 @@ export type ExternalBookDisplayData = {
   language: string;
   categories: string[];
 }
+
+export type ExternalApiIsbnResponse = {
+  title: string;
+  publish_date?: string;
+  publishers?: string[];
+  number_of_pages?: number;
+  covers?: number[];
+  languages?: { key: string }[];
+  works?: { key: string }[];
+  authors?: { key: string }[];
+}
+
+export type ExternalApiWorkResponse = {
+  description?: string | { value: string };
+  subjects?: string[];
+  covers?: number[];
+}
+
+export type ExternalApiAuthorResponse = {
+  name: string;
+}
