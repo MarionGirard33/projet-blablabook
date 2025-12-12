@@ -141,9 +141,9 @@ export function AddBookModal({ isOpen, onClose, userId }: AddBookModalProps) {
                   />
                 )}
 
-                {book.cover_i ? (
+                {book.cover ? (
                   <img
-                    src={`https://covers.openlibrary.org/b/id/${book.cover_i}-M.jpg`}
+                    src={book.cover}
                     alt={book.title}
                     className="w-16 h-24 object-cover rounded"
                   />
@@ -154,13 +154,11 @@ export function AddBookModal({ isOpen, onClose, userId }: AddBookModalProps) {
                 <div>
                   <p className="font-semibold text-lg">{book.title}</p>
                   <p className="text-sm text-gray-600">
-                    {book.author_name?.[0] || "Unknown"}
+                    {book.author || "Unknown"}
                   </p>
 
-                  {book.first_publish_year && (
-                    <p className="text-xs text-gray-500">
-                      {book.first_publish_year}
-                    </p>
+                  {book.publishDate && (
+                    <p className="text-xs text-gray-500">{book.publishDate}</p>
                   )}
                 </div>
               </button>

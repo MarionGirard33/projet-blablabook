@@ -9,7 +9,7 @@ import { getUserBooks, removeBookFromUserList } from "@/api/books";
 
 export default function LibraryPage() {
   //const { userId } = useAuth();
-  const userId = 1; // dev (updated to match seeded DB)
+  const userId = 2; // dev (updated to match seeded DB)
   const { data: books = [], refetch } = useQuery({
     queryKey: ["userBooks", userId],
     queryFn: () => getUserBooks(userId),

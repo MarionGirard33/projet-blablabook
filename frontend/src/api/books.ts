@@ -1,4 +1,9 @@
-import type { GetBooksParams, BookType, InternalBook } from "@/types/books";
+import type {
+  GetBooksParams,
+  BookType,
+  InternalBook,
+  WorkSearchItem,
+} from "@/types/books";
 import { api, externalApi } from "./axios";
 
 // -----------------------------
@@ -73,41 +78,62 @@ export const searchExternalBooks = async (
     params: {
       q: searchText,
       limit: 20,
-      fields:
-        "key,title,author_name,first_publish_year,language,edition_key,cover_i,isbn",
-      editions: true,
+      language: ["fre", "eng"],
+      fields: "key,title,author_name,edition_key",
     },
   });
-  console.log(response);
 
-  return response.data.docs
-    .filter((doc: BookType) => doc.edition_key?.length > 0)
-    .map((doc: BookType) => ({
-      key: doc.edition_key[0],
-      title: doc.title,
-      author_name: doc.author_name || [],
-      first_publish_year: doc.first_publish_year,
-      language: doc.language || [],
-      cover_i: doc.cover_i,
-      isbn: doc.isbn,
-    }));
+  const docs = response.data.docs;
+  const books: BookType[] = [];
+
+  for (const work of docs) {
+    if (!work.edition_key || work.edition_key.length === 0) continue;
+
+    const editionKey = work.edition_key[0]; // prendre uniquement la première édition
+    try {
+      const editionResponse = await externalApi.get(
+        `/books/${editionKey}.json`
+      );
+      const data = editionResponse.data;
+
+      const languages =
+        data.languages?.map((l: any) => l.key.replace("/languages/", "")) || [];
+      if (!data.isbn_13 || data.isbn_13.length === 0) continue;
+
+      books.push({
+        key: data.key.replace("/books/", ""),
+        title: data.title,
+        author: data.authors?.[0]?.name || work.author_name?.[0] || "Unknown",
+        isbn: data.isbn_13[0],
+        language: languages,
+        publishDate: data.publish_date,
+        cover: data.covers?.[0]
+          ? `https://covers.openlibrary.org/b/id/${data.covers[0]}-L.jpg`
+          : undefined,
+      });
+    } catch (err) {
+      console.warn(`Failed to fetch edition ${editionKey}`, err);
+    }
+  }
+  console.log(books);
+  return books;
 };
 
-export const getExternalBooksByCategory = async (
-  categoryName: string
-): Promise<BookType[]> => {
-  const response = await externalApi.get(`/subjects/${categoryName}.json`, {
-    params: { limit: 30 },
-  });
+// export const getExternalBooksByCategory = async (
+//   categoryName: string
+// ): Promise<BookType[]> => {
+//   const response = await externalApi.get(`/subjects/${categoryName}.json`, {
+//     params: { limit: 30 },
+//   });
 
-  return response.data.works.map((work: BookType) => ({
-    key: work.edition_key,
-    author_name: work.author_name || [],
-    first_publish_year: work.first_publish_year,
-    language: work.language || [],
-    title: work.title,
-    cover_id: work.cover_id,
-    cover_i: work.cover_id, // OpenLibrary uses cover_id
-    edition_count: work.edition_count,
-  }));
-};
+//   return response.data.works.map((work: BookType) => ({
+//     key: work.edition_key,
+//     author_name: work.author_name || [],
+//     first_publish_year: work.first_publish_year,
+//     language: work.language || [],
+//     title: work.title,
+//     cover_id: work.cover_id,
+//     cover_i: work.cover_id, // OpenLibrary uses cover_id
+//     edition_count: work.edition_count,
+//   }));
+// };
