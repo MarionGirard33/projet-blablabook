@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useLibraryStore } from "@/stores/libraryStore";
 import { BookCard } from "@/components/BookCard";
 import { Plus, Search } from "lucide-react";
 import type { Book } from "../@types/books";
@@ -7,6 +8,9 @@ import type { Book } from "../@types/books";
 export default function LibraryPage() {
   //const { userId } = useAuth();
   const userId = 1; // dev
+  const books = useLibraryStore((s) => s.books);
+  const loadBooks = useLibraryStore((s) => s.loadBooks);
+  const removeBook = useLibraryStore((s) => s.removeBook);
 
   const [search, setSearch] = useState("");
 
