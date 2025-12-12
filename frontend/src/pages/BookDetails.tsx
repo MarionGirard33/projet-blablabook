@@ -2,9 +2,10 @@ import { Link, useParams } from "@tanstack/react-router";
 import { ArrowLeft, Loader2 } from "lucide-react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 //import api from "../api/axios"; 
+import { bookDetailsRoute } from "../routes/routes";
 import { getFullExternalBook } from "../api/externalBooks";
 
-import type { CreateBookDto } from "../@types/books";
+//import type { CreateBookDto } from "../@types/books";
 import type { ExternalBookDisplayData } from "../@types/externalBooks";
 
 import { BookCover } from "../components/BookCover";
@@ -31,10 +32,7 @@ import { Button } from "../components/ui/button";
 // --- MAIN COMPONENT ---
 
 const BookDetails = () => {
-  //const { isbn } = useParams<{ isbn?: string }>(); // Uncomment to use dynamic URL parameter
-  const isbn = "9780140328721"; // Hardcoded ISBN for development/testing
-
-  // QUERY: Fetch book details from OpenLibrary
+  const { isbn } = bookDetailsRoute.useParams();
   const { 
     data: book, 
     isLoading, 
