@@ -2,7 +2,7 @@
 node_modules/
 # Yarn / npm
 yarn-error.log
-
+package-lock.json
 yarn.lock
 
 # Build outputs
