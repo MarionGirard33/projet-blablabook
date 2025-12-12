@@ -23,16 +23,6 @@ interface BookDisplayData {
   categories: string[];
 }
 
-interface CreateBookDto {
-  name: string;
-  coverId: string;
-  author: string;
-  description: string;
-  isbn: string;
-  publishingHouse: string;
-  publishedAt: string;
-}
-
 // --- HELPERS ---
 
 const parseDescription = (desc: any): string => {
