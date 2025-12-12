@@ -1,6 +1,6 @@
 export type ExternalBookCarouselProps = {
   title: string;
-  books: Array<BookType>;
+  books: Array<ExternalBook>;
 };
 
 export type ExternalBook = {
@@ -22,7 +22,7 @@ export type GetExternalBooksParams = {
 };
 
 // Todo revoir type @mohini
-export type ExternalBookDisplayData {
+export type ExternalBookDisplayData = {
   title: string;
   authors: string[];
   cover: string;

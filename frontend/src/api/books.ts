@@ -1,11 +1,12 @@
-import type { GetBooksParams } from "@/types/books";
+import type { GetExternalBooksParams } from "../@types/externalBooks";
+import type { CreateBookDto , Book } from "../@types/books"
 import api from "./axios";
 
 // -----------------------------
 // API functions
 // -----------------------------
 
-export function getSearchBooks(params: GetBooksParams) {
+export function getSearchBooks(params: GetExternalBooksParams) {
   const query: Record<string, string> = {};
   if (params.type) query.type = params.type;
   if (params.categoryName) query.categoryName = params.categoryName;
