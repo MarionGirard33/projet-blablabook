@@ -2,13 +2,12 @@ import React from "react";
 import { Heart, CheckCircle, BookOpen, Clock, Loader2, BookmarkCheck } from "lucide-react";
 import { Button } from "./ui/button"; 
 
-// On reprend exactement les textes de ta collègue
 export type BookStatus = "Lu" | "En cours" | "À lire" | null;
 
 interface BookStatusActionProps {
-  status: BookStatus; // Le statut actuel (null si pas dans la lib)
-  onAddToLibrary: () => void;  // La fonction pour ajouter
-  isAdding?: boolean;          // État de chargement du bouton
+  status: BookStatus; 
+  onAddToLibrary: () => void; 
+  isAdding?: boolean; 
 }
 
 export const BookStatusAction: React.FC<BookStatusActionProps> = ({ 
@@ -17,7 +16,6 @@ export const BookStatusAction: React.FC<BookStatusActionProps> = ({
   isAdding = false 
 }) => {
 
-  // Configuration visuelle pour chaque statut
   const statusConfig: Record<string, { label: string; icon: any; style: string; iconColor: string }> = {
     "Lu": { 
       label: "Livre lu", 
@@ -39,7 +37,6 @@ export const BookStatusAction: React.FC<BookStatusActionProps> = ({
     },
   };
 
-  // 1. Si on a un statut (Le livre est dans la bibliothèque)
   if (status && statusConfig[status]) {
     const config = statusConfig[status];
     const Icon = config.icon;
@@ -60,7 +57,6 @@ export const BookStatusAction: React.FC<BookStatusActionProps> = ({
     );
   }
 
-  // 2. Sinon (Le livre n'est pas dans la bibliothèque)
   return (
     <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm flex flex-col items-center text-center gap-4">
       <div className="text-center space-y-1">

@@ -1,11 +1,9 @@
 import React from "react";
-import { Star, FileText, Calendar } from "lucide-react";
 
-// Props for the BookHeaderInfo component, which displays the main book information in the header section
+// Props for the BookHeaderInfo component
 interface BookHeaderInfoProps {
   title: string;
   author: string;
-       // Book rating (optional)
 }
 
 export const BookHeaderInfo: React.FC<BookHeaderInfoProps> = ({ 
