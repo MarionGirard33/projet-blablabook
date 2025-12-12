@@ -116,7 +116,7 @@ export default function LoginPage() {
       </form.Field>
 
       <p className="text-sm text-center mt-4">
-        Pas encore de compte ?{" "}
+        Pas encore de compte?{" "}
         <Link
           to="/register"
           className="text-blue-600 underline hover:text-blue-800"
