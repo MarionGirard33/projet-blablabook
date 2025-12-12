@@ -176,4 +176,11 @@ export class AuthService {
       excludeExtraneousValues: true,
     });
   }
+
+  async destroyRefreshToken(token: string) {
+    const result = await db
+      .delete(refreshToken)
+      .where(eq(refreshToken.token, token));
+    return result || null;
+  }
 }
