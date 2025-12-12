@@ -1,9 +1,9 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Trash2 } from "lucide-react";
-import type { InternalBook } from "@/types/books";
+import type { Book } from "../@types/books";
 
 type Props = {
-  readonly book: InternalBook;
+  readonly book: Book;
   readonly onRemove: () => void;
 };
 

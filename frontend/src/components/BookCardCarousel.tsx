@@ -5,12 +5,12 @@ import {
   CardDescription,
   CardContent,
 } from "@/components/ui/card";
-import type { BookType } from "@/types/books";
+import type { ExternalBook } from "../@types/externalBooks";
 
 export default function BookCardCarousel({
   book,
 }: {
-  readonly book: BookType;
+  readonly book: ExternalBook;
 }) {
   const cover = book.cover_id || book.cover_i;
 
