@@ -1,9 +1,9 @@
-export type BookCarouselProps = {
+export type ExternalBookCarouselProps = {
   title: string;
   books: Array<BookType>;
 };
 
-export type BookType = {
+export type ExternalBook = {
   key: string;
   author_name: string[];
   first_publish_year?: number;
@@ -12,25 +12,25 @@ export type BookType = {
   cover_id?: number;
   cover_i?: number;
   edition_count?: number;
+  isbn: string;
 };
 
-export type GetBooksParams = {
+export type GetExternalBooksParams = {
   type: "random" | "category" | "search";
   categoryName?: string;
   searchText?: string;
 };
 
-export type InternalBook = {
-  id: number;
-  name: string;
-  author: string;
-  coverId: string;
+// Todo revoir type @mohini
+export type ExternalBookDisplayData {
+  title: string;
+  authors: string[];
+  cover: string;
   description: string;
   isbn: string;
-  publishingHouse: string;
+  publisher: string;
   publishedAt: string;
-  listName?: string;
-  status?: "Lu" | "En cours" | "À lire";
-  readStart?: string;
-  readEnd?: string;
-};
+  pages: number;
+  language: string;
+  categories: string[];
+}

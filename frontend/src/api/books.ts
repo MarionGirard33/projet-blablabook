@@ -2,31 +2,6 @@ import type { GetBooksParams } from "@/types/books";
 import api from "./axios";
 
 // -----------------------------
-// Types
-// -----------------------------
-export interface Book {
-  id: number;
-  name: string;
-  coverId: string;
-  author: string;
-  description: string;
-  isbn: string;
-  publishingHouse: string;
-  publishedAt: string;
-  listName?: string;
-}
-
-export interface CreateBookDto {
-  name: string;
-  coverId: string;
-  author: string;
-  description: string;
-  isbn: string;
-  publishingHouse: string;
-  publishedAt: string; // YYYY-MM-DD
-}
-
-// -----------------------------
 // API functions
 // -----------------------------
 
