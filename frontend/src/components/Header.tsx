@@ -45,14 +45,14 @@ export default function Header() {
               </Link>
               {user ? (
                 <Link
-                  to={{ to: "/profile" }}
+                  to="/profile"
                   className="text-white text-xl"
                   onClick={() => setOpen(false)}
                 >
                   {user.username}
                 </Link>
               ) : (
-                <Link to={{ to: "/login" }} onClick={() => setOpen(false)}>
+                <Link to="/login" onClick={() => setOpen(false)}>
                   <Button>Se connecter</Button>
                 </Link>
               )}
