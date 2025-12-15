@@ -1,13 +1,33 @@
 import * as argon2 from 'argon2';
-import { eq } from 'drizzle-orm';
-import { users } from '../db/schema';
-import { NotFoundException } from '@nestjs/common';
+import { eq, or } from 'drizzle-orm';
+import { user } from '../db/schema';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { db } from 'src/db';
 import { plainToInstance } from 'class-transformer';
 import { UpdateUserResponseDto } from './dto/update-user.response.dto';
 import { UpdateUserRequestDto } from './dto/update-user.request.dto';
+import { UserInsert, UserSelect } from './types/user';
 
+@Injectable()
 export class UserService {
+
+ async checkUserExisting(
+     username: string,
+     email: string,
+   ): Promise<UserSelect | null> {
+     const result = await db
+       .select()
+       .from(user)
+       .where(or(eq(user.email, email), eq(user.username, username)));
+ 
+     return result[0] ?? null;
+   }
+ 
+   async createUser(userInputData: UserInsert): Promise<UserSelect | null> {
+     const result = await db.insert(user).values(userInputData).returning();
+     return result[0] ?? null;
+   }
+
   async update(id: number, data: UpdateUserRequestDto) {
     const updateData = { ...data };
 
@@ -16,9 +36,9 @@ export class UserService {
     }
 
     const [updatedUser] = await db
-      .update(users)
+      .update(user)
       .set(updateData)
-      .where(eq(users.id, id))
+      .where(eq(user.id, id))
       .returning();
 
     if (!updatedUser) {
@@ -31,17 +51,17 @@ export class UserService {
   }
 
   async findById(id: number) {
-    const [user] = await db
+    const [userRow] = await db
       .select()
-      .from(users)
-      .where(eq(users.id, id))
+      .from(user)
+      .where(eq(user.id, id))
       .limit(1);
 
-    if (!user) {
+    if (!userRow) {
       throw new NotFoundException(`User with id ${id} not found`);
     }
 
-    return plainToInstance(UpdateUserResponseDto, user, {
+    return plainToInstance(UpdateUserResponseDto, userRow, {
       excludeExtraneousValues: true,
     });
   }

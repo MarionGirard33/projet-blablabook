@@ -5,15 +5,15 @@ import {
 } from '@nestjs/common';
 import { plainToInstance } from 'class-transformer';
 import { RegisterRequestDto } from './dto/register-request.dto';
-import { UsersService } from 'src/users/users.service';
+import { UserService } from 'src/user/user.service';
 import argon2 from 'argon2';
-import { UserInsert } from 'src/users/types/users';
+import { UserInsert } from 'src/user/types/user';
 import { RegisterResponseDto } from './dto/register-response.dto';
 
 @Injectable()
 export class AuthService {
   // injection de dépendances pour accéder aux méthodes
-  constructor(private readonly userService: UsersService) {}
+  constructor(private readonly userService: UserService) {}
 
   async register(payload: RegisterRequestDto) {
     if (payload.password !== payload.confirmPassword) {

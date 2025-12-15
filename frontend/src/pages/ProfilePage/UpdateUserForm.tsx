@@ -120,7 +120,7 @@ export default function UpdateUserForm({ userId, initialData, onClose, onUpdate 
         {(field) => (
           <div className="mb-4">
             <label htmlFor="password" className="block text-gray-500 text-sm mb-1">
-              de mot de passe
+              Mot de mot de passe
             </label>
             <input
               id="password"

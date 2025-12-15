@@ -1,5 +1,5 @@
 import { db } from './db';
-import { users, list, book, listBook } from './db/schema';
+import { user, list, book, listBook } from './db/schema';
 
 async function seed() {
   console.log('Seeding database...');
@@ -8,11 +8,11 @@ async function seed() {
   await db.delete(listBook).execute();
   await db.delete(book).execute();
   await db.delete(list).execute();
-  await db.delete(users).execute();
+  await db.delete(user).execute();
 
   // 2️⃣ Create test user
-  const [user] = await db
-    .insert(users)
+  const [userTable] = await db
+    .insert(user)
     .values({
       email: 'test@example.com',
       password: 'password123',
@@ -21,14 +21,18 @@ async function seed() {
     })
     .returning();
 
+  if (!userTable) throw new Error("User insert failed");
+
   // 3️⃣ Create the user list
   const [userList] = await db
     .insert(list)
     .values({
       name: 'My Reading List',
-      userId: user.id,
+      userId: userTable.id,
     })
     .returning();
+
+  if (!userList) throw new Error("User list insert failed");
 
   // 4️⃣ Create books
   const booksToInsert = [
@@ -75,6 +79,9 @@ async function seed() {
   ];
 
   const insertedBooks = await db.insert(book).values(booksToInsert).returning();
+
+  if (!insertedBooks || insertedBooks.length !== booksToInsert.length) 
+  throw new Error("Books insert failed");
 
   // 5️⃣ Add each book with different reading status
   await db
