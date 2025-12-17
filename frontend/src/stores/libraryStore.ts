@@ -4,11 +4,11 @@ import {
   getUserBooks,
   removeBookFromUserList,
 } from "@/api/books";
-import type { InternalBook } from "@/types/books";
+import type { Book } from "../@types/books";
 
 type LibraryState = {
-  books: InternalBook[];
-  addBook: (userId: number, book: InternalBook) => Promise<void>;
+  books: Book[];
+  addBook: (userId: number, book: Book) => Promise<void>;
   removeBook: (userId: number, bookId: number) => Promise<void>;
   loadBooks: (userId: number) => Promise<void>;
 };
@@ -17,10 +17,10 @@ export const useLibraryStore = create<LibraryState>((set) => ({
   books: [],
 
   // Add a book for a specific user
-  addBook: async (userId: number, book: InternalBook): Promise<void> => {
+  addBook: async (userId: number, book: Book): Promise<void> => {
     try {
       if (!userId) throw new Error("User ID is required to add a book.");
-      const addedBook: InternalBook = await addBookToUserList(userId, book); // API call
+      const addedBook: Book = await addBookToUserList(userId, book); // API call
       set((state: LibraryState) => ({
         books: [...state.books, addedBook],
       }));
@@ -46,7 +46,7 @@ export const useLibraryStore = create<LibraryState>((set) => ({
   loadBooks: async (userId: number) => {
     try {
       if (!userId) throw new Error("User ID is required to load books.");
-      const res: InternalBook[] = await getUserBooks(userId);
+      const res: Book[] = await getUserBooks(userId);
       set({ books: res });
     } catch (error) {
       console.error("Failed to load books:", error);

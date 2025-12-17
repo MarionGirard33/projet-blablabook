@@ -2,26 +2,30 @@ import { Button } from "@/components/ui/button";
 import { useForm } from "@tanstack/react-form";
 import { useUpdateUser } from "./mutation/updateUser.mutation";
 import type { UpdateUserInput } from "./@types/user";
+import { useCurrentUser } from "@/hooks/useCurrentUser";
+import { useAuthStore } from "@/stores/authStore";
 
 type UpdateUserFormProps = {
   userId: number;
-  initialData?: { email: string; username: string; image: string };
   onClose?: () => void;
   onUpdate?: (updatedUser: { email: string; username: string; image: string }) => void;
 };
 
 const availableImages = ["image1.jpg", "image2.jpg", "image3.jpg"];
 
-export default function UpdateUserForm({ userId, initialData, onClose, onUpdate }: UpdateUserFormProps) {
+export default function UpdateUserForm({ userId, onClose, onUpdate }: UpdateUserFormProps) {
   const updateUserMutation = useUpdateUser(userId);
+
+  const { data: currentUser } = useCurrentUser();
+  if (!currentUser) return <div>Loading...</div>;
 
   const form = useForm({
     defaultValues: {
-      username: initialData?.username || "",
-      email: initialData?.email || "",
+      username: currentUser?.username || "",
+      email: currentUser?.email || "",
       password: "",
       confirmPassword: "",
-      image: initialData?.image || "image1.png",
+      image: currentUser?.image || "image1.jpg",
     },
     onSubmit: async ({ value }) => {
       if (value.password && value.password !== value.confirmPassword) {
@@ -38,12 +42,19 @@ export default function UpdateUserForm({ userId, initialData, onClose, onUpdate 
 
       updateUserMutation.mutate(body, {
         onSuccess: () => {
+          // mettre à jour le store
+          useAuthStore.getState().updateUser({
+            username: value.username,
+            email: value.email,
+            image: value.image,
+          });
           if (onUpdate) onUpdate({ username: value.username, email: value.email, image: value.image });
           if (onClose) onClose();
         },
       });
     },
   });
+
 
   return (
     <form
@@ -153,7 +164,7 @@ export default function UpdateUserForm({ userId, initialData, onClose, onUpdate 
       </form.Field>
 
 
-      <Button type="submit" className="w-full mt-4 cursor-pointer">
+      <Button type="submit" className="w-full mt-4 cursor-pointer bg-emerald-700 text-white">
         {updateUserMutation.isPending ? "Mise à jour..." : "Enregistrer"}
       </Button>
     </form>

@@ -1,5 +1,5 @@
 import * as argon2 from 'argon2';
-import { eq, or } from 'drizzle-orm';
+import { eq, or, and, isNull } from 'drizzle-orm';
 import { user } from '../db/schema';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { db } from 'src/db';
@@ -10,23 +10,31 @@ import { UserInsert, UserSelect } from './types/user';
 
 @Injectable()
 export class UserService {
+  async getUserByUsername(username: string): Promise<UserSelect | null> {
+      const result = await db
+        .select()
+        .from(user)
+        .where(and(eq(user.username, username), isNull(user.deletedAt)));
+  
+      return result[0] ?? null;
+    }
 
- async checkUserExisting(
-     username: string,
-     email: string,
-   ): Promise<UserSelect | null> {
-     const result = await db
-       .select()
-       .from(user)
-       .where(or(eq(user.email, email), eq(user.username, username)));
- 
-     return result[0] ?? null;
-   }
- 
-   async createUser(userInputData: UserInsert): Promise<UserSelect | null> {
-     const result = await db.insert(user).values(userInputData).returning();
-     return result[0] ?? null;
-   }
+  async checkUserExisting(
+      username: string,
+      email: string,
+    ): Promise<UserSelect | null> {
+      const result = await db
+        .select()
+        .from(user)
+        .where(or(eq(user.email, email), eq(user.username, username)));
+  
+      return result[0] ?? null;
+    }
+  
+  async createUser(userInputData: UserInsert): Promise<UserSelect | null> {
+    const result = await db.insert(user).values(userInputData).returning();
+    return result[0] ?? null;
+  }
 
   async update(id: number, data: UpdateUserRequestDto) {
     const updateData = { ...data };

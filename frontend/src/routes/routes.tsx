@@ -1,4 +1,5 @@
 import RootLayout from "@/layouts/RootLayout";
+import LoginPage from "@/pages/Auth/LoginPage";
 import RegisterPage from "@/pages/Auth/RegisterPage";
 import HomePage from "@/pages/HomePage";
 import NotFound from "@/pages/NotFound";
@@ -9,13 +10,16 @@ import {
   createRouter,
   createRootRoute,
   createRoute,
+  useNavigate,
 } from "@tanstack/react-router";
+import { useCurrentUser } from "@/hooks/useCurrentUser";
 
 const rootRoute = createRootRoute({
   component: () => <RootLayout />,
   notFoundComponent: () => <NotFound />,
 });
 
+// HOME ROUTE
 const homeRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/",
@@ -36,11 +40,25 @@ const libraryRoute = createRoute({
   component: () => <LibraryPage />,
 });
 
+// LOGIN ROUTE
+const loginPage = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/login",
+  component: () => <LoginPage />,
+});
+
 // Profile ROUTE 
 const profilePage = createRoute({
   getParentRoute: () => rootRoute,
   path: "/profile",
-  component: () => <ProfilePage userId={1} />, // temporaire
+  component: () => {
+    const { data: currentUser, isLoading, isError } = useCurrentUser();
+
+    if (isLoading) return <div>Chargement...</div>;
+    if (isError || !currentUser) return <div>Impossible de charger le profil</div>;
+
+    return <ProfilePage userId={currentUser.id} />;
+  },
 });
 
 
@@ -49,6 +67,7 @@ const profilePage = createRoute({
 const routeTree = rootRoute.addChildren([
   homeRoute,
   registerPage,
+  loginPage,
   libraryRoute,
   profilePage
 ]);

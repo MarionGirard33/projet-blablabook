@@ -1,6 +1,7 @@
 import {
   Injectable,
   InternalServerErrorException,
+  UnauthorizedException,
   UnprocessableEntityException,
 } from '@nestjs/common';
 import { plainToInstance } from 'class-transformer';
@@ -9,11 +10,44 @@ import { UserService } from 'src/user/user.service';
 import argon2 from 'argon2';
 import { UserInsert } from 'src/user/types/user';
 import { RegisterResponseDto } from './dto/register-response.dto';
+import { LoginRequestDto } from './dto/login-request.dto';
+import { LoginResponseDto } from './dto/login-response.dto';
 
 @Injectable()
 export class AuthService {
   // injection de dépendances pour accéder aux méthodes
   constructor(private readonly userService: UserService) {}
+
+  async login(payload: LoginRequestDto) {
+    const user = await this.userService.getUserByUsername(payload.username);
+    if (!user) {
+      console.error('email not found');
+      throw new UnauthorizedException('invalid credentials');
+    }
+
+    let isPasswordValid: boolean;
+    try {
+      isPasswordValid = await argon2.verify(user.password, payload.password);
+    } catch (err) {
+      let errorMessage = 'failed to check the password';
+      if (err instanceof Error) {
+        errorMessage = err.message;
+      }
+      console.error('check password is failed: ', errorMessage);
+      throw new InternalServerErrorException('failed to hash password');
+    }
+
+    if (!isPasswordValid) {
+      console.error('password is not valid');
+      throw new UnauthorizedException('invalid credentials');
+    }
+
+    // TODO: créer le token JWT
+    // TODO: créer le refresh token
+    return plainToInstance(LoginResponseDto, user, {
+      excludeExtraneousValues: true,
+    });
+  }
 
   async register(payload: RegisterRequestDto) {
     if (payload.password !== payload.confirmPassword) {

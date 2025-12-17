@@ -31,7 +31,7 @@
       <div className="w-full max-w-md h-[70vh] mx-auto flex flex-col justify-center p-2">
 
         {/* Carré principal */}
-        <div className="w-full border border-black rounded-lg bg-gray-50 p-6 flex flex-col justify-between h-[85%] mt-4">
+        <div className="w-full border border-black rounded bg-gray-50 p-6 flex flex-col justify-between h-[85%] mt-4">
           
           {/* Bloc supérieur : crayon + image + infos */}
           <div>
@@ -71,6 +71,8 @@
           <Button
             disabled={deleteUserMutation.isPending}
             onClick={() => deleteUserMutation.mutate()}
+            variant="destructive"
+            className="cursor-pointer"
           >
             {deleteUserMutation.isPending ? "Suppression..." : "Supprimer mon compte"}
           </Button>

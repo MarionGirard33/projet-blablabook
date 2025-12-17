@@ -1,60 +1,45 @@
-import { z } from "zod";
+import api from "@/api/axios";
+import FormAction from "@/components/Form/FormAction/FormAction";
+import FormField from "@/components/Form/FormFields/FormField";
+import FormGlobalError from "@/components/Form/FormGlobalError";
+import FormTitle from "@/components/Form/FormTitle";
+import type { BackendErrorResponse } from "@/components/Form/Types/form.type";
+import { useAuthStore } from "@/stores/authStore";
+import { useForm } from "@tanstack/react-form";
 import { useMutation } from "@tanstack/react-query";
 import { useNavigate, Link } from "@tanstack/react-router";
-import api from "@/api/axios";
 import type { AxiosError } from "axios";
-import { useForm } from "@tanstack/react-form";
-import FormTitle from "@/components/Form/FormTitle";
-import FormField from "@/components/Form/FormFields/FormField";
-import FormAction from "@/components/Form/FormAction/FormAction";
-import type { BackendErrorResponse } from "@/components/Form/Types/form.type";
 import { useState } from "react";
-import FormGlobalError from "@/components/Form/FormGlobalError";
+import { z } from "zod";
 
-const schema = z
-  .object({
-    email: z.email("Email invalide").trim(),
-    username: z
-      .string()
-      .min(2, "Le nom d'utilisateur doit contenir au moins 2 caractères")
-      .trim(),
-    password: z
-      .string()
-      .min(8, "Le mot de passe doit contenir au moins 8 caractères")
-      .trim(),
-    confirmPassword: z
-      .string()
-      .min(1, "Veuillez confirmer votre mot de passe")
-      .trim(),
-  })
-  .refine((data) => data.password === data.confirmPassword, {
-    message: "La confirmation du mot de passe a échouée",
-    path: ["confirmPassword"],
-  });
+const schema = z.object({
+  username: z.string().min(1, "Le nom d'utilisateur doit être définis"),
+  password: z.string().min(1, "Le mot de passe est attendu"),
+});
 
-type RegisterFormData = {
-  email: string;
+type LoginFormData = {
   username: string;
   password: string;
-  confirmPassword: string;
 };
 
-export default function RegisterPage() {
+export default function LoginPage() {
   const navigate = useNavigate();
+  const authStore = useAuthStore();
+  // state for global error if request is failed
   const [globalError, setGlobalError] = useState<string | null>(null);
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const mutation = useMutation<
     any,
     AxiosError<BackendErrorResponse>,
-    RegisterFormData
+    LoginFormData
   >({
-    mutationFn: async (data: RegisterFormData) => {
-      return api.post("/auth/register", data);
+    mutationFn: async (data: LoginFormData) => {
+      return api.post("/auth/login", data);
     },
-    onSuccess: () => {
-      // TODO: envoi un message pour indiquer que l'inscription à fonctionner
-      navigate({ to: "/login" });
+    onSuccess: (response) => {
+      authStore.login(response.data);
+      navigate({ to: "/" });
     },
     onError: (error) => {
       console.error("Erreur serveur: ", error.message);
@@ -62,10 +47,8 @@ export default function RegisterPage() {
   });
 
   const defaultValues = {
-    email: "",
     username: "",
     password: "",
-    confirmPassword: "",
   };
 
   const form = useForm({
@@ -73,20 +56,15 @@ export default function RegisterPage() {
     onSubmit: async ({ value }) => {
       setGlobalError(null);
       mutation.mutate(value, {
+        // if request failed, we set error message in the state, and reset input password
         onError: (error) => {
           const errorMessage =
-            error.response?.data.message || "Une erreur est survenue";
-          setGlobalError(errorMessage);
+            error.response?.data?.message || "Une erreur est survenue";
+          setGlobalError(errorMessage); // add error message to the globalError state
 
+          // reset input password
           form.setFieldValue("password", "");
-          form.setFieldValue("confirmPassword", "");
-
           form.setFieldMeta("password", (prev) => ({
-            ...prev,
-            isTouched: false,
-          }));
-
-          form.setFieldMeta("confirmPassword", (prev) => ({
             ...prev,
             isTouched: false,
           }));
@@ -107,22 +85,9 @@ export default function RegisterPage() {
         form.handleSubmit();
       }}
     >
-      <FormTitle title="Inscription" />
+      <FormTitle title="Connexion" />
 
       {globalError && <FormGlobalError message={globalError} />}
-
-      <form.Field name="email">
-        {(field) => {
-          return (
-            <FormField
-              field={field}
-              type={"email"}
-              label={"Email"}
-              placeholder={""}
-            />
-          );
-        }}
-      </form.Field>
 
       <form.Field name="username">
         {(field) => {
@@ -150,26 +115,13 @@ export default function RegisterPage() {
         }}
       </form.Field>
 
-      <form.Field name="confirmPassword">
-        {(field) => {
-          return (
-            <FormField
-              field={field}
-              type={"password"}
-              label={"Confirmation du mot de passe"}
-              placeholder={""}
-            />
-          );
-        }}
-      </form.Field>
-
       <p className="text-sm text-center mt-4">
-        Vous avez déjà un compte ?{" "}
+        Pas encore de compte ?{" "}
         <Link
-          to="/login"
+          to="/register"
           className="text-blue-600 underline hover:text-blue-800"
         >
-          Connectez-vous
+          Créez-en un ici
         </Link>
       </p>
 
