@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import { Menu, X, Book } from "lucide-react";
@@ -26,6 +26,8 @@ export default function Header() {
           <Book className="h-8 w-8" />
           <span className="font-bold text-xl">Blablabook</span>
         </Link>
+
+        {/* Desktop nav */}
         <nav className="hidden md:flex items-center gap-4">
           <Link to="/" className="hover:underline">
             Accueil
@@ -39,19 +41,11 @@ export default function Header() {
                 <DropdownMenu>
                   <DropdownMenuTrigger className="cursor-pointer" asChild>
                     <Avatar>
-                      {user.image? (
-                        <img
-                          src={user.image ? `/images/${user.image}` : "/images/default-avatar.png"}
-                          alt={`Avatar de ${user.username || "l'utilisateur"}`}
-                          className="w-8 h-8 rounded-full"
-                        />
-                      ) : (
-                        <img
-                          src="https://cdn-icons-png.flaticon.com/512/29/29302.png"
-                          alt="Book avatar"
-                          className="w-8 h-8 rounded-full bg-gray-200"
-                        />
-                      )}
+                      <img
+                        src={user.image ? `/images/${user.image}` : "/images/image1.jpg"}
+                        alt={`Avatar de ${user.username || "l'utilisateur"}`}
+                        className="w-8 h-8 rounded-full"
+                      />
                     </Avatar>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
@@ -79,12 +73,15 @@ export default function Header() {
             </Link>
           )}
         </nav>
+
+        {/* Mobile burger */}
         <button className="md:hidden" onClick={() => setOpen(true)}>
-          <Menu />
+          <Menu className="cursor-pointer" />
         </button>
+        {/* Mobile menu overlay */}
         {open && (
           <div className="fixed inset-0 z-50 bg-black bg-opacity-50 flex flex-col p-4">
-            <button className="self-end text-white text-2xl" onClick={() => setOpen(false)}>
+            <button className="self-end text-white text-2xl cursor-pointer" onClick={() => setOpen(false)}>
               <X size={28} />
             </button>
             <nav className="flex flex-col items-center gap-6 mt-20">
@@ -97,7 +94,7 @@ export default function Header() {
                     Librairie
                   </Link>
                   <Link to="/profile" className="text-white text-xl" onClick={() => setOpen(false)}>
-                    {user.username ?? "Profil"}
+                    {"Mon profil"}
                   </Link>
                   <Button
                     variant="destructive"

@@ -28,10 +28,10 @@
     if (isError) return <div>{error?.message}</div>;
 
     return (
-      <div className="w-full max-w-md h-[70vh] mx-auto flex flex-col justify-center p-2">
+      <div className="flex w-full flex-col items-center justify-center py-4">
 
         {/* Carré principal */}
-        <div className="w-full border border-black rounded bg-gray-50 p-6 flex flex-col justify-between h-[85%] mt-4">
+        <div className="w-full max-w-md border border-black rounded bg-gray-50 p-6 flex flex-col justify-between min-h-[500px]">
           
           {/* Bloc supérieur : crayon + image + infos */}
           <div>
@@ -82,7 +82,6 @@
         {isModalOpen && user && (
           <ProfilePageModal
             userId={userId}
-            userData={{ email: user.email, username: user.username, image: user.image }}
             onClose={() => setIsModalOpen(false)}
             onUpdate={(updatedUser) => {
             // au lieu de setUser (useEffect)
