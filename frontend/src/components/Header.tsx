@@ -39,10 +39,10 @@ export default function Header() {
                 <DropdownMenu>
                   <DropdownMenuTrigger className="cursor-pointer" asChild>
                     <Avatar>
-                      {user.avatarUrl ? (
+                      {user.image? (
                         <img
-                          src={user.avatarUrl}
-                          alt={user.username}
+                          src={user.image ? `/images/${user.image}` : "/images/default-avatar.png"}
+                          alt={`Avatar de ${user.username || "l'utilisateur"}`}
                           className="w-8 h-8 rounded-full"
                         />
                       ) : (
@@ -62,7 +62,10 @@ export default function Header() {
                     </DropdownMenuItem>
                     <DropdownMenuItem
                       className="text-red-500"
-                      onClick={() => logout()}
+                      onClick={() => {
+                        logout();
+                        navigate({ to: "/" });
+                      }}
                     >
                       Déconnexion
                     </DropdownMenuItem>
@@ -80,32 +83,20 @@ export default function Header() {
           <Menu />
         </button>
         {open && (
-          <div className="fixed inset-0 z-50 bg-black bg-opacity-50 flex flex-col">
-            <button className="self-end m-4" onClick={() => setOpen(false)}>
-              <X color="white" />
+          <div className="fixed inset-0 z-50 bg-black bg-opacity-50 flex flex-col p-4">
+            <button className="self-end text-white text-2xl" onClick={() => setOpen(false)}>
+              <X size={28} />
             </button>
             <nav className="flex flex-col items-center gap-6 mt-20">
-              <Link
-                to="/"
-                className="text-white text-xl"
-                onClick={() => setOpen(false)}
-              >
+              <Link to="/" className="text-white text-xl" onClick={() => setOpen(false)}>
                 Accueil
               </Link>
               {user ? (
                 <>
-                  <Link
-                    to="/library"
-                    className="text-white text-xl"
-                    onClick={() => setOpen(false)}
-                  >
+                  <Link to="/library" className="text-white text-xl" onClick={() => setOpen(false)}>
                     Librairie
                   </Link>
-                  <Link
-                    to="/profile"
-                    className="text-white text-xl"
-                    onClick={() => setOpen(false)}
-                  >
+                  <Link to="/profile" className="text-white text-xl" onClick={() => setOpen(false)}>
                     {user.username ?? "Profil"}
                   </Link>
                   <Button
@@ -113,6 +104,7 @@ export default function Header() {
                     className="text-white"
                     onClick={() => {
                       logout();
+                      navigate({ to: "/" });
                       setOpen(false);
                     }}
                   >
@@ -120,9 +112,11 @@ export default function Header() {
                   </Button>
                 </>
               ) : (
-                <Link to="/login" onClick={() => setOpen(false)}>
-                  <Button>Se connecter</Button>
-                </Link>
+                <>
+                  <Link to="/login" onClick={() => setOpen(false)}>
+                    <Button>Se connecter</Button>
+                  </Link>
+                </>
               )}
             </nav>
           </div>
