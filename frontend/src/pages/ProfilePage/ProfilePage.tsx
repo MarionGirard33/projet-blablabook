@@ -28,10 +28,13 @@
     if (isError) return <div>{error?.message}</div>;
 
     return (
-      <div className="flex w-full flex-col items-center justify-center py-4">
-
+      <div className="flex w-full flex-col items-center justify-center py-6 md:py-0 px-4">
         {/* Carré principal */}
-        <div className="w-full max-w-md border border-black rounded bg-gray-50 p-6 flex flex-col justify-between min-h-[500px]">
+        <div
+          className="w-full max-w-md md:max-w-lg lg:max-w-2xl border border-black rounded bg-gray-50 p-4 lg:p-12 flex flex-col justify-between
+          min-h-[500px] md:min-h-[550px] lg:min-h-[600px]
+          "
+        >
           
           {/* Bloc supérieur : crayon + image + infos */}
           <div>
@@ -55,16 +58,18 @@
             />
 
             {/* Infos utilisateur alignées */}
-            <div className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-2 px-4">
+            <div className="grid grid-cols-[max-content_1fr] gap-x-4 md:gap-x-8 lg:gap-x-12 gap-y-2 md:ml-24 lg:ml-40 w-full min-w-0">
               <span className="font-semibold">Pseudo :</span>
-              <span>{user?.username}</span>
+              <span className="break-words min-w-0">{user?.username}</span>
 
               <span className="font-semibold">Email :</span>
-              <span>{user?.email}</span>
+              <span className="break-words min-w-0">{user?.email}</span>
 
               <span className="font-semibold">Mot de passe :</span>
-              <span className="tracking-widest">••••••••••••</span>
+              <span className="tracking-widest break-words min-w-0">••••••••••••</span>
             </div>
+
+
           </div>
 
           {/* Bouton supprimer en bas */}

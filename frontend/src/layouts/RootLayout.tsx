@@ -4,11 +4,13 @@ import { Outlet } from "@tanstack/react-router";
 
 export default function RootLayout() {
   return (
-    <div className="flex min-h-screen w-full flex-col overflow-x-hidden">
+    <div className="flex min-h-screen w-full flex-col">
       <Header />
-      <main className="flex-1 w-full px-4 sm:px-12 md:px-20 py-10 flex flex-col">
+
+      <main className="flex-1 flex flex-col justify-center w-full px-4 sm:px-12 md:px-20 container mx-auto py-10">
         <Outlet />
       </main>
+
       <Footer />
     </div>
   );
