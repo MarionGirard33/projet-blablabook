@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import { Menu, X, Book } from "lucide-react";
@@ -75,11 +75,25 @@ export default function Header() {
             </Link>
           )}
         </nav>
-
-        {/* Mobile burger */}
-        <button className="md:hidden" onClick={() => setOpen(true)}>
-          <Menu className="cursor-pointer" />
-        </button>
+          
+        {/* Mobile avatar ou burger */}
+        <div className="flex items-center md:hidden">
+          <button onClick={() => setOpen(true)}>
+            {user ? (
+              <Avatar className="w-10 h-10">
+                <AvatarImage
+                  src={user.image ? `/images/${user.image}` : undefined}
+                  alt={`Avatar de ${user.username || "X"}`}
+                />
+                <AvatarFallback>
+                  {user.username ? user.username[0].toUpperCase() : "X"}
+                </AvatarFallback>
+              </Avatar>
+            ) : (
+              <Menu className="cursor-pointer" />
+            )}
+          </button>
+        </div>
         {/* Mobile menu overlay */}
         {open && (
           <div className="fixed inset-0 z-50 bg-black bg-opacity-50 flex flex-col p-4">

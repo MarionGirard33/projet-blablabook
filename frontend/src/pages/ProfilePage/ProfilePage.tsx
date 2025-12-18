@@ -63,7 +63,7 @@
                 alt={`Avatar de ${user?.username || "l'utilisateur"}`}
               />
               <AvatarFallback className="text-4xl font-bold">
-                {user?.username ? user.username[0].toUpperCase() : "U"} {/* première lettre */}
+                {user?.username ? user.username[0].toUpperCase() : "X"} {/* première lettre */}
               </AvatarFallback>
             </Avatar>
     

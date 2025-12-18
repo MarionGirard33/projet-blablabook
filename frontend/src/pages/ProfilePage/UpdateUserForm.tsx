@@ -91,7 +91,7 @@ export default function UpdateUserForm({ userId, onClose, onUpdate }: UpdateUser
                     <AvatarImage src={`/images/${img}`} />
                   ) : (
                     <AvatarFallback className="text-lg font-bold">
-                      {currentUser.username ? currentUser.username[0].toUpperCase() : "U"}
+                      {currentUser.username ? currentUser.username[0].toUpperCase() : "X"}
                     </AvatarFallback>
                   )}
                 </Avatar>
