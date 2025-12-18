@@ -4,14 +4,15 @@ import { useUpdateUser } from "./mutation/updateUser.mutation";
 import type { UpdateUserInput } from "./@types/user";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { useAuthStore } from "@/stores/authStore";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 type UpdateUserFormProps = {
   userId: number;
   onClose?: () => void;
-  onUpdate?: (updatedUser: { email: string; username: string; image: string }) => void;
+  onUpdate?: (updatedUser: { email: string; username: string; image?: string }) => void;
 };
 
-const availableImages = ["image1.jpg", "image2.jpg", "image3.jpg"];
+const availableImages = ["image1.jpg", "image2.jpg", "image3.jpg", undefined];
 
 export default function UpdateUserForm({ userId, onClose, onUpdate }: UpdateUserFormProps) {
   const updateUserMutation = useUpdateUser(userId);
@@ -25,7 +26,7 @@ export default function UpdateUserForm({ userId, onClose, onUpdate }: UpdateUser
       email: currentUser?.email || "",
       password: "",
       confirmPassword: "",
-      image: currentUser?.image || "image1.jpg",
+      image: currentUser?.image || undefined,
     },
     onSubmit: async ({ value }) => {
       if (value.password && value.password !== value.confirmPassword) {
@@ -68,22 +69,33 @@ export default function UpdateUserForm({ userId, onClose, onUpdate }: UpdateUser
       <form.Field name="image">
         {(field) => (
           <>
-            <img
-              src={`/images/${field.state.value}`}
-              alt="User avatar"
-              className="w-28 h-28 rounded-full mx-auto border shadow mb-6"
-            />
-
+            <Avatar className="w-28 h-28 mx-auto mb-6 border shadow">
+        <AvatarImage
+          src={field.state.value ? `/images/${field.state.value}` : undefined}
+          alt={`Avatar de ${currentUser.username || "l'utilisateur"}`}
+        />
+        <AvatarFallback className="text-4xl font-bold">
+          {currentUser.username ? currentUser.username[0].toUpperCase() : "X"}
+        </AvatarFallback>
+      </Avatar>
+      
             {/* Miniatures */}
             <div className="flex justify-center gap-3 mb-8">
               {availableImages.map((img) => (
-                <img
+                <Avatar
                   key={img}
-                  src={`/images/${img}`}
-                  className={`w-14 h-14 rounded-full cursor-pointer border 
-                    ${field.state.value === img ? "ring-4 ring-blue-400" : "opacity-70 hover:opacity-100"}`}
-                  onClick={() => field.handleChange(img)}   
-                />
+                  className={`w-14 h-14 cursor-pointer border 
+                    ${field.state.value === img ? "ring-1 ring-blue-100" : "opacity-70 hover:opacity-100"}`}
+                  onClick={() => field.handleChange(img)}
+                >
+                  {img ? (
+                    <AvatarImage src={`/images/${img}`} />
+                  ) : (
+                    <AvatarFallback className="text-lg font-bold">
+                      {currentUser.username ? currentUser.username[0].toUpperCase() : "U"}
+                    </AvatarFallback>
+                  )}
+                </Avatar>
               ))}
             </div>
           </>
@@ -95,14 +107,14 @@ export default function UpdateUserForm({ userId, onClose, onUpdate }: UpdateUser
         {(field) => (
           <div className="mb-4">
             <label htmlFor="username" className="block text-gray-500 text-sm mb-1">
-              Pseudo
+              Nom d'utilisateur
             </label>
             <input
               id="username"
               type="text"
               value={field.state.value}
               onChange={(e) => field.handleChange(e.target.value)}
-              placeholder="Entrez votre pseudo"
+              placeholder="Entrez votre nom d'utilisateur"
               className="w-full border rounded px-3 py-2 text-sm placeholder-gray-400"
             />
           </div>
@@ -162,7 +174,6 @@ export default function UpdateUserForm({ userId, onClose, onUpdate }: UpdateUser
           </div>
         )}
       </form.Field>
-
 
       <Button type="submit" className="w-full mt-4 cursor-pointer bg-emerald-700 text-white">
         {updateUserMutation.isPending ? "Mise à jour..." : "Enregistrer"}

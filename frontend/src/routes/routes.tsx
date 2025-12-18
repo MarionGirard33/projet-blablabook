@@ -10,7 +10,6 @@ import {
   createRouter,
   createRootRoute,
   createRoute,
-  useNavigate,
 } from "@tanstack/react-router";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 
@@ -60,9 +59,6 @@ const profilePage = createRoute({
     return <ProfilePage userId={currentUser.id} />;
   },
 });
-
-
-
 
 const routeTree = rootRoute.addChildren([
   homeRoute,

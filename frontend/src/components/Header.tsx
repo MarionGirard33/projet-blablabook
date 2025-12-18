@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import { Menu, X, Book } from "lucide-react";
-import { Avatar } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -40,12 +40,14 @@ export default function Header() {
               <div className="hidden md:flex items-center">
                 <DropdownMenu>
                   <DropdownMenuTrigger className="cursor-pointer" asChild>
-                    <Avatar>
-                      <img
-                        src={user.image ? `/images/${user.image}` : "/images/image1.jpg"}
+                    <Avatar className="w-8 h-8">
+                      <AvatarImage
+                        src={user.image ? `/images/${user.image}` : undefined} 
                         alt={`Avatar de ${user.username || "l'utilisateur"}`}
-                        className="w-8 h-8 rounded-full"
                       />
+                      <AvatarFallback>
+                        {user.username ? user.username[0].toUpperCase() : "X"} 
+                      </AvatarFallback>
                     </Avatar>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">

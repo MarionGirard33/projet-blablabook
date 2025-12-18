@@ -39,7 +39,7 @@ export class AuthService {
 
     if (!isPasswordValid) {
       console.error('password is not valid');
-      throw new UnauthorizedException('invalid credentials');
+      throw new UnauthorizedException("nom d'utilisateur ou mot de passe invalide");
     }
 
     // TODO: créer le token JWT

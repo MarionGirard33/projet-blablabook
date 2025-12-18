@@ -9,5 +9,5 @@ export type UpdateUserInput = {
   username: string;
   email: string;
   password?: string;
-  image: string;
+  image?: string;
 };
