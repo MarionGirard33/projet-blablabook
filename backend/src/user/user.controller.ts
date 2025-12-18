@@ -9,6 +9,14 @@ import { UpdateUserRequestDto } from './dto/update-user.request.dto';
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
+  @Get(':id')
+  @ApiResponse({ status: 200, type: UpdateUserResponseDto })
+  @ApiResponse({ status: 404, description: 'User not found' })
+  async findById(@Param('id', ParseIntPipe) id: number) {
+    return this.userService.findById(id);
+  }
+
+  // mise à jour
   @Patch(':id')
   @ApiResponse({ status: 200, type: UpdateUserResponseDto })
   @ApiResponse({ status: 404, description: 'User not found' })
@@ -22,11 +30,16 @@ export class UserController {
       user: updatedUser,
     };
   }
-
-  @Get(':id')
-  @ApiResponse({ status: 200, type: UpdateUserResponseDto })
+  
+  // soft delete
+  @Patch(':id/soft-delete')
+  @ApiResponse({ status: 200, description: 'User soft deleted successfully', type: UpdateUserResponseDto })
   @ApiResponse({ status: 404, description: 'User not found' })
-  async findById(@Param('id', ParseIntPipe) id: number) {
-    return this.userService.findById(id);
+  async softDelete(@Param('id', ParseIntPipe) id: number) {
+    const deletedUser = await this.userService.softDelete(id);
+    return {
+      message: 'User deleted successfully',
+      deletedUser,
+    };
   }
 }

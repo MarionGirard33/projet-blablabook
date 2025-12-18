@@ -23,7 +23,7 @@ export default function UpdateUserForm({ userId, onClose, onUpdate }: UpdateUser
   const form = useForm({
     defaultValues: {
       username: currentUser?.username || "",
-      email: currentUser?.email || "",
+      email: currentUser?.email.toLowerCase() || "",
       password: "",
       confirmPassword: "",
       image: currentUser?.image || undefined,
@@ -36,7 +36,7 @@ export default function UpdateUserForm({ userId, onClose, onUpdate }: UpdateUser
 
       const body: UpdateUserInput = {
         username: value.username,
-        email: value.email,
+        email: value.email.toLowerCase(),
         image: value.image,
         ...(value.password ? { password: value.password } : {}),
       };
@@ -55,7 +55,6 @@ export default function UpdateUserForm({ userId, onClose, onUpdate }: UpdateUser
       });
     },
   });
-
 
   return (
     <form
@@ -81,9 +80,9 @@ export default function UpdateUserForm({ userId, onClose, onUpdate }: UpdateUser
       
             {/* Miniatures */}
             <div className="flex justify-center gap-3 mb-8">
-              {availableImages.map((img) => (
+              {availableImages.map((img, index) => (
                 <Avatar
-                  key={img}
+                  key={img ?? `fallback-${index}`} 
                   className={`w-14 h-14 cursor-pointer border 
                     ${field.state.value === img ? "ring-1 ring-blue-100" : "opacity-70 hover:opacity-100"}`}
                   onClick={() => field.handleChange(img)}

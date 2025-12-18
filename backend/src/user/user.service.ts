@@ -1,5 +1,5 @@
 import * as argon2 from 'argon2';
-import { eq, or, and, isNull } from 'drizzle-orm';
+import { eq, or, and, isNull, ilike } from 'drizzle-orm';
 import { user } from '../db/schema';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { db } from 'src/db';
@@ -10,34 +10,51 @@ import { UserInsert, UserSelect } from './types/user';
 
 @Injectable()
 export class UserService {
-  async getUserByUsername(username: string): Promise<UserSelect | null> {
-      const result = await db
-        .select()
-        .from(user)
-        .where(and(eq(user.username, username), isNull(user.deletedAt)));
   
-      return result[0] ?? null;
-    }
-
-  async checkUserExisting(
-      username: string,
-      email: string,
-    ): Promise<UserSelect | null> {
-      const result = await db
-        .select()
-        .from(user)
-        .where(or(eq(user.email, email), eq(user.username, username)));
-  
-      return result[0] ?? null;
-    }
-  
+  //  TODO Filtrer les champs sensibles (password)
   async createUser(userInputData: UserInsert): Promise<UserSelect | null> {
-    const result = await db.insert(user).values(userInputData).returning();
+    const normalizedEmail = userInputData.email.toLowerCase();
+
+    const result = await db
+    .insert(user)
+    .values({
+      ...userInputData,
+      email: normalizedEmail,
+    })
+    .returning();
+    return result[0] ?? null;
+  }
+
+  async getUserByUsername(username: string): Promise<UserSelect | null> {
+    const result = await db
+      .select()
+      .from(user)
+      .where(and(ilike(user.username, username), isNull(user.deletedAt))); 
+
+    return result[0] ?? null;
+  }
+
+  async checkUserExisting(username: string, email: string): Promise<UserSelect | null> {
+    const normalizedEmail = email.toLowerCase();
+    const result = await db
+      .select()
+      .from(user)
+      .where(
+        and(
+          or(ilike(user.email, normalizedEmail), ilike(user.username, username)),
+          isNull(user.deletedAt)
+        )
+      );
     return result[0] ?? null;
   }
 
   async update(id: number, data: UpdateUserRequestDto) {
     const updateData = { ...data };
+
+    if (updateData.email) updateData.email = updateData.email.toLowerCase();
+    if (updateData.password) {
+      updateData.password = await argon2.hash(updateData.password);
+    }
 
     if (updateData.password) {
       updateData.password = await argon2.hash(updateData.password);
@@ -46,9 +63,9 @@ export class UserService {
     const [updatedUser] = await db
       .update(user)
       .set(updateData)
-      .where(eq(user.id, id))
+      .where(and(eq(user.id, id), isNull(user.deletedAt)))
       .returning();
-
+      
     if (!updatedUser) {
       throw new NotFoundException(`User not found`);
     }
@@ -62,7 +79,10 @@ export class UserService {
     const [userRow] = await db
       .select()
       .from(user)
-      .where(eq(user.id, id))
+      .where(and(
+        eq(user.id, id),
+        isNull(user.deletedAt)
+      ))
       .limit(1);
 
     if (!userRow) {
@@ -70,6 +90,22 @@ export class UserService {
     }
 
     return plainToInstance(UpdateUserResponseDto, userRow, {
+      excludeExtraneousValues: true,
+    });
+  }
+
+  async softDelete(id: number) {
+    const [deletedUser] = await db
+      .update(user)
+      .set({ deletedAt: new Date() })
+      .where(eq(user.id, id))
+      .returning();
+
+    if (!deletedUser) {
+      throw new NotFoundException(`User not found`);
+    }
+
+    return plainToInstance(UpdateUserResponseDto, deletedUser, {
       excludeExtraneousValues: true,
     });
   }

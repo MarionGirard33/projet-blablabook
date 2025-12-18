@@ -1,32 +1,38 @@
   import { useState } from "react";
   import { Pencil } from "lucide-react";
   import ProfilePageModal from "./ProfilePageModale";
-  import { useQuery, useQueryClient, type UseQueryOptions } from "@tanstack/react-query";
+  import { useQuery, useQueryClient } from "@tanstack/react-query";
   import type { User } from "./@types/user";
   import { Button } from "@/components/ui/button";
   import api from "@/api/axios";
   import { useDeleteUser } from "./mutation/deleteUser.mutation";
   import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+  import { useAuthStore } from "@/stores/authStore";
 
   export default function ProfilePage({ userId }: { userId: number }) {
     const [isModalOpen, setIsModalOpen] = useState(false);
 
+    const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
     const queryClient = useQueryClient();
-    
-    const queryOptions: UseQueryOptions<User, Error> = {
+
+    const { data: user, isLoading, isError, error, } = useQuery<User, Error>({
       queryKey: ["user", userId],
-      queryFn: async (): Promise<User> => {
+      enabled: isAuthenticated,
+      queryFn: async () => {
         const res = await api.get<User>(`/user/${userId}`);
         return res.data;
       },
-    };
-
-    const { data: user, isLoading, isError, error } = useQuery<User, Error>(queryOptions);
+    });
 
     const deleteUserMutation = useDeleteUser(userId);
 
+    if (!isAuthenticated) {
+      return null;
+    }
+
     if (isLoading) return <div>Loading...</div>;
-    if (isError) return <div>{error?.message}</div>;
+    if (isError) return <div>{error.message}</div>;
+    if (!user) return null;
 
     return (
       <div className="flex w-full flex-col items-center justify-center py-6 md:py-0">
@@ -36,7 +42,6 @@
           min-h-[500px] md:min-h-[550px] lg:min-h-[600px]
           "
         >
-          
           {/* Bloc supérieur : crayon + image + infos */}
           <div>
             
@@ -69,7 +74,7 @@
               <span className="break-words min-w-0">{user?.username}</span>
 
               <span className="font-semibold">Email :</span>
-              <span className="break-words min-w-0">{user?.email}</span>
+              <span className="break-words min-w-0">{user?.email.toLowerCase()}</span>
 
               <span className="font-semibold">Mot de passe :</span>
               <span className="tracking-widest break-words min-w-0">••••••••••••</span>

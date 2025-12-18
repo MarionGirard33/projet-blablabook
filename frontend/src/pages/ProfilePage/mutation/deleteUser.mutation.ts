@@ -1,16 +1,23 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import api from "@/api/axios";
+import { useNavigate } from "@tanstack/react-router";
+import { useAuthStore } from "@/stores/authStore";
 
 export const useDeleteUser = (userId: number) => {
+  const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const logout = useAuthStore((state) => state.logout);
 
   return useMutation({
     mutationFn: async () => {
-      return api.delete(`/user/${userId}`);
+      if (!confirm("Êtes-vous sûr de vouloir supprimer votre compte ?")) return null;
+      return api.patch(`/user/${userId}/soft-delete`);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["user", userId] });
+      queryClient.removeQueries({ queryKey: ["user", userId] });
+      logout(); 
       alert("Compte supprimé !");
+      navigate({ to: "/" });
     },
     onError: (error) => {
       alert("Erreur lors de la suppression du compte");
