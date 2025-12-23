@@ -12,8 +12,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Check, Search, X } from "lucide-react";
 
-import { useQuery } from "@tanstack/react-query";
-import { getUserBooks } from "@/api/books";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { getUserBooks, addBookToUserList } from "@/api/books";
+import type { CreateBookDto, Book } from "@/@types/books";
 import type { ExternalBook } from "@/@types/externalBooks";
 import { searchExternalBooks } from "@/api/externalBooks";
 
@@ -30,6 +31,8 @@ export function AddBookModal({ isOpen, onClose, userId }: AddBookModalProps) {
     queryFn: () => getUserBooks(userId!),
     enabled: !!userId,
   });
+
+  const queryClient = useQueryClient();
 
   // Reset query and results when modal closes
   const handleClose = () => {
@@ -67,8 +70,53 @@ export function AddBookModal({ isOpen, onClose, userId }: AddBookModalProps) {
   const isInLibrary = (externalBook: ExternalBook) => {
     if (!externalBook.isbn?.length) return false;
 
-    return userBooks.some((b) => externalBook.isbn!.includes(b.isbn));
+    return userBooks.some((b) => externalBook.isbn.includes(b.isbn));
   };
+
+  // Normalize publishDate to YYYY-MM-DD format
+  const toIsoDate = (publishDate?: string): string => {
+    if (!publishDate) return new Date().toISOString().split("T")[0];
+
+    // Try parsing as date
+    const parsed = new Date(publishDate);
+    if (!isNaN(parsed.getTime())) {
+      return parsed.toISOString().split("T")[0];
+    }
+
+    // If year only (YYYY), pad with -01-01
+    const yearMatch = publishDate.match(/^(\d{4})$/);
+    if (yearMatch) return `${yearMatch[1]}-01-01`;
+
+    // Default to today
+    return new Date().toISOString().split("T")[0];
+  };
+
+  // Mutation to add a book
+  const addBookMutation = useMutation<Book, Error, ExternalBook>({
+    mutationFn: (externalBook) => {
+      if (!userId) throw new Error("UserId is required");
+      const createBookDto: CreateBookDto = {
+        name: externalBook.title || "Unknown Title",
+        author: externalBook.author || "Unknown Author",
+        isbn: Array.isArray(externalBook.isbn)
+          ? externalBook.isbn[0] || "N/A"
+          : externalBook.isbn || "N/A",
+        coverId: externalBook.cover || "default_cover.png",
+        description: "No description", // TODO : à rajouter lorsque les types seront finalisés
+        publishingHouse: "Unknown publisher", // TODO : à rajouter lorsque les types seront finalisés
+        publishedAt: toIsoDate(externalBook.publishDate),
+      };
+
+      return addBookToUserList(userId, createBookDto);
+    },
+    onSuccess: () => {
+      // Invalidate and refetch the user's library
+      queryClient.invalidateQueries({ 
+        queryKey: ["userBooks", userId],
+        refetchType: 'active'
+      });
+    },
+  });
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
@@ -124,21 +172,43 @@ export function AddBookModal({ isOpen, onClose, userId }: AddBookModalProps) {
             const alreadyInLibrary = isInLibrary(book);
 
             return (
-              <button
+              <div
                 key={book.key}
+                role="button"
+                tabIndex={0}
                 onClick={() => !alreadyInLibrary && handleCardClick(book)}
-                disabled={alreadyInLibrary}
                 className={`
-                  relative w-full bg-bookcream flex items-center gap-4
-                  mb-4 p-3 border rounded-lg text-left
-                  ${alreadyInLibrary ? "opacity-50 cursor-not-allowed" : "hover:bg-gray-50"}
-                `}
+          relative w-full bg-bookcream flex items-center gap-4
+          mb-4 p-3 border rounded-lg text-left
+          ${alreadyInLibrary ? "opacity-50" : "hover:bg-gray-50"}
+        `}
               >
+                {/* ✔️ Already in library */}
                 {alreadyInLibrary && (
                   <Check
                     className="absolute top-2 right-2 text-green-600"
                     size={22}
                   />
+                )}
+
+                {/* ➕ Add to library */}
+                {!alreadyInLibrary && (
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation(); // prevent triggering the card click
+                      addBookMutation.mutate(book);
+                    }}
+                    className="
+              absolute top-2 right-2
+              p-1 rounded-full
+              bg-bookterracotta text-white
+              hover:bg-bookochre
+            "
+                    aria-label="Ajouter à la librairie"
+                  >
+                    +
+                  </button>
                 )}
 
                 {book.cover ? (
@@ -156,12 +226,11 @@ export function AddBookModal({ isOpen, onClose, userId }: AddBookModalProps) {
                   <p className="text-sm text-gray-600">
                     {book.author || "Unknown"}
                   </p>
-
                   {book.publishDate && (
                     <p className="text-xs text-gray-500">{book.publishDate}</p>
                   )}
                 </div>
-              </button>
+              </div>
             );
           })}
         </div>

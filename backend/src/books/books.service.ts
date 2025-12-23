@@ -1,84 +1,12 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger, HttpException, HttpStatus } from '@nestjs/common';
 import { db } from '../db';
 import { book, list, listBook } from '../db/schema';
 import { CreateBookDto } from './dto/create-book.dto';
-import { eq, and } from 'drizzle-orm';
+import { eq, and, desc } from 'drizzle-orm';
 import { BookSelect, ListBookSelect } from './types/books';
-import axios from 'axios';
-
-function getRandomQuery() {
-  const words = [
-    'Science',
-    'Fantasy',
-    'Adventure',
-    'Mystery',
-    'Biography',
-    'Travel',
-    'Comics',
-    'Romance',
-    'History',
-    'Children',
-    'Young adult',
-    'Thriller',
-    'Cooking',
-    'Music',
-    'Technology',
-    'Nature',
-    'Animals',
-    'Space',
-    'Friendship',
-    'Family',
-    'Crime',
-    'Humor',
-    'Drama',
-    'Science fiction',
-    'Horror',
-    'Magic',
-    'Mythology',
-    'Education',
-  ];
-  return words[Math.floor(Math.random() * words.length)];
-}
-
 @Injectable()
 export class BooksService {
-  async getRandomExternalBooks() {
-    const q = getRandomQuery();
-    try {
-      const res = await axios.get(
-        `https://openlibrary.org/search.json?q=${q}&sort=random&limit=10`,
-      );
-      return res.data.docs;
-    } catch (error) {
-      console.error('Error searching books:', error);
-      return [];
-    }
-  }
-
-  async getExternalBooksByCategoryName(categoryName: string) {
-    try {
-      const res = await axios.get(
-        `https://openlibrary.org/subjects/${categoryName}.json?limit=10`,
-      );
-      return res.data.works;
-    } catch (error) {
-      console.error('Error searching books:', error);
-      return [];
-    }
-  }
-
-  async searchExternalBooks(searchText: string) {
-    try {
-      const res = await axios.get(
-        `https://openlibrary.org/search.json?q=${encodeURIComponent(searchText)}&limit=10`,
-      );
-      return res.data.docs;
-    } catch (error) {
-      console.error('Error searching books:', error);
-      return [];
-    }
-  }
-
+  private readonly logger = new Logger(BooksService.name);
   // -------------------------------------------------------
   // Get all books from the 'book' table
   // -------------------------------------------------------
@@ -103,11 +31,13 @@ export class BooksService {
         // Keep dates so we can compute status
         readStart: listBook.readStart,
         readEnd: listBook.readEnd,
+        addedAt: listBook.addedAt,
       })
       .from(listBook)
       .innerJoin(book, eq(book.id, listBook.bookId))
       .innerJoin(list, eq(list.id, listBook.listId))
-      .where(eq(list.userId, userId));
+      .where(eq(list.userId, userId))
+      .orderBy(desc(listBook.addedAt));
 
     // Add "status" property dynamically
     return rows.map((b) => ({
@@ -123,64 +53,83 @@ export class BooksService {
     userId: number,
     createBookDto: CreateBookDto,
   ): Promise<BookSelect> {
-    // Check if the book already exists
-    const found = await db
-      .select()
-      .from(book)
-      .where(eq(book.isbn, createBookDto.isbn));
+    try {
+      this.logger.debug(
+        `addToUserList userId=${userId} payload=${JSON.stringify(createBookDto)}`,
+      );
 
-    let existingBook = found[0];
+      // Check if the book already exists
+      const found = await db
+        .select()
+        .from(book)
+        .where(eq(book.isbn, createBookDto.isbn));
 
-    // Insert new book if not found
-    if (!existingBook) {
-      const inserted = await db
-        .insert(book)
+      let existingBook = found[0];
+
+      // Insert new book if not found
+      if (!existingBook) {
+        const inserted = await db
+          .insert(book)
+          .values({
+            name: createBookDto.name,
+            coverId: createBookDto.coverId,
+            author: createBookDto.author,
+            description: createBookDto.description,
+            isbn: createBookDto.isbn,
+            publishingHouse: createBookDto.publishingHouse,
+            // publishedAt is already in YYYY-MM-DD format from frontend
+            publishedAt: createBookDto.publishedAt,
+          })
+          .returning();
+
+        existingBook = inserted[0];
+      }
+
+      // Retrieve existing user list
+      const userListFound = await db
+        .select()
+        .from(list)
+        .where(eq(list.userId, userId));
+
+      let userList = userListFound[0];
+
+      // Create list if it does not exist
+      if (!userList) {
+        const created = await db
+          .insert(list)
+          .values({
+            name: 'My List',
+            userId,
+          })
+          .returning();
+
+        userList = created[0];
+      }
+
+      // Add book to list
+      await db
+        .insert(listBook)
         .values({
-          name: createBookDto.name,
-          coverId: createBookDto.coverId,
-          author: createBookDto.author,
-          description: createBookDto.description,
-          isbn: createBookDto.isbn,
-          publishingHouse: createBookDto.publishingHouse,
-          // convert Date into string because drizzle expects string for timestamps
-          publishedAt: createBookDto.publishedAt.toString(),
+          bookId: existingBook.id,
+          listId: userList.id,
         })
         .returning();
 
-      existingBook = inserted[0];
+      return existingBook;
+    } catch (err) {
+      const error = err instanceof Error ? err : new Error(String(err));
+      this.logger.error(
+        'Failed to add book to user list',
+        error.stack || error,
+      );
+      throw new HttpException(
+        {
+          message: 'Unable to add book to user list',
+          error: error.message,
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
-
-    // Retrieve existing user list
-    const userListFound = await db
-      .select()
-      .from(list)
-      .where(eq(list.userId, userId));
-
-    let userList = userListFound[0];
-
-    // Create list if it does not exist
-    if (!userList) {
-      const created = await db
-        .insert(list)
-        .values({
-          name: 'My List',
-          userId,
-        })
-        .returning();
-
-      userList = created[0];
-    }
-
-    // Add book to list
-    await db
-      .insert(listBook)
-      .values({
-        bookId: existingBook.id,
-        listId: userList.id,
-      })
-      .returning();
-
-    return existingBook;
   }
 
   // -------------------------------------------------------

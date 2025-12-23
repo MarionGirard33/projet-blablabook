@@ -6,8 +6,6 @@ import {
   Param,
   Body,
   ParseIntPipe,
-  Query,
-  BadRequestException,
 } from '@nestjs/common';
 import { BooksService } from './books.service';
 import { CreateBookDto } from './dto/create-book.dto';
@@ -15,44 +13,6 @@ import { CreateBookDto } from './dto/create-book.dto';
 @Controller('books')
 export class BooksController {
   constructor(private readonly booksService: BooksService) {}
-
-  // -----------------------------
-  // Get books by: search, category, theme
-  // -----------------------------
-  @Get('search')
-  async getSearchBooks(
-    @Query('type') type: string,
-    @Query('searchText') searchText?: string,
-    @Query('categoryName') categoryName?: string,
-  ) {
-    if (!type) {
-      throw new BadRequestException("The 'type' parameter is required.");
-    }
-    if (type === 'category') {
-      if (!categoryName) {
-        throw new BadRequestException(
-          "Both 'type=category' and 'categoryName' parameters are required.",
-        );
-      }
-      return this.booksService.getExternalBooksByCategoryName(categoryName);
-    }
-    if (type === 'search') {
-      if (!searchText) {
-        throw new BadRequestException(
-          "Both 'type=search' and 'searchText' parameters are required.",
-        );
-      }
-      return this.booksService.searchExternalBooks(searchText);
-    }
-    if (type === 'random') {
-      if (categoryName || searchText) {
-        throw new BadRequestException(
-          "'categoryName' and 'searchText' should not be provided when type=random.",
-        );
-      }
-      return this.booksService.getRandomExternalBooks();
-    }
-  }
 
   // -----------------------------
   // Get all books

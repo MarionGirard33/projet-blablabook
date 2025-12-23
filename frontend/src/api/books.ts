@@ -27,7 +27,7 @@ export const getUserBooks = async (userId: number): Promise<Book[]> => {
   return response.data;
 };
 
-// Add a book to a user's list
+// Add a book to a user's list and to book table if doesn't exists
 export const addBookToUserList = async (
   userId: number,
   bookData: CreateBookDto
