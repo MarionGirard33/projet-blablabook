@@ -79,7 +79,7 @@ export function AddBookModal({ isOpen, onClose, userId }: AddBookModalProps) {
 
     // Try parsing as date
     const parsed = new Date(publishDate);
-    if (!isNaN(parsed.getTime())) {
+    if (!Number.isNaN(parsed.getTime())) {
       return parsed.toISOString().split("T")[0];
     }
 
@@ -111,9 +111,9 @@ export function AddBookModal({ isOpen, onClose, userId }: AddBookModalProps) {
     },
     onSuccess: () => {
       // Invalidate and refetch the user's library
-      queryClient.invalidateQueries({ 
+      queryClient.invalidateQueries({
         queryKey: ["userBooks", userId],
-        refetchType: 'active'
+        refetchType: "active",
       });
     },
   });

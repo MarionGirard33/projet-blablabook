@@ -23,7 +23,7 @@ export const getBooks = async (): Promise<Book[]> => {
 
 // Get all books from a specific user's list
 export const getUserBooks = async (userId: number): Promise<Book[]> => {
-  const response = await api.get<Book[]>(`/books/user/${userId}`);
+  const response = await api.get<Book[]>(`/books/library/${userId}`);
   return response.data;
 };
 
@@ -32,7 +32,7 @@ export const addBookToUserList = async (
   userId: number,
   bookData: CreateBookDto
 ): Promise<Book> => {
-  const response = await api.post<Book>(`/books/user/${userId}`, bookData);
+  const response = await api.post<Book>(`/books/library/${userId}`, bookData);
   return response.data;
 };
 
@@ -42,7 +42,7 @@ export const removeBookFromUserList = async (
   bookId: number
 ): Promise<{ id: number }[]> => {
   const response = await api.delete<{ id: number }[]>(
-    `/books/user/${userId}/book/${bookId}`
+    `/books/library/${userId}/book/${bookId}`
   );
   return response.data;
 };

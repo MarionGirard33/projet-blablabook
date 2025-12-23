@@ -25,7 +25,7 @@ export class BooksController {
   // -----------------------------
   // Get all books for a specific user
   // -----------------------------
-  @Get('user/:userId')
+  @Get('library/:userId')
   async getUserBooks(@Param('userId', ParseIntPipe) userId: number) {
     return this.booksService.findUserBooks(userId);
   }
@@ -33,7 +33,7 @@ export class BooksController {
   // -----------------------------
   // Add a book to a user's list
   // -----------------------------
-  @Post('user/:userId')
+  @Post('library/:userId')
   async addBookToUserList(
     @Param('userId', ParseIntPipe) userId: number,
     @Body() createBookDto: CreateBookDto,
@@ -44,7 +44,7 @@ export class BooksController {
   // -----------------------------
   // Remove a book from a user's list
   // -----------------------------
-  @Delete('user/:userId/book/:bookId')
+  @Delete('library/:userId/book/:bookId')
   async removeBookFromUserList(
     @Param('userId', ParseIntPipe) userId: number,
     @Param('bookId', ParseIntPipe) bookId: number,
