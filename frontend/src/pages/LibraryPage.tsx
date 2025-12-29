@@ -8,15 +8,15 @@ import { Plus, Search } from "lucide-react";
 import type { Book } from "../@types/books";
 import { getUserBooks, removeBookFromUserList } from "@/api/books";
 import { AddBookModal } from "@/components/AddBookModal";
-//import { useAuth } from "@/contexts/AuthContext";
+import { useAuthStore } from "@/stores/authStore";
 
 export default function LibraryPage() {
-  //const { userId } = useAuth();
-  const userId = 1; // dev (updated to match seeded DB)
+  const { user } = useAuthStore();
+  const userId = user?.id;
   // Fetch user's books; re-fetching is controlled and also triggered after mutations
   const { data: books = [], refetch } = useQuery({
     queryKey: ["userBooks", userId],
-    queryFn: () => getUserBooks(userId),
+    queryFn: () => getUserBooks(userId!),
     enabled: !!userId,
   });
 
@@ -24,7 +24,10 @@ export default function LibraryPage() {
 
   // Remove a book from the user's list and invalidate the cache so the UI refreshes
   const removeMutation = useMutation({
-    mutationFn: (bookId: number) => removeBookFromUserList(userId, bookId),
+    mutationFn: (bookId: number) => {
+      if (!userId) throw new Error("UserId is required");
+      return removeBookFromUserList(userId, bookId);
+    },
     onSuccess: () =>
       queryClient.invalidateQueries({ queryKey: ["userBooks", userId] }),
   });

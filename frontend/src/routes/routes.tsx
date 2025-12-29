@@ -5,11 +5,13 @@ import HomePage from "@/pages/HomePage";
 import NotFound from "@/pages/NotFound";
 import LibraryPage from "@/pages/LibraryPage";
 import BookDetails from "@/pages/BookDetails";
+import { useAuthStore } from "@/stores/authStore";
 
 import {
   createRouter,
   createRootRoute,
   createRoute,
+  redirect,
 } from "@tanstack/react-router";
 
 const rootRoute = createRootRoute({
@@ -35,6 +37,12 @@ const registerPage = createRoute({
 const libraryRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/library",
+  beforeLoad: () => {
+    const { isAuthenticated } = useAuthStore.getState();
+    if (!isAuthenticated) {
+      throw redirect({ to: "/login" });
+    }
+  },
   component: () => <LibraryPage />,
 });
 
