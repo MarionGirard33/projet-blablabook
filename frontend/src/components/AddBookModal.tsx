@@ -1,3 +1,6 @@
+// AddBookModal lets the user search books from the external API,
+// preview results, navigate to details, or add a book directly
+// to their library. Uses TanStack Query for fetching and mutation.
 import { useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import {
@@ -12,11 +15,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Check, Search, X } from "lucide-react";
 
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { getUserBooks, addBookToUserList } from "@/api/books";
-import type { CreateBookDto, Book } from "@/@types/books";
+import { useQuery } from "@tanstack/react-query";
+import { getUserBooks } from "@/api/books";
 import type { ExternalBook } from "@/@types/externalBooks";
 import { searchExternalBooks } from "@/api/externalBooks";
+import { useAddBook } from "@/hooks/useAddBook";
 
 type AddBookModalProps = {
   readonly isOpen: boolean;
@@ -26,17 +29,21 @@ type AddBookModalProps = {
 
 export function AddBookModal({ isOpen, onClose, userId }: AddBookModalProps) {
   const [query, setQuery] = useState("");
+  const [hasSearched, setHasSearched] = useState(false);
+  // User's current library, used to mark items already added
   const { data: userBooks = [] } = useQuery({
     queryKey: ["userBooks", userId],
     queryFn: () => getUserBooks(userId!),
     enabled: !!userId,
   });
 
-  const queryClient = useQueryClient();
+  // Mutation hook to add a book to the user's list
+  const addBookMutation = useAddBook(userId);
 
   // Reset query and results when modal closes
   const handleClose = () => {
     setQuery("");
+    setHasSearched(false);
     onClose();
   };
 
@@ -51,13 +58,16 @@ export function AddBookModal({ isOpen, onClose, userId }: AddBookModalProps) {
     queryFn: () => searchExternalBooks(query),
   });
 
+  // Trigger a search only when input is non-empty
   const handleSearch = () => {
     if (!query.trim()) return;
+    setHasSearched(true);
     refetch();
   };
 
   const navigate = useNavigate();
 
+  // Navigate to internal book details page using the work id
   const handleCardClick = (book: ExternalBook) => {
     // Extract the last segment of the key (e.g., “works/OL82586W” -> “OL82586W”)
     const rawKey = book.key?.toString() ?? "";
@@ -72,51 +82,6 @@ export function AddBookModal({ isOpen, onClose, userId }: AddBookModalProps) {
 
     return userBooks.some((b) => externalBook.isbn.includes(b.isbn));
   };
-
-  // Normalize publishDate to YYYY-MM-DD format
-  const toIsoDate = (publishDate?: string): string => {
-    if (!publishDate) return new Date().toISOString().split("T")[0];
-
-    // Try parsing as date
-    const parsed = new Date(publishDate);
-    if (!Number.isNaN(parsed.getTime())) {
-      return parsed.toISOString().split("T")[0];
-    }
-
-    // If year only (YYYY), pad with -01-01
-    const yearMatch = publishDate.match(/^(\d{4})$/);
-    if (yearMatch) return `${yearMatch[1]}-01-01`;
-
-    // Default to today
-    return new Date().toISOString().split("T")[0];
-  };
-
-  // Mutation to add a book
-  const addBookMutation = useMutation<Book, Error, ExternalBook>({
-    mutationFn: (externalBook) => {
-      if (!userId) throw new Error("UserId is required");
-      const createBookDto: CreateBookDto = {
-        name: externalBook.title || "Unknown Title",
-        author: externalBook.author || "Unknown Author",
-        isbn: Array.isArray(externalBook.isbn)
-          ? externalBook.isbn[0] || "N/A"
-          : externalBook.isbn || "N/A",
-        coverId: externalBook.cover || "default_cover.png",
-        description: "No description", // TODO : à rajouter lorsque les types seront finalisés
-        publishingHouse: "Unknown publisher", // TODO : à rajouter lorsque les types seront finalisés
-        publishedAt: toIsoDate(externalBook.publishDate),
-      };
-
-      return addBookToUserList(userId, createBookDto);
-    },
-    onSuccess: () => {
-      // Invalidate and refetch the user's library
-      queryClient.invalidateQueries({
-        queryKey: ["userBooks", userId],
-        refetchType: "active",
-      });
-    },
-  });
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
@@ -141,6 +106,7 @@ export function AddBookModal({ isOpen, onClose, userId }: AddBookModalProps) {
             Rechercher un livre
           </DialogTitle>
 
+          {/* Close button (asChild to keep semantics of the child button) */}
           <DialogClose asChild>
             <button className="absolute top-3 right-3 text-gray-500 hover:text-gray-800">
               <X size={22} />
@@ -167,20 +133,34 @@ export function AddBookModal({ isOpen, onClose, userId }: AddBookModalProps) {
 
         {isFetching && <p>Chargement...</p>}
 
+        {/* Empty state: show message only after an explicit search */}
+        {!isFetching && hasSearched && results.length === 0 && (
+          <p className="mt-4 text-sm text-gray-600">Aucun livre trouvé.</p>
+        )}
+
         <div className="max-h-[500px] overflow-y-auto mt-4">
           {results.map((book) => {
             const alreadyInLibrary = isInLibrary(book);
 
+            // Keyboard support for the whole clickable row (Enter/Space)
+            const handleKeyDown = (e: React.KeyboardEvent) => {
+              if ((e.key === "Enter" || e.key === " ") && !alreadyInLibrary) {
+                handleCardClick(book);
+              }
+            };
+
             return (
+              // Use a div with role=button to avoid nesting a button inside a button
               <div
                 key={book.key}
                 role="button"
-                tabIndex={0}
+                tabIndex={alreadyInLibrary ? -1 : 0}
                 onClick={() => !alreadyInLibrary && handleCardClick(book)}
+                onKeyDown={handleKeyDown}
                 className={`
           relative w-full bg-bookcream flex items-center gap-4
           mb-4 p-3 border rounded-lg text-left
-          ${alreadyInLibrary ? "opacity-50" : "hover:bg-gray-50"}
+          ${alreadyInLibrary ? "opacity-50 cursor-default" : "hover:bg-gray-50 cursor-pointer"}
         `}
               >
                 {/* ✔️ Already in library */}
@@ -196,7 +176,7 @@ export function AddBookModal({ isOpen, onClose, userId }: AddBookModalProps) {
                   <button
                     type="button"
                     onClick={(e) => {
-                      e.stopPropagation(); // prevent triggering the card click
+                      e.stopPropagation(); // prevent triggering the row click
                       addBookMutation.mutate(book);
                     }}
                     className="

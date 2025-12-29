@@ -4,18 +4,37 @@ import { book, list, listBook } from '../db/schema';
 import { CreateBookDto } from './dto/create-book.dto';
 import { eq, and, desc } from 'drizzle-orm';
 import { BookSelect, ListBookSelect } from './types/books';
+/**
+ * BooksService encapsulates CRUD-like operations around books and user lists.
+ * It reads/writes through Drizzle ORM and computes transient fields like status.
+ */
 @Injectable()
 export class BooksService {
   private readonly logger = new Logger(BooksService.name);
-  // -------------------------------------------------------
-  // Get all books from the 'book' table
-  // -------------------------------------------------------
+  /**
+   * Compute reading status without using nested ternaries to satisfy Sonar.
+   */
+  private computeStatus(
+    readStart?: Date | string | null,
+    readEnd?: Date | string | null,
+  ): 'Lu' | 'En cours' | 'À lire' {
+    if (readEnd) return 'Lu';
+    if (readStart) return 'En cours';
+    return 'À lire';
+  }
+  /**
+   * Get all books from the `book` table.
+   * @returns Array of persisted book records
+   */
   async findAllBooks(): Promise<BookSelect[]> {
     return db.select().from(book);
   }
-  // -------------------------------------------------------
-  // Get all books from a specific user's list
-  // -------------------------------------------------------
+  /**
+   * Get all books belonging to a specific user's list, enriched with a computed
+   * `status` field based on `readStart`/`readEnd` dates and ordered by `addedAt`.
+   * @param userId Target user id
+   * @returns Array of user's books with transient status
+   */
   async findUserBooks(userId: number): Promise<BookSelect[]> {
     const rows = await db
       .select({
@@ -39,16 +58,20 @@ export class BooksService {
       .where(eq(list.userId, userId))
       .orderBy(desc(listBook.addedAt));
 
-    // Add "status" property dynamically
+    // Compute "status" dynamically based on reading dates, avoiding nested ternaries
     return rows.map((b) => ({
       ...b,
-      status: b.readEnd ? 'Lu' : b.readStart ? 'En cours' : 'À lire',
+      status: this.computeStatus(b.readStart, b.readEnd),
     }));
   }
 
-  // -------------------------------------------------------
-  // Add a book to a user list
-  // -------------------------------------------------------
+  /**
+   * Add a book to a user's list. If the book does not exist (by ISBN), it is
+   * created first. If the user's list does not exist, it is created as well.
+   * @param userId Target user id
+   * @param createBookDto Payload from frontend (already normalized)
+   * @returns The (existing or newly created) book record
+   */
   async addToUserList(
     userId: number,
     createBookDto: CreateBookDto,
@@ -58,7 +81,7 @@ export class BooksService {
         `addToUserList userId=${userId} payload=${JSON.stringify(createBookDto)}`,
       );
 
-      // Check if the book already exists
+      // Check if the book already exists by ISBN to avoid duplicates
       const found = await db
         .select()
         .from(book)
@@ -85,7 +108,7 @@ export class BooksService {
         existingBook = inserted[0];
       }
 
-      // Retrieve existing user list
+      // Retrieve (or lazily create) the user's list
       const userListFound = await db
         .select()
         .from(list)
@@ -106,7 +129,7 @@ export class BooksService {
         userList = created[0];
       }
 
-      // Add book to list
+      // Link book to list in the join table
       await db
         .insert(listBook)
         .values({
@@ -132,9 +155,12 @@ export class BooksService {
     }
   }
 
-  // -------------------------------------------------------
-  // Remove a book from user list
-  // -------------------------------------------------------
+  /**
+   * Remove a book from the user's list by unlinking it in the join table.
+   * Returns the deleted join rows or null if the user has no list yet.
+   * @param userId Target user id
+   * @param bookId Book to unlink
+   */
   async removeFromUserList(
     userId: number,
     bookId: number,

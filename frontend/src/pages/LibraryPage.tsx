@@ -1,3 +1,6 @@
+// LibraryPage displays the user's personal book collection with basic
+// filtering, counters by reading status, and a modal to add new books.
+// Data is fetched via TanStack Query and updates automatically after mutations.
 import { useEffect, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { BookCard } from "@/components/BookCard";
@@ -10,6 +13,7 @@ import { AddBookModal } from "@/components/AddBookModal";
 export default function LibraryPage() {
   //const { userId } = useAuth();
   const userId = 1; // dev (updated to match seeded DB)
+  // Fetch user's books; re-fetching is controlled and also triggered after mutations
   const { data: books = [], refetch } = useQuery({
     queryKey: ["userBooks", userId],
     queryFn: () => getUserBooks(userId),
@@ -18,6 +22,7 @@ export default function LibraryPage() {
 
   const queryClient = useQueryClient();
 
+  // Remove a book from the user's list and invalidate the cache so the UI refreshes
   const removeMutation = useMutation({
     mutationFn: (bookId: number) => removeBookFromUserList(userId, bookId),
     onSuccess: () =>
@@ -27,17 +32,19 @@ export default function LibraryPage() {
   const [search, setSearch] = useState("");
   const [open, setOpen] = useState(false);
 
-  // Load books
+  // Load books when a userId is set (or changes)
   useEffect(() => {
     if (userId) refetch();
   }, [userId, refetch]);
 
+  // Client-side filtering by title
   const filteredBooks: Book[] =
     books?.filter((b: Book) => {
       const searchLower = search.toLowerCase();
       return b.name.toLowerCase().includes(searchLower);
     }) || [];
 
+  // Reading status counters for quick stats
   const readCount = books?.filter((b: Book) => b.status === "Lu").length || 0;
   const readingCount =
     books?.filter((b: Book) => b.status === "En cours").length || 0;
@@ -46,7 +53,7 @@ export default function LibraryPage() {
 
   return (
     <div className="p-2 w-full">
-      {/* Banner */}
+      {/* Banner: page title + open AddBook modal */}
       <div className="bg-bookcream rounded-xl p-6 shadow-md flex flex-col items-center">
         <h1 className="text-2xl font-bold mb-3 text-bookdark">
           Ma Bibliothèque
@@ -59,7 +66,7 @@ export default function LibraryPage() {
           <Plus size={16} />
           Ajouter
         </button>
-        {/* Modale */}
+        {/* AddBook modal controlled by `open` state */}
         <AddBookModal
           isOpen={open}
           onClose={() => setOpen(false)}
@@ -67,7 +74,7 @@ export default function LibraryPage() {
         />
       </div>
 
-      {/* Status */}
+      {/* Status: counters by reading status */}
       <div className="flex justify-center gap-4 mt-4 text-sm text-bookdark">
         <span className="px-2 py-1 bg-bookbeige rounded-lg">
           Lus : <strong>{readCount}</strong>
@@ -82,7 +89,7 @@ export default function LibraryPage() {
         </span>
       </div>
 
-      {/* Search */}
+      {/* Search input (client-side filtering only) */}
       <div className="mt-4 flex items-center gap-2">
         <input
           type="text"
@@ -98,7 +105,7 @@ export default function LibraryPage() {
         </button>
       </div>
 
-      {/* Books list */}
+      {/* Books list: show empty state when no results */}
       <div className="mt-6 grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
         {filteredBooks.length === 0 ? (
           <p className="text-gray-500 text-center col-span-full">
