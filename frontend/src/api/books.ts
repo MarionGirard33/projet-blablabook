@@ -55,3 +55,43 @@ export const removeBookFromUserList = async (
   );
   return response.data;
 };
+
+/**
+ * Update the reading dates of a book in a user's library to reflect status change.
+ * Status is calculated from dates:
+ * - "À lire": readStart and readEnd are null
+ * - "En cours": readStart is set, readEnd is null
+ * - "Lu": readEnd is set
+ */
+export const updateBookStatus = async (
+  userId: number,
+  bookId: number,
+  status: "Lu" | "En cours" | "À lire",
+  currentBook: Book
+): Promise<Book> => {
+  const now = new Date().toISOString();
+
+  let readStart: string | null;
+  let readEnd: string | null;
+
+  if (status === "À lire") {
+    // Reset to "to read" state
+    readStart = null;
+    readEnd = null;
+  } else if (status === "En cours") {
+    // Start reading: set start date if not already set, clear end date
+    readStart = currentBook.readStart || now;
+    readEnd = null;
+  } else {
+    // "Lu": Mark as finished
+    // Keep existing readStart or set to now if never started
+    readStart = currentBook.readStart || now;
+    readEnd = now;
+  }
+
+  const response = await api.patch<Book>(
+    `/books/library/${userId}/book/${bookId}/status`,
+    { readStart, readEnd }
+  );
+  return response.data;
+};

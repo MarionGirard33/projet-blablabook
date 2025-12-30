@@ -2,35 +2,19 @@
 // filtering, counters by reading status, and a modal to add new books.
 // Data is fetched via TanStack Query and updates automatically after mutations.
 import { useEffect, useState } from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { BookCard } from "@/components/BookCard";
 import { Plus, Search } from "lucide-react";
 import type { Book } from "../@types/books";
-import { getUserBooks, removeBookFromUserList } from "@/api/books";
 import { AddBookModal } from "@/components/AddBookModal";
 import { useAuthStore } from "@/stores/authStore";
+import { useUserBooks } from "@/hooks/useUserBooks";
 
 export default function LibraryPage() {
   const { user } = useAuthStore();
   const userId = user?.id;
-  // Fetch user's books; re-fetching is controlled and also triggered after mutations
-  const { data: books = [], refetch } = useQuery({
-    queryKey: ["userBooks", userId],
-    queryFn: () => getUserBooks(userId!),
-    enabled: !!userId,
-  });
 
-  const queryClient = useQueryClient();
-
-  // Remove a book from the user's list and invalidate the cache so the UI refreshes
-  const removeMutation = useMutation({
-    mutationFn: (bookId: number) => {
-      if (!userId) throw new Error("UserId is required");
-      return removeBookFromUserList(userId, bookId);
-    },
-    onSuccess: () =>
-      queryClient.invalidateQueries({ queryKey: ["userBooks", userId] }),
-  });
+  // Use custom hook for all book operations
+  const { books, refetch, removeBook, updateStatus } = useUserBooks(userId);
 
   const [search, setSearch] = useState("");
   const [open, setOpen] = useState(false);
@@ -119,7 +103,14 @@ export default function LibraryPage() {
             <BookCard
               key={book.id}
               book={book}
-              onRemove={() => removeMutation.mutate(book.id)}
+              onRemove={() => removeBook(book.id)}
+              onStatusChange={(newStatus) =>
+                updateStatus({
+                  bookId: book.id,
+                  status: newStatus,
+                  currentBook: book,
+                })
+              }
             />
           ))
         )}
