@@ -3,12 +3,14 @@ import {
   Get,
   Post,
   Delete,
+  Patch,
   Param,
   Body,
   ParseIntPipe,
 } from '@nestjs/common';
 import { BooksService } from './books.service';
 import { CreateBookDto } from './dto/create-book.dto';
+import { UpdateBookStatusDto } from './dto/update-book-status.dto';
 
 /**
  * REST controller for book-related routes.
@@ -58,5 +60,31 @@ export class BooksController {
     @Param('bookId', ParseIntPipe) bookId: number,
   ) {
     return this.booksService.removeFromUserList(userId, bookId);
+  }
+
+  /**
+   * PATCH /books/library/:userId/book/:bookId/status
+   * Updates the reading dates (readStart, readEnd) for a book in the user's list.
+   * This allows changing the computed status based on dates.
+   */
+  @Patch('library/:userId/book/:bookId/status')
+  async updateBookStatusDates(
+    @Param('userId', ParseIntPipe) userId: number,
+    @Param('bookId', ParseIntPipe) bookId: number,
+    @Body() updateDatesDto: UpdateBookStatusDto,
+  ) {
+    const readStart = updateDatesDto.readStart
+      ? new Date(updateDatesDto.readStart)
+      : null;
+    const readEnd = updateDatesDto.readEnd
+      ? new Date(updateDatesDto.readEnd)
+      : null;
+
+    return this.booksService.updateBookStatus(
+      userId,
+      bookId,
+      readStart,
+      readEnd,
+    );
   }
 }
