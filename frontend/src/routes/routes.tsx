@@ -55,7 +55,7 @@ const loginPage = createRoute({
   component: () => <LoginPage />,
 });
 
-// Profile ROUTE 
+// Profile ROUTE
 const profilePage = createRoute({
   getParentRoute: () => rootRoute,
   path: "/profile",
@@ -63,7 +63,8 @@ const profilePage = createRoute({
     const { data: currentUser, isLoading, isError } = useCurrentUser();
 
     if (isLoading) return <div>Chargement...</div>;
-    if (isError || !currentUser) return <div>Impossible de charger le profil</div>;
+    if (isError || !currentUser)
+      return <div>Impossible de charger le profil</div>;
 
     return <ProfilePage userId={currentUser.id} />;
   },
@@ -81,7 +82,7 @@ const routeTree = rootRoute.addChildren([
   registerPage,
   loginPage,
   libraryRoute,
-  profilePage
+  profilePage,
   bookDetailsRoute,
 ]);
 

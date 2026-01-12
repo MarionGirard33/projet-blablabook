@@ -1,11 +1,19 @@
 import type { 
+  ExternalBook,
   ExternalBookDisplayData, 
   ExternalApiIsbnResponse, 
   ExternalApiWorkResponse, 
   ExternalApiAuthorResponse,
-  WorkSearchDoc
+  WorkSearchDoc,
+  EditionData
 } from "../@types/externalBooks"; 
 import externalApi from "./axiosExternal";
+
+// -----------------------------
+// CONSTANTS
+// -----------------------------
+
+const DEFAULT_COVER = '/default-book-cover.png';
 
 // -----------------------------
 // HELPERS
@@ -18,12 +26,15 @@ const parseDescription = (desc: any): string => {
   return '';
 };
 
-// SEARCH 
-// Search OpenLibrary works, then load the first edition to enrich details
+// -----------------------------
+// SEARCH BY TITLE OR AUTHOR
+// -----------------------------
+
 export const searchExternalBooks = async (
   searchText: string
 ): Promise<ExternalBook[]> => {
   const allowedLanguages = new Set(["fre", "eng"]);
+  
   const response = await externalApi.get("/search.json", {
     params: {
       q: searchText,
@@ -32,27 +43,49 @@ export const searchExternalBooks = async (
     },
   });
 
-  const docs: WorkSearchDoc[] = response.data.docs;
+  const docs: WorkSearchDoc[] = response.data.docs || [];
   const books: ExternalBook[] = [];
 
   for (const work of docs) {
     if (!work.edition_key || work.edition_key.length === 0) continue;
 
-    const editionKey = work.edition_key[0]; // take only the first edition
+    const editionKey = work.edition_key[0];
     try {
       const editionResponse = await externalApi.get<EditionData>(
         `/books/${editionKey}.json`
       );
-      const book = await processEdition(editionResponse.data, work);
-      // Keep only French/English editions for now
-      if (book?.language.some((lang) => allowedLanguages.has(lang))) {
-        books.push(book);
-      }
+      const edition = editionResponse.data;
+
+      // Extract ISBN
+      const isbn = edition.isbn_13?.[0] || '';
+      if (!isbn) continue;
+
+      // Extract and filter languages
+      const languages = edition.languages?.map((l) => l.key.split('/').pop() || 'en') || ['en'];
+      if (!languages.some((lang) => allowedLanguages.has(lang))) continue;
+
+      // Build cover URL
+      const coverId = edition.covers?.[0];
+      const coverUrl = coverId 
+        ? `https://covers.openlibrary.org/b/id/${coverId}-M.jpg` 
+        : DEFAULT_COVER;
+
+      // Create ExternalBook object
+      books.push({
+        key: edition.key,
+        title: edition.title,
+        author: work.author_name?.[0] || edition.authors?.[0]?.name || 'Auteur inconnu',
+        isbn,
+        language: languages,
+        publishDate: edition.publish_date,
+        cover: coverUrl,
+        publisher: edition.publishers?.[0],
+      });
     } catch (err) {
-      console.warn(`Failed to fetch edition ${editionKey}`, err);
+      console.warn(`Failed to fetch edition ${editionKey}:`, err);
     }
   }
-  // Return normalized external books
+
   return books;
 };
 
@@ -94,7 +127,7 @@ export const getFullExternalBook = async (isbn: string): Promise<ExternalBookDis
   const coverId = dataIsbn.covers?.[0] || dataWork.covers?.[0];
   const coverUrl = coverId 
     ? `https://covers.openlibrary.org/b/id/${coverId}-L.jpg` 
-    : ''; 
+    : DEFAULT_COVER;
 
   return {
     isbn: isbn,
