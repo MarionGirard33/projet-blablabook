@@ -6,7 +6,7 @@
   import { Button } from "@/components/ui/button";
   import api from "@/api/axios";
   import { useDeleteUser } from "./mutation/deleteUser.mutation";
-  import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+  import { Avatar, AvatarImage } from "@/components/ui/avatar";
   import { useAuthStore } from "@/stores/authStore";
 
   export default function ProfilePage({ userId }: { userId: number }) {
@@ -38,7 +38,7 @@
       <div className="flex w-full flex-col items-center justify-center py-6 md:py-0">
         {/* Carré principal */}
         <div
-          className="w-full max-w-md md:max-w-lg lg:max-w-2xl border border-black rounded bg-gray-50 p-4 lg:p-4 flex flex-col justify-between
+          className="w-full max-w-md md:max-w-lg lg:max-w-2xl border border-bookbeige shadow-sm rounded-xl p-4 lg:p-4 flex flex-col justify-between
           min-h-[500px] md:min-h-[550px] lg:min-h-[600px]
           "
         >
@@ -49,7 +49,7 @@
             <div className="flex justify-end mb-2">
               <button
                 onClick={() => setIsModalOpen(true)}
-                className="w-10 h-10 flex items-center justify-center rounded-full border border-black cursor-pointer transition"
+                className="w-10 h-10 flex items-center justify-center rounded-full border border-bookbeige cursor-pointer transition"
                 title="Modifier profil"
               >
                 <Pencil size={20} color="black" />
@@ -58,15 +58,13 @@
 
             {/* Image */}
             <Avatar className="w-28 h-28 mx-auto mb-16 border shadow">
-              <AvatarImage
-                src={user?.image ? `/images/${user.image}` : undefined} // pas d'image → fallback
-                alt={`Avatar de ${user?.username || "l'utilisateur"}`}
-              />
-              <AvatarFallback className="text-4xl font-bold">
-                {user?.username ? user.username[0].toUpperCase() : "X"} {/* première lettre */}
-              </AvatarFallback>
+              {user.image && (
+                <AvatarImage
+                  src={`/images/${user.image}`}
+                  alt={`Avatar de ${user.username}`}
+                />
+              )}
             </Avatar>
-    
             {/* Infos utilisateur alignées */}
               <div className="grid grid-cols-[max-content_1fr] gap-x-4 md:gap-x-8 lg:gap-x-12 gap-y-2 md:w-[400px] lg:w-[400px] mx-auto">
 

@@ -13,7 +13,7 @@ type UpdateUserFormProps = {
   onUpdate?: (updatedUser: { email: string; username: string; image?: string }) => void;
 };
 
-const availableImages = ["image1.jpg", "image2.jpg", "image3.jpg","image4.jpg", "image5.jpg", "image6.jpg", undefined];
+const availableImages = ["image1.jpg", "image2.jpg", "image3.jpg","image4.jpg", "image5.jpg", "image6.jpg"];
 
 export default function UpdateUserForm({ userId, onClose, onUpdate }: UpdateUserFormProps) {
   const updateUserMutation = useUpdateUser(userId);
@@ -63,36 +63,33 @@ export default function UpdateUserForm({ userId, onClose, onUpdate }: UpdateUser
         e.preventDefault();
         form.handleSubmit();
       }}
-      className="max-w-md mx-auto p-6 bg-white shadow rounded space-y-4"
+      className="max-w-md mx-auto p-6 bg-white shadow  border border-bookbeige/50 rounded-xl space-y-4"
     >
       {/* Image actuelle */}
       <form.Field name="image">
         {(field) => (
           <>
             <Avatar className="w-28 h-28 mx-auto mb-6 border shadow">
-        <AvatarImage
-          src={field.state.value ? `/images/${field.state.value}` : undefined}
-          alt={`Avatar de ${currentUser.username || "l'utilisateur"}`}
-        />
-        <AvatarFallback className="text-4xl font-bold">
-          {currentUser.username ? currentUser.username[0].toUpperCase() : "X"}
-        </AvatarFallback>
-      </Avatar>
-      
+              <AvatarImage
+                src={field.state.value ? `/images/${field.state.value}` : undefined}
+                alt={`Avatar de ${currentUser.username || "l'utilisateur"}`}
+              />
+              <AvatarFallback className="text-4xl font-bold">
+                {currentUser.username ? currentUser.username[0].toUpperCase() : "X"}
+              </AvatarFallback>
+            </Avatar>
+            
             {/* Miniatures */}
             <div className="flex justify-center gap-3 mb-8">
               <form.Field name="image">
-  {(field) => (
-    <AvatarCarousel
-      images={availableImages}
-      selectedImage={field.state.value}
-      onSelect={(img) => field.handleChange(img)}
-    />
-  )}
-</form.Field>
-
-
-            
+                {(field) => (
+                  <AvatarCarousel
+                    images={availableImages}
+                    selectedImage={field.state.value}
+                    onSelect={(img) => field.handleChange(img)}
+                  />
+                )}
+              </form.Field>
             </div>
           </>
         )}
