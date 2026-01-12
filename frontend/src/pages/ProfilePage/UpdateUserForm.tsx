@@ -5,6 +5,7 @@ import type { UpdateUserInput } from "./@types/user";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { useAuthStore } from "@/stores/authStore";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import AvatarCarousel from "@/components/AvatarCarousel";
 
 type UpdateUserFormProps = {
   userId: number;
@@ -12,7 +13,7 @@ type UpdateUserFormProps = {
   onUpdate?: (updatedUser: { email: string; username: string; image?: string }) => void;
 };
 
-const availableImages = ["image1.jpg", "image2.jpg", "image3.jpg", undefined];
+const availableImages = ["image1.jpg", "image2.jpg", "image3.jpg","image4.jpg", "image5.jpg", "image6.jpg", undefined];
 
 export default function UpdateUserForm({ userId, onClose, onUpdate }: UpdateUserFormProps) {
   const updateUserMutation = useUpdateUser(userId);
@@ -80,22 +81,18 @@ export default function UpdateUserForm({ userId, onClose, onUpdate }: UpdateUser
       
             {/* Miniatures */}
             <div className="flex justify-center gap-3 mb-8">
-              {availableImages.map((img, index) => (
-                <Avatar
-                  key={img ?? `fallback-${index}`} 
-                  className={`w-14 h-14 cursor-pointer border 
-                    ${field.state.value === img ? "ring-1 ring-blue-100" : "opacity-70 hover:opacity-100"}`}
-                  onClick={() => field.handleChange(img)}
-                >
-                  {img ? (
-                    <AvatarImage src={`/images/${img}`} />
-                  ) : (
-                    <AvatarFallback className="text-lg font-bold">
-                      {currentUser.username ? currentUser.username[0].toUpperCase() : "X"}
-                    </AvatarFallback>
-                  )}
-                </Avatar>
-              ))}
+              <form.Field name="image">
+  {(field) => (
+    <AvatarCarousel
+      images={availableImages}
+      selectedImage={field.state.value}
+      onSelect={(img) => field.handleChange(img)}
+    />
+  )}
+</form.Field>
+
+
+            
             </div>
           </>
         )}

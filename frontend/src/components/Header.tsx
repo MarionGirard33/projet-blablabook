@@ -80,7 +80,7 @@ export default function Header() {
         <div className="flex items-center md:hidden">
           <button onClick={() => setOpen(true)}>
             {user ? (
-              <Avatar className="w-10 h-10">
+              <Avatar className="w-10 h-10 cursor-pointer">
                 <AvatarImage
                   src={user.image ? `/images/${user.image}` : undefined}
                   alt={`Avatar de ${user.username || "X"}`}
