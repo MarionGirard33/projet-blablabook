@@ -32,6 +32,12 @@ export interface WorkSearchDoc {
   edition_key?: string[];
 }
 
+export type GetExternalBooksParams = {
+  type: "random" | "category" | "search";
+  categoryName?: string;
+  searchText?: string;
+};
+
 export type ExternalBookDisplayData = {
   title: string;
   authors: string[];
