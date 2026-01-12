@@ -16,6 +16,7 @@ interface AuthStoreProps {
 
   login: (user: UserProps) => void;
   logout: () => void;
+  updateUser: (user: Partial<UserProps>) => void;
 }
 
 export const useAuthStore = create<AuthStoreProps>()(
@@ -43,6 +44,11 @@ export const useAuthStore = create<AuthStoreProps>()(
           // redirect user to homepage and reload all state
           window.location.href = "/";
         }
+      },
+      updateUser: (updatedFields) => {
+        set((state) => ({
+          user: state.user ? { ...state.user, ...updatedFields } : null,
+        }));
       },
     }),
     {

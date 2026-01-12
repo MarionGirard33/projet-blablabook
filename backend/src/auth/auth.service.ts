@@ -6,9 +6,9 @@ import {
 } from '@nestjs/common';
 import { plainToInstance } from 'class-transformer';
 import { RegisterRequestDto } from './dto/register-request.dto';
-import { UsersService } from 'src/users/users.service';
+import { UserService } from 'src/user/user.service';
 import argon2 from 'argon2';
-import { UserInsert } from 'src/users/types/users';
+import { UserInsert } from 'src/user/types/user';
 import { RegisterResponseDto } from './dto/register-response.dto';
 import { LoginRequestDto } from './dto/login-request.dto';
 import { JwtService } from '@nestjs/jwt';
@@ -30,7 +30,7 @@ import { eq } from 'drizzle-orm';
 export class AuthService {
   // injection de dépendances pour accéder aux méthodes
   constructor(
-    private readonly userService: UsersService,
+    private readonly userService: UserService,
     private readonly jwtService: JwtService,
   ) {}
 
@@ -38,8 +38,8 @@ export class AuthService {
   async login(payload: LoginRequestDto) {
     const user = await this.userService.getUserByUsername(payload.username);
     if (!user) {
-      console.error('email not found');
-      throw new UnauthorizedException('invalid credentials');
+      console.error('Login attempt failed');
+      throw new UnauthorizedException("nom d'utilisateur ou mot de passe invalide");
     }
 
     let isPasswordValid: boolean;
@@ -55,8 +55,8 @@ export class AuthService {
     }
 
     if (!isPasswordValid) {
-      console.error('password is not valid');
-      throw new UnauthorizedException('invalid credentials');
+      console.error('Login attempt failed');
+      throw new UnauthorizedException("nom d'utilisateur ou mot de passe invalide");
     }
 
     return user;
