@@ -96,10 +96,10 @@ const BookDetails = () => {
     return (
       <div className="flex flex-col items-center justify-center h-[50vh] space-y-4">
         <p className="text-destructive font-semibold text-lg">
-          Oops! {(error as Error)?.message || "Unable to load this book."}
+          Oups ! {(error as Error)?.message || "Impossible de charger ce livre."}
         </p>
         <Button variant="outline" onClick={() => globalThis.history.back()}>
-          Go Back
+          Retour
         </Button>
       </div>
     );
@@ -116,7 +116,7 @@ const BookDetails = () => {
           className="inline-flex items-center text-sm font-medium text-muted-foreground hover:text-primary transition-colors"
         >
           <ArrowLeft className="mr-2 h-4 w-4" />
-          Back to search
+          Retour à la recherche
         </Link>
       </div>
 
@@ -150,7 +150,6 @@ const BookDetails = () => {
               status={isInLibrary ? (userBooks.find((b) => b.isbn === book.isbn)?.status ?? null) : null}
               onAddToLibrary={handleAddToLibrary}
               isAdding={addBookMutation.status === "pending"}
-              book={isInLibrary ? userBooks.find((b) => b.isbn === book.isbn) : undefined}
               onChangeStatus={handleChangeStatus}
               isUpdatingStatus={isUpdatingStatus}
             />
@@ -159,9 +158,9 @@ const BookDetails = () => {
 
         {/* Summary */}
         <div className="w-full pt-6 border-t border-border">
-          <h3 className="text-xl font-semibold tracking-tight mb-4">Summary</h3>
+          <h3 className="text-xl font-semibold tracking-tight mb-4">Résumé</h3>
           <div className="prose prose-lg dark:prose-invert max-w-none text-muted-foreground leading-relaxed whitespace-pre-line">
-            {book.description || <span className="italic opacity-70">No description provided by the publisher.</span>}
+            {book.description || <span className="italic opacity-70">Aucune description fournie par l'éditeur.</span>}
           </div>
         </div>
       </div>
