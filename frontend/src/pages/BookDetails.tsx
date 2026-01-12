@@ -109,7 +109,7 @@ const BookDetails = () => {
   return (
     <div className="container mx-auto p-6 max-w-5xl animate-in fade-in zoom-in-95 duration-500">
       
-      {/* Back Navigation */}
+      {/* BACK NAVIGATION */}
       <div className="mb-6">
         <Link
           to="/library"
@@ -121,7 +121,7 @@ const BookDetails = () => {
       </div>
 
       <div className="flex flex-col items-center space-y-10">
-        {/* Cover & Header */}
+      {/* COVER AND HEADER INFO */}
         <div className="flex flex-col items-center text-center space-y-6 w-full max-w-2xl">
           <div className="relative group shadow-2xl rounded-lg">
             <BookCover
@@ -133,7 +133,7 @@ const BookDetails = () => {
           <BookHeaderInfo title={book.title} author={book.authors[0]} />
         </div>
 
-        {/* Details & Status */}
+        {/* DETAILS AND STATUS */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 w-full items-start">
           <div className="lg:col-span-2 w-full">
             <BookDataGrid
@@ -156,7 +156,7 @@ const BookDetails = () => {
           </div>
         </div>
 
-        {/* Summary */}
+        {/* SUMMARY */}
         <div className="w-full pt-6 border-t border-border">
           <h3 className="text-xl font-semibold tracking-tight mb-4">Résumé</h3>
           <div className="prose prose-lg dark:prose-invert max-w-none text-muted-foreground leading-relaxed whitespace-pre-line">
