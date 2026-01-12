@@ -1,6 +1,4 @@
-type FormGlobalErrorProps = {
-  message: string;
-}
+import type { FormGlobalErrorProps } from "@/@types/form";
 
 export default function FormGlobalError({ message }: FormGlobalErrorProps) {
   return (
