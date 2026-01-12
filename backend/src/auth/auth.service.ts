@@ -193,21 +193,14 @@ export class AuthService {
     return result[0] ?? null;
   }
 
-  async destoyRefreshToken(token: string) {
+  async destroyRefreshToken(token: string) {
     const result = await db
       .delete(refreshToken)
       .where(eq(refreshToken.token, token));
     return result || null;
   }
 
-  async refreshToken(userId: number) {
-    await db.delete(refreshToken).where(eq(refreshToken.userId, userId));
-    const token = await this.generateRefreshToken(userId);
-    if (!token) {
-      console.error('failed to refresh the refresh token');
-      throw new InternalServerErrorException('failed to refresh token');
-    }
-  }
+
 
   async rotateTokens(refreshToken: string): Promise<RotateTokensData> {
     // hash for find token in DB
@@ -222,9 +215,6 @@ export class AuthService {
       throw new UnauthorizedException('invalide refresh token');
     }
 
-    // delete old refresh token
-    await this.destoyRefreshToken(hashedIncomingToken);
-
     const user: JwtPayload = {
       sub: userFromDb.user.id,
       userRole: userFromDb.user.role,
@@ -232,6 +222,17 @@ export class AuthService {
 
     const newJwtToken = await this.generateJWTToken(user.sub, user.userRole);
     const newRefreshToken = await this.generateRefreshToken(user.sub);
+
+    if(!newJwtToken){
+      throw new InternalServerErrorException("failed to generate new JWT token");
+    }
+
+    if(!newRefreshToken){
+      throw new InternalServerErrorException("failed to generate new refresh token");
+    }
+
+    // delete old refresh token
+    await this.destroyRefreshToken(hashedIncomingToken);
 
     return {
       newJwtToken,
@@ -241,13 +242,13 @@ export class AuthService {
   }
 
   async getUserByRefreshToken(
-    token: string,
+    hashedToken: string,
   ): Promise<UserJoinRefreshToken | null> {
     const result = await db
       .select()
       .from(refreshToken)
       .leftJoin(users, eq(refreshToken.userId, users.id))
-      .where(eq(refreshToken.token, token));
+      .where(eq(refreshToken.token, hashedToken));
     return result[0] ?? null;
   }
 }

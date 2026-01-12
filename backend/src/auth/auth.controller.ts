@@ -96,7 +96,7 @@ export class AuthController {
     const refreshToken = request['refresh_token'] as string;
     // delete refresh token
     const isDestoyToken =
-      await this.authService.destoyRefreshToken(refreshToken);
+      await this.authService.destroyRefreshToken(refreshToken);
 
     if (!isDestoyToken) {
       console.warn('refresh token not found in the db');

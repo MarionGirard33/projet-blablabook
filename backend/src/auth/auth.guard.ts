@@ -83,7 +83,7 @@ export class AuthGuard implements CanActivate {
           // if refresh failed
           console.error('Auto-refresh failed: ', refreshError);
           // clean cookie
-          response.clearCookie('jwt_ccokie', cookieConfig.jwtCookieConfig);
+          response.clearCookie('jwt_cookie', cookieConfig.jwtCookieConfig);
           response.clearCookie(
             'refresh_token',
             cookieConfig.refreshCookieConfig,
@@ -100,9 +100,9 @@ export class AuthGuard implements CanActivate {
 
   private extractTokenFromCookie(request: Request): TokenExtractorData {
     const jwtCookie =
-      ((request.cookies?.['jwt_cookie'] as string) || undefined) ?? null;
+      (request.cookies?.['jwt_cookie'] || undefined) ?? null;
     const refreshTokenCookie =
-      ((request.cookies?.['refresh_cookie'] as string) || undefined) ?? null;
+      (request.cookies?.['refresh_cookie'] || undefined) ?? null;
 
     return {
       jwtCookie,
