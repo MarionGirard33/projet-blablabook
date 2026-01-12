@@ -40,7 +40,7 @@ export default function Header() {
               <div className="hidden md:flex items-center ">
                 <DropdownMenu>
                   <DropdownMenuTrigger className="cursor-pointer" asChild>
-                    <Avatar className="w-8 h-8">
+                    <Avatar className="w-8 h-8 border border-bookbeige">
                       <AvatarImage
                         key={user.image}
                         src={user.image ? `/images/${user.image}` : undefined}
@@ -81,7 +81,7 @@ export default function Header() {
         <div className="flex items-center md:hidden">
           <button onClick={() => setOpen(true)}>
             {user ? (
-              <Avatar className="w-10 h-10 cursor-pointer">
+              <Avatar className="w-10 h-10 cursor-pointer border border-bookbeige">
                 <AvatarImage
                   src={user.image ? `/images/${user.image}` : undefined}
                   alt={`Avatar de ${user.username || "X"}`}
