@@ -38,6 +38,7 @@ services:
       # - REDIS_PORT=${REDIS_PORT}
       - CHOKIDAR_USEPOLLING=true
       - FRONTEND_URL_CORS=${FRONTEND_URL_CORS}
+      - NODE_ENV=${NODE_ENV}
     ports:
       # Publish backend port to host for direct access
       - "3000:3000"

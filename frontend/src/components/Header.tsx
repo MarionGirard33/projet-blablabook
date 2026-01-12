@@ -40,14 +40,20 @@ export default function Header() {
               <div className="hidden md:flex items-center">
                 <DropdownMenu>
                   <DropdownMenuTrigger className="cursor-pointer" asChild>
-                    <Avatar className="w-8 h-8">
-                      <AvatarImage
-                        src={user.image ? `/images/${user.image}` : undefined} 
-                        alt={`Avatar de ${user.username || "l'utilisateur"}`}
-                      />
-                      <AvatarFallback>
-                        {user.username ? user.username[0].toUpperCase() : "X"} 
-                      </AvatarFallback>
+                    <Avatar>
+                      {user.image ? (
+                        <img
+                          src={user.image}
+                          alt={user.username}
+                          className="w-8 h-8 rounded-full"
+                        />
+                      ) : (
+                        <img
+                          src="https://cdn-icons-png.flaticon.com/512/29/29302.png"
+                          alt="Book avatar"
+                          className="w-8 h-8 rounded-full bg-gray-200"
+                        />
+                      )}
                     </Avatar>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
