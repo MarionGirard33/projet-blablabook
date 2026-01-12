@@ -146,7 +146,9 @@ const BookDetails = () => {
               pages={book.pages}
               isbn={book.isbn}
               language={book.language}
-              categories={book.categories}
+              // On limite l'affichage aux 5 premières catégories pour l'instant
+              categories={book.categories.slice(0, 5)} 
+              // TODO: Evolutions -> filtrer les catégories les plus utilisées à partir de l'API externe
             />
           </div>
           <div className="lg:col-span-1 w-full lg:sticky lg:top-6">
