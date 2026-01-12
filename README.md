@@ -76,25 +76,7 @@ Create a `.env` file at the project root based on `.env.example`.
 docker-compose up
 ```
 
-This will start:
-
-- **Backend (NestJS)** on `http://localhost:3000`
-- **Frontend (React + Vite)** on `http://localhost:5173`
-- **PostgreSQL** on `localhost:5432`
-- **Adminer** on `http://localhost:8080`
-
-### 5️⃣ Run the database seed (required for initial data)
-
-Open a new terminal and execute:
-
-```bash
-docker exec -it backend sh
-# Inside the container:
-npx ts-node src/seed.ts
-exit
-```
-
-### 6️⃣ Access the services
+### 5️⃣ Access the services
 
 | Service               | URL                                                    |
 | --------------------- | ------------------------------------------------------ |
@@ -103,7 +85,7 @@ exit
 | Swagger Documentation | [http://localhost:3000/api](http://localhost:3000/api) |
 | Adminer               | [http://localhost:8080](http://localhost:8080)         |
 
-### 7️⃣ Verify functionality
+### 6️⃣ Verify functionality
 
 **➤ Check the API**  
 Open in browser: [http://localhost:3000/api](http://localhost:3000/api)  
@@ -115,12 +97,6 @@ The React interface should display correctly.
 
 **➤ Check Adminer**  
 Go to: [http://localhost:8080](http://localhost:8080)  
-Login with:
-
-- **Host:** `postgres`
-- **Username:** `postgres`
-- **Password:** `postgres`
-- **Database:** `blablabook`
 
 ---
 
