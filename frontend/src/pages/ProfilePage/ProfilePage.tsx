@@ -6,7 +6,7 @@
   import { Button } from "@/components/ui/button";
   import api from "@/api/axios";
   import { useDeleteUser } from "./mutation/deleteUser.mutation";
-  import { Avatar, AvatarImage } from "@/components/ui/avatar";
+  import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
   import { useAuthStore } from "@/stores/authStore";
 
   export default function ProfilePage({ userId }: { userId: number }) {
@@ -57,13 +57,16 @@
             </div>
 
             {/* Image */}
-            <Avatar className="w-28 h-28 mx-auto mb-16 border shadow">
+            <Avatar className="w-28 h-28 mx-auto mb-16 border border-bookbeige shadow">
               {user.image && (
                 <AvatarImage
                   src={`/images/${user.image}`}
                   alt={`Avatar de ${user.username}`}
                 />
               )}
+              <AvatarFallback className="text-4xl bg-bookbeige/50 font-bold">
+                {user.username ? user.username[0].toUpperCase() : "X"}
+              </AvatarFallback>
             </Avatar>
             {/* Infos utilisateur alignées */}
               <div className="grid grid-cols-[max-content_1fr] gap-x-4 md:gap-x-8 lg:gap-x-12 gap-y-2 md:w-[400px] lg:w-[400px] mx-auto">

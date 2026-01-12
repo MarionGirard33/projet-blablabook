@@ -63,18 +63,18 @@ export default function UpdateUserForm({ userId, onClose, onUpdate }: UpdateUser
         e.preventDefault();
         form.handleSubmit();
       }}
-      className="max-w-md mx-auto p-6 bg-white shadow  border border-bookbeige/50 rounded-xl space-y-4"
+      className="max-w-md mx-auto p-6 bg-white shadow border border-bookbeige/50 rounded-xl space-y-4"
     >
       {/* Image actuelle */}
       <form.Field name="image">
         {(field) => (
           <>
-            <Avatar className="w-28 h-28 mx-auto mb-6 border shadow">
+            <Avatar className="w-28 h-28 mx-auto mb-6 border border-bookbeige shadow">
               <AvatarImage
                 src={field.state.value ? `/images/${field.state.value}` : undefined}
                 alt={`Avatar de ${currentUser.username || "l'utilisateur"}`}
               />
-              <AvatarFallback className="text-4xl font-bold">
+              <AvatarFallback className="text-4xl bg-bookbeige/50 border-bookbeige font-bold">
                 {currentUser.username ? currentUser.username[0].toUpperCase() : "X"}
               </AvatarFallback>
             </Avatar>
