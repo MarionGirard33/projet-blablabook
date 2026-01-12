@@ -15,6 +15,7 @@ interface AuthStoreProps {
 
   login: (user: UserProps) => void;
   logout: () => void;
+  updateUser: (user: Partial<UserProps>) => void;
 }
 
 export const useAuthStore = create<AuthStoreProps>()(
@@ -28,6 +29,11 @@ export const useAuthStore = create<AuthStoreProps>()(
       },
       logout: () => {
         set({ user: null, isAuthenticated: false });
+      },
+      updateUser: (updatedFields) => {
+        set((state) => ({
+          user: state.user ? { ...state.user, ...updatedFields } : null,
+        }));
       },
     }),
     {
