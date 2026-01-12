@@ -81,7 +81,7 @@ const routeTree = rootRoute.addChildren([
   registerPage,
   loginPage,
   libraryRoute,
-  profilePage
+  profilePage,
   bookDetailsRoute,
 ]);
 
