@@ -35,10 +35,4 @@ export class CreateBookDto {
   @IsString()
   @IsNotEmpty()
   publishedAt: string; // Drizzle date type expects a string or Date
-
-  // Optional fields (kept for future use)
-  @IsOptional()
-  @IsString()
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  extra?: string;
 }
