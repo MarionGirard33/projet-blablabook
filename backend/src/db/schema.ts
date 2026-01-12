@@ -76,8 +76,8 @@ export const userCategory = pgTable(
       .references(() => category.id)
       .notNull(),
     userId: integer('user_id')
-      .references(() => user.id)
-      .notNull(),
+      .references(() => user.id, { onDelete: 'cascade' })
+      .notNull()
   },
   // prevent duplicate cotegory for user
   (t) => [unique('unique_categroy_user').on(t.userId, t.categoryId)],
@@ -124,6 +124,6 @@ export const refreshToken = pgTable('refresh_token', {
   token: varchar().notNull(),
   createdAt: timestamp().defaultNow().notNull(),
   userId: integer('user_id')
-    .references(() => user.id)
-    .notNull(),
+  .references(() => user.id, { onDelete: 'cascade' })
+  .notNull()
 });
