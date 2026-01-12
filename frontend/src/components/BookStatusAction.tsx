@@ -1,21 +1,37 @@
 import React from "react";
-import { Heart, CheckCircle, BookOpen, Clock, Loader2, BookmarkCheck } from "lucide-react";
+import { Heart, CheckCircle, BookOpen, Clock, Loader2 } from "lucide-react";
 import { Button } from "./ui/button"; 
+import { Badge } from "./ui/badge";
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+} from "./ui/dropdown-menu";
 
+// Define the possible book statuses
 export type BookStatus = "Lu" | "En cours" | "À lire" | null;
 
+// Props for the BookStatusAction component
 interface BookStatusActionProps {
-  status: BookStatus; 
-  onAddToLibrary: () => void; 
-  isAdding?: boolean; 
+  status: BookStatus;                      // Current status of the book
+  onAddToLibrary: () => void;             // Callback to add the book to user's library
+  isAdding?: boolean;                      // Whether the book is currently being added
+  book?: import("@/@types/books").Book;   // Optional book object (if needed)
+  onChangeStatus?: (status: Exclude<BookStatus, null>) => void; // Callback to change status
+  isUpdatingStatus?: boolean;             // Whether a status update is in progress
 }
 
+// Component to display the book status and allow adding/updating
 export const BookStatusAction: React.FC<BookStatusActionProps> = ({ 
   status, 
   onAddToLibrary, 
-  isAdding = false 
+  isAdding = false, 
+  onChangeStatus,
+  isUpdatingStatus = false,
 }) => {
 
+  // Map each status to a label, icon, and styling
   const statusConfig: Record<string, { label: string; icon: any; style: string; iconColor: string }> = {
     "Lu": { 
       label: "Livre lu", 
@@ -37,31 +53,53 @@ export const BookStatusAction: React.FC<BookStatusActionProps> = ({
     },
   };
 
+  // If the book has a status, display it with a dropdown for updating
   if (status && statusConfig[status]) {
     const config = statusConfig[status];
     const Icon = config.icon;
 
+    // Determine badge variant for UI
+    let badgeVariant: "success" | "warning" | "default" = "default";
+    if (status === "Lu") badgeVariant = "success";
+    else if (status === "En cours") badgeVariant = "warning";
+
     return (
-      <div className={`rounded-xl border p-5 flex items-center justify-between shadow-sm animate-in fade-in zoom-in-95 duration-300 ${config.style}`}>
-        <div className="flex items-center gap-4">
-          <div className={`p-3 rounded-full ${config.iconColor}`}>
-            <Icon size={24} strokeWidth={2.5} />
-          </div>
-          <div className="flex flex-col">
-            <span className="text-xs font-bold uppercase tracking-wider opacity-70">Ma bibliothèque</span>
-            <span className="font-bold text-xl">{config.label}</span>
-          </div>
-        </div>
-        <BookmarkCheck className="opacity-10 w-16 h-16 -mr-4 -my-4 rotate-12" />
-      </div>
+      <DropdownMenu>
+        {/* Trigger badge showing the current status */}
+        <DropdownMenuTrigger asChild>
+          <Badge 
+            variant={badgeVariant} 
+            className="cursor-pointer flex items-center gap-2 px-3 py-2 text-base"
+          >
+            <Icon size={18} strokeWidth={2.2} />
+            {isUpdatingStatus && (
+              <Loader2 className="mr-1 h-4 w-4 animate-spin inline" />
+            )}
+            {status}
+          </Badge>
+        </DropdownMenuTrigger>
+
+        {/* Dropdown menu for changing the status */}
+        <DropdownMenuContent align="start">
+          {["À lire", "En cours", "Lu"].map((s) => (
+            <DropdownMenuItem
+              key={s}
+              onClick={() => onChangeStatus?.(s as Exclude<BookStatus, null>)}
+              disabled={isUpdatingStatus || s === status} // Disable if updating or same status
+            >
+              {s}
+            </DropdownMenuItem>
+          ))}
+        </DropdownMenuContent>
+      </DropdownMenu>
     );
   }
 
+  // If the book is not in the library yet, show "Add to Library" button
   return (
     <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm flex flex-col items-center text-center gap-4">
       <div className="text-center space-y-1">
-        <h3 className="font-semibold text-lg text-gray-900">Ce livre vous intéresse ?</h3>
-        <p className="text-sm text-gray-500">Ajoutez-le pour le suivre.</p>
+        <h3 className="font-semibold text-lg text-gray-900">Intéressé par ce livre?</h3>
       </div>
 
       <Button 
@@ -74,7 +112,7 @@ export const BookStatusAction: React.FC<BookStatusActionProps> = ({
         ) : (
           <Heart className="mr-2 h-5 w-5 fill-transparent group-hover:fill-white transition-colors duration-300" />
         )}
-        {isAdding ? "Ajout en cours..." : "Ajouter à ma bibliothèque"}
+        {isAdding ? "Adding..." : "Ajouter à ma bibliothèque"}
       </Button>
     </div>
   );
