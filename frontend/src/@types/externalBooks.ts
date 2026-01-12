@@ -41,10 +41,6 @@ export interface WorkData {
   author_name?: string[];
 }
 
-export interface WorkDetails {
-  description?: DescriptionField;
-}
-
 export interface WorkSearchDoc extends WorkData {
   edition_key?: string[];
 }
@@ -55,7 +51,6 @@ export type GetExternalBooksParams = {
   searchText?: string;
 };
 
-// Todo revoir type @mohini
 export type ExternalBookDisplayData = {
   title: string;
   authors: string[];
@@ -68,3 +63,14 @@ export type ExternalBookDisplayData = {
   language: string;
   categories: string[];
 };
+}
+
+export type ExternalApiWorkResponse = {
+  description?: string | { value: string };
+  subjects?: string[];
+  covers?: number[];
+}
+
+export type ExternalApiAuthorResponse = {
+  name: string;
+}

@@ -54,12 +54,12 @@ const loginPage = createRoute({
 });
 
 // DETAILS BOOK ROUTE
-const bookDetailsRoute = createRoute({
+export const bookDetailsRoute = createRoute({
   getParentRoute: () => rootRoute,
-  path: "/books/:id",
+  path: "/books/$isbn",
   component: () => <BookDetails />,
 });
-// =====================================
+//
 
 const routeTree = rootRoute.addChildren([
   homeRoute,

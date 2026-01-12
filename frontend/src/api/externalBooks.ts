@@ -1,79 +1,24 @@
-// Frontend client for OpenLibrary external API.
-// Orchestrates search on works, loads first edition details, fetches work descriptions,
-// and maps them into our `ExternalBook` shape.
-import type {
-  ExternalBook,
-  EditionData,
-  WorkData,
-  WorkDetails,
-  DescriptionField,
-  WorkSearchDoc,
-} from "../@types/externalBooks";
+import type { 
+  ExternalBookDisplayData, 
+  ExternalApiIsbnResponse, 
+  ExternalApiWorkResponse, 
+  ExternalApiAuthorResponse,
+  WorkSearchDoc
+} from "../@types/externalBooks"; 
 import externalApi from "./axiosExternal";
 
-// Helper: normalize OpenLibrary `description` which can be a string or an object
-const extractDescription = (
-  descriptionField?: DescriptionField
-): string | undefined => {
-  if (!descriptionField) return undefined;
+// -----------------------------
+// HELPERS
+// -----------------------------
 
-  return typeof descriptionField === "string"
-    ? descriptionField
-    : descriptionField.value;
+const parseDescription = (desc: any): string => {
+  if (!desc) return '';
+  if (typeof desc === 'string') return desc;
+  if (typeof desc === 'object' && desc.value) return desc.value;
+  return '';
 };
 
-// Helper: fetch a work's description from `/works/{workKey}.json`
-const fetchWorkDescription = async (
-  workKey: string
-): Promise<string | undefined> => {
-  try {
-    const workResponse = await externalApi.get<WorkDetails>(
-      `/works/${workKey}.json`
-    );
-    return extractDescription(workResponse.data.description);
-  } catch (err) {
-    console.warn(`Failed to fetch work description for ${workKey}`, err);
-    return undefined;
-  }
-};
-
-// Helper: build an `ExternalBook` from an edition + its parent work
-const processEdition = async (
-  data: EditionData,
-  work: WorkData
-): Promise<ExternalBook | null> => {
-  // Validate ISBN existence
-  if (!data.isbn_13 || data.isbn_13.length === 0) {
-    return null;
-  }
-
-  // Extract languages
-  const languages = (data.languages || []).map((lang) =>
-    lang.key.replace("/languages/", "")
-  );
-
-  // Fetch work description if available
-  let description: string | undefined;
-  if (data.works && data.works.length > 0) {
-    const workKey = data.works[0].key.replace("/works/", "");
-    description = await fetchWorkDescription(workKey);
-  }
-
-  return {
-    key: data.key.replace("/books/", ""),
-    title: data.title,
-    author: data.authors?.[0]?.name || work.author_name?.[0] || "Unknown",
-    isbn: data.isbn_13[0],
-    language: languages,
-    publishDate: data.publish_date,
-    cover: data.covers?.[0]
-      ? `https://covers.openlibrary.org/b/id/${data.covers[0]}-L.jpg`
-      : undefined,
-    description,
-    publisher: data.publishers?.[0] || undefined,
-  };
-};
-
+// SEARCH 
 // Search OpenLibrary works, then load the first edition to enrich details
 export const searchExternalBooks = async (
   searchText: string
@@ -109,4 +54,58 @@ export const searchExternalBooks = async (
   }
   // Return normalized external books
   return books;
+};
+
+// -----------------------------
+// API functions
+// -----------------------------
+
+// GET Book ISBN Data
+export const getOpenLibIsbnData = async (isbn: string): Promise<ExternalApiIsbnResponse> => {
+  const response = await externalApi.get<ExternalApiIsbnResponse>(`/isbn/${isbn}.json`);
+  return response.data;
+};
+
+// GET Book Work Data
+export const getOpenLibWorkData = async (workKey: string): Promise<ExternalApiWorkResponse> => {
+  const response = await externalApi.get<ExternalApiWorkResponse>(`${workKey}.json`);
+  return response.data;
+};
+
+// GET Book Author Data
+export const getOpenLibAuthorData = async (authorKey: string): Promise<ExternalApiAuthorResponse> => {
+  const response = await externalApi.get<ExternalApiAuthorResponse>(`${authorKey}.json`);
+  return response.data;
+};
+
+// -----------------------------
+// PRINCIPAL FUNCTION FOR BOOK DETAILS
+// -----------------------------
+
+export const getFullExternalBook = async (isbn: string): Promise<ExternalBookDisplayData> => {
+    // MAPPING DATA FROM MULTIPLE CALLS
+  const dataIsbn = await getOpenLibIsbnData(isbn);
+  const workKey = dataIsbn.works?.[0]?.key;
+  const authorKey = dataIsbn.authors?.[0]?.key;
+  const [dataWork, dataAuthor] = await Promise.all([
+    workKey ? getOpenLibWorkData(workKey) : Promise.resolve({} as ExternalApiWorkResponse),
+    authorKey ? getOpenLibAuthorData(authorKey) : Promise.resolve({ name: 'Auteur inconnu' } as ExternalApiAuthorResponse)
+  ]);
+  const coverId = dataIsbn.covers?.[0] || dataWork.covers?.[0];
+  const coverUrl = coverId 
+    ? `https://covers.openlibrary.org/b/id/${coverId}-L.jpg` 
+    : ''; 
+
+  return {
+    isbn: isbn,
+    title: dataIsbn.title,
+    authors: [dataAuthor.name || 'Inconnu'],
+    cover: coverUrl,
+    description: parseDescription(dataWork.description),
+    publisher: dataIsbn.publishers?.[0] || 'Éditeur inconnu',
+    publishedAt: dataIsbn.publish_date || '',
+    pages: dataIsbn.number_of_pages || 0,
+    language: dataIsbn.languages?.[0]?.key?.split('/').pop() || 'en',
+    categories: dataWork.subjects || []
+  };
 };
