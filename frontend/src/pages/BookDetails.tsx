@@ -1,6 +1,9 @@
 import { Link, useParams } from "@tanstack/react-router";
 import { ArrowLeft, Loader2 } from "lucide-react";
 import { useQuery, useMutation } from "@tanstack/react-query";
+import { addBookToUserList } from "../api/books";
+import { useCurrentUser } from "../hooks/useCurrentUser";
+import { useUserBooks } from "../hooks/useUserBooks";
 //import api from "../api/axios"; 
 import { bookDetailsRoute } from "../routes/routes";
 import { getFullExternalBook } from "../api/externalBooks";
@@ -14,25 +17,11 @@ import { BookDataGrid } from "../components/BookDataGrid";
 import { BookStatusAction } from "../components/BookStatusAction";
 import { Button } from "../components/ui/button";
 
-// TODO when back is connected --- HELPERS ---
-
-// const formatDateForDB = (dateString: string): string => {
-//   if (!dateString) return new Date().toISOString().split('T')[0];
-//   const date = new Date(dateString);
-  
-//   // If date parsing fails, try extracting just the year
-//   if (Number.isNaN(date.getTime())) {
-//     const yearRegex = /\d{4}/;
-//     const yearMatch = yearRegex.exec(dateString);
-//     return yearMatch ? `${yearMatch[0]}-01-01` : new Date().toISOString().split('T')[0];
-//   }
-//   return date.toISOString().split('T')[0];
-// };
-
 // --- MAIN COMPONENT ---
 
 const BookDetails = () => {
   const { isbn } = bookDetailsRoute.useParams();
+  const { data: currentUser } = useCurrentUser();
   const { 
     data: book, 
     isLoading, 
@@ -46,36 +35,64 @@ const BookDetails = () => {
     retry: 1,
   });
 
-  //  TODO when back is connected MUTATION: Save the book to the internal NestJS backend
-  // const addBookMutation = useMutation({
-  //   mutationFn: async (bookData: ExternalBookDisplayData) => {
-  //     const payload: CreateBookDto = {
-  //       name: bookData.title,
-  //       coverId: bookData.cover,
-  //       author: bookData.authors[0],
-  //       description: bookData.description || "Pas de description",
-  //       isbn: bookData.isbn,
-  //       publishingHouse: bookData.publisher,
-  //       publishedAt: formatDateForDB(bookData.publishedAt),
-  //     };
-  //     const response = await api.post('/books', payload); 
-  //     return response.data;
-  //   },
-  //   onSuccess: () => {
-  //     alert("Succès : Livre ajouté à ta bibliothèque !");
-  //   },
-  //   onError: (err: any) => {
-  //     console.error("Backend error:", err);
-  //     const message = err.response?.data?.message || "Erreur lors de l'ajout.";
-  //     alert(`Erreur: ${message}`);
-  //   }
-  // });
+  const { books: userBooks, refetch } = useUserBooks(currentUser?.id);
 
-  // const handleAddToLibrary = () => {
-  //   if (book) {
-  //     addBookMutation.mutate(book);
-  //   }
-  // };
+  // Helper pour formater la date
+  const formatDateForDB = (dateString: string): string => {
+    if (!dateString) return new Date().toISOString().split('T')[0];
+    const date = new Date(dateString);
+    if (Number.isNaN(date.getTime())) {
+      const yearRegex = /\d{4}/;
+      const yearMatch = yearRegex.exec(dateString);
+      return yearMatch ? `${yearMatch[0]}-01-01` : new Date().toISOString().split('T')[0];
+    }
+    return date.toISOString().split('T')[0];
+  };
+
+  // Mutation pour ajouter le livre à la bibliothèque utilisateur
+  const addBookMutation = useMutation({
+    mutationFn: async (bookData: ExternalBookDisplayData) => {
+      if (!currentUser?.id) throw new Error("Utilisateur non connecté");
+      const payload = {
+        name: bookData.title,
+        coverId: bookData.cover,
+        author: bookData.authors[0],
+        description: bookData.description || "Pas de description",
+        isbn: bookData.isbn,
+        publishingHouse: bookData.publisher,
+        publishedAt: formatDateForDB(bookData.publishedAt),
+      };
+      return addBookToUserList(currentUser.id, payload);
+    },
+    onSuccess: () => {
+      alert("Succès : Livre ajouté à ta bibliothèque !");
+      refetch();
+    },
+    onError: (err: any) => {
+      console.error("Backend error:", err);
+      const message = err.response?.data?.message || err.message || "Erreur lors de l'ajout.";
+      alert(`Erreur: ${message}`);
+    }
+  });
+
+  const handleAddToLibrary = () => {
+    if (book) {
+      addBookMutation.mutate(book);
+    }
+  };
+
+  // Vérifie si le livre est déjà dans la bibliothèque utilisateur
+  const isInLibrary = userBooks.some((b) => b.isbn === book?.isbn);
+
+  // Pour changer le statut d'un livre de la bibliothèque
+  const { updateStatus, isUpdatingStatus } = useUserBooks(currentUser?.id);
+
+  const handleChangeStatus = (newStatus: "Lu" | "En cours" | "À lire") => {
+    const userBook = userBooks.find((b) => b.isbn === book?.isbn);
+    if (userBook?.id) {
+      updateStatus({ bookId: userBook.id, status: newStatus, currentBook: userBook });
+    }
+  };
 
   // --- LOADING / ERROR STATES ---
 
@@ -153,9 +170,12 @@ const BookDetails = () => {
           </div>
           <div className="lg:col-span-1 w-full lg:sticky lg:top-6">
             <BookStatusAction 
-              status={null} // TODO: Fetch user's book status from backend
-              onAddToLibrary={() => {}} //TODO: {handleAddToLibrary}
-              isAdding={false} // TODO: {addBookMutation.isLoading}
+              status={isInLibrary ? (userBooks.find((b) => b.isbn === book.isbn)?.status ?? null) : null}
+              onAddToLibrary={handleAddToLibrary}
+              isAdding={addBookMutation.status === "pending"}
+              book={isInLibrary ? userBooks.find((b) => b.isbn === book.isbn) : undefined}
+              onChangeStatus={handleChangeStatus}
+              isUpdatingStatus={isUpdatingStatus}
             />
           </div>
 
