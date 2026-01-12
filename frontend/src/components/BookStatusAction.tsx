@@ -14,12 +14,11 @@ export type BookStatus = "Lu" | "En cours" | "À lire" | null;
 
 // Props for the BookStatusAction component
 interface BookStatusActionProps {
-  status: BookStatus;                      // Current status of the book
-  onAddToLibrary: () => void;             // Callback to add the book to user's library
-  isAdding?: boolean;                      // Whether the book is currently being added
-  book?: import("@/@types/books").Book;   // Optional book object (if needed)
-  onChangeStatus?: (status: Exclude<BookStatus, null>) => void; // Callback to change status
-  isUpdatingStatus?: boolean;             // Whether a status update is in progress
+  status: BookStatus;
+  onAddToLibrary: () => void;
+  isAdding?: boolean;
+  onChangeStatus?: (status: Exclude<BookStatus, null>) => void;
+  isUpdatingStatus?: boolean; 
 }
 
 // Component to display the book status and allow adding/updating
