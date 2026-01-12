@@ -30,10 +30,10 @@ export const list = pgTable('list', {
   name: varchar({ length: 150 }),
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
-  deletedAt: timestamp('deleted_at'),
   userId: integer('user_id')
-    .references(() => user.id)
-    .notNull(),
+  .references(() => user.id, { onDelete: 'cascade' })
+  .notNull()
+
 });
 
 export const book = pgTable('book', {
@@ -116,8 +116,7 @@ export const review = pgTable('review', {
     .references(() => book.id)
     .notNull(),
   userId: integer('user_id')
-    .references(() => user.id)
-    .notNull(),
+    .references(() => user.id, { onDelete: 'set null' }) 
 });
 
 export const refreshToken = pgTable('refresh_token', {

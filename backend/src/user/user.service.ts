@@ -1,7 +1,7 @@
 import * as argon2 from 'argon2';
-import { eq, or, and, isNull, ilike } from 'drizzle-orm';
+import { eq, or, and, isNull, ilike, not } from 'drizzle-orm';
 import { user } from '../db/schema';
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, UnprocessableEntityException } from '@nestjs/common';
 import { db } from 'src/db';
 import { plainToInstance } from 'class-transformer';
 import { UpdateUserResponseDto } from './dto/update-user.response.dto';
@@ -51,11 +51,26 @@ export class UserService {
   async update(id: number, data: UpdateUserRequestDto) {
     const updateData = { ...data };
 
-    if (updateData.email) updateData.email = updateData.email.toLowerCase();
-    if (updateData.password) {
-      updateData.password = await argon2.hash(updateData.password);
+    if (updateData.email) {
+      const emailToCheck = updateData.email.toLowerCase();
+
+      const existingUser = await db
+        .select()
+        .from(user)
+        .where(
+          and(
+            eq(user.email, emailToCheck),
+            isNull(user.deletedAt),
+            not(eq(user.id, id))
+          )
+        );
+
+      if (existingUser.length > 0) {
+        throw new UnprocessableEntityException('Email already in use');
+      }
     }
 
+    
     if (updateData.password) {
       updateData.password = await argon2.hash(updateData.password);
     }
