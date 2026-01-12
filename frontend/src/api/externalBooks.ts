@@ -2,7 +2,8 @@ import type {
   ExternalBookDisplayData, 
   ExternalApiIsbnResponse, 
   ExternalApiWorkResponse, 
-  ExternalApiAuthorResponse
+  ExternalApiAuthorResponse,
+  WorkSearchDoc
 } from "../@types/externalBooks"; 
 import externalApi from "./axiosExternal";
 
@@ -15,6 +16,44 @@ const parseDescription = (desc: any): string => {
   if (typeof desc === 'string') return desc;
   if (typeof desc === 'object' && desc.value) return desc.value;
   return '';
+};
+
+// SEARCH 
+// Search OpenLibrary works, then load the first edition to enrich details
+export const searchExternalBooks = async (
+  searchText: string
+): Promise<ExternalBook[]> => {
+  const allowedLanguages = new Set(["fre", "eng"]);
+  const response = await externalApi.get("/search.json", {
+    params: {
+      q: searchText,
+      limit: 20,
+      fields: "key,title,author_name,edition_key",
+    },
+  });
+
+  const docs: WorkSearchDoc[] = response.data.docs;
+  const books: ExternalBook[] = [];
+
+  for (const work of docs) {
+    if (!work.edition_key || work.edition_key.length === 0) continue;
+
+    const editionKey = work.edition_key[0]; // take only the first edition
+    try {
+      const editionResponse = await externalApi.get<EditionData>(
+        `/books/${editionKey}.json`
+      );
+      const book = await processEdition(editionResponse.data, work);
+      // Keep only French/English editions for now
+      if (book?.language.some((lang) => allowedLanguages.has(lang))) {
+        books.push(book);
+      }
+    } catch (err) {
+      console.warn(`Failed to fetch edition ${editionKey}`, err);
+    }
+  }
+  // Return normalized external books
+  return books;
 };
 
 // -----------------------------

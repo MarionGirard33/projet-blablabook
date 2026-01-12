@@ -4,16 +4,46 @@ export type ExternalBookCarouselProps = {
 };
 
 export type ExternalBook = {
-  key: string;
-  author_name: string[];
-  first_publish_year?: number;
-  language: string[];
+  key: string; // book/ ex: "OL55900058M"
   title: string;
-  cover_id?: number;
-  cover_i?: number;
-  edition_count?: number;
-  isbn: string;
+  author: string;
+  isbn: string; // isbn_13
+  language: string[];
+  publishDate?: string;
+  cover?: string;
+  description?: string;
+  publisher?: string;
 };
+
+export type DescriptionField = string | { value: string };
+
+export interface LanguageRef {
+  key: string;
+}
+
+export interface WorkRef {
+  key: string;
+}
+
+export interface EditionData {
+  key: string;
+  title: string;
+  authors?: Array<{ name?: string }>;
+  isbn_13?: string[];
+  languages?: LanguageRef[];
+  publish_date?: string;
+  covers?: number[];
+  works?: WorkRef[];
+  publishers?: string[];
+}
+
+export interface WorkData {
+  author_name?: string[];
+}
+
+export interface WorkSearchDoc extends WorkData {
+  edition_key?: string[];
+}
 
 export type GetExternalBooksParams = {
   type: "random" | "category" | "search";
@@ -32,17 +62,7 @@ export type ExternalBookDisplayData = {
   pages: number;
   language: string;
   categories: string[];
-}
-
-export type ExternalApiIsbnResponse = {
-  title: string;
-  publish_date?: string;
-  publishers?: string[];
-  number_of_pages?: number;
-  covers?: number[];
-  languages?: { key: string }[];
-  works?: { key: string }[];
-  authors?: { key: string }[];
+};
 }
 
 export type ExternalApiWorkResponse = {
