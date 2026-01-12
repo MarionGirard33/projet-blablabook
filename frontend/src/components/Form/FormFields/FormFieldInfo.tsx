@@ -1,8 +1,6 @@
-import type { AnyFieldApi } from "@tanstack/react-form"
+import type { FormFieldInfoProps } from "@/@types/form";
 
-type FormFieldInfoProps = {
-  readonly field: AnyFieldApi;
-}
+
 
 export default function FormFieldInfo({ field }: FormFieldInfoProps) {
   const errors = field.state.meta.errors; // get errors array

@@ -5,11 +5,14 @@ import HomePage from "@/pages/HomePage";
 import NotFound from "@/pages/NotFound";
 import LibraryPage from "@/pages/LibraryPage";
 import ProfilePage from "@/pages/ProfilePage/ProfilePage";
+import BookDetails from "@/pages/BookDetails";
+import { useAuthStore } from "@/stores/authStore";
 
 import {
   createRouter,
   createRootRoute,
   createRoute,
+  redirect,
 } from "@tanstack/react-router";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 
@@ -36,6 +39,12 @@ const registerPage = createRoute({
 const libraryRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/library",
+  beforeLoad: () => {
+    const { isAuthenticated } = useAuthStore.getState();
+    if (!isAuthenticated) {
+      throw redirect({ to: "/login" });
+    }
+  },
   component: () => <LibraryPage />,
 });
 
@@ -59,6 +68,13 @@ const profilePage = createRoute({
     return <ProfilePage userId={currentUser.id} />;
   },
 });
+// DETAILS BOOK ROUTE
+export const bookDetailsRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/books/$isbn",
+  component: () => <BookDetails />,
+});
+//
 
 const routeTree = rootRoute.addChildren([
   homeRoute,
@@ -66,6 +82,7 @@ const routeTree = rootRoute.addChildren([
   loginPage,
   libraryRoute,
   profilePage
+  bookDetailsRoute,
 ]);
 
 export const router = createRouter({
