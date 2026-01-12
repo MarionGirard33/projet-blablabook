@@ -168,7 +168,7 @@ export default function UpdateUserForm({ userId, onClose, onUpdate }: UpdateUser
         )}
       </form.Field>
 
-      <Button type="submit" className="w-full mt-4 cursor-pointer bg-emerald-700 text-white">
+      <Button type="submit" className="w-full mt-4 cursor-pointer bg-bookterracotta text-white">
         {updateUserMutation.isPending ? "Mise à jour..." : "Enregistrer"}
       </Button>
     </form>
