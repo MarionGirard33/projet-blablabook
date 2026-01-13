@@ -51,16 +51,18 @@ export const BookStatusAction: React.FC<BookStatusActionProps> = ({
     const Icon = statusConfig[status].icon;
 
     // Determine badge variant for UI
-    let badgeVariant: "success" | "warning" | "default" = "default";
-    if (status === "Lu") badgeVariant = "success";
-    else if (status === "En cours") badgeVariant = "warning";
+  const badgeVariantMap: Record<BookStatus, "success" | "warning" | "default"> = {
+    "Lu": "success",
+    "En cours": "warning",
+    "À lire": "default",
+  };
 
     return (
       <DropdownMenu>
         {/* Trigger badge showing the current status */}
         <DropdownMenuTrigger asChild>
-          <Badge 
-            variant={badgeVariant} 
+          <Badge
+            variant={badgeVariantMap[status]}
             className="cursor-pointer flex items-center gap-2 px-3 py-2 text-base"
           >
             <Icon size={18} strokeWidth={2.2} />
