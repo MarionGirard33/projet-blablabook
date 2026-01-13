@@ -40,19 +40,6 @@ const getWorkDescription = async (workKey: string): Promise<string> => {
   return desc;
 };
 
-const extractLanguages = (edition: EditionData): string[] => {
-  return (
-    edition.languages?.map((l) => l.key.split("/").pop() || "en") || ["en"]
-  );
-};
-
-const isLanguageAllowed = (
-  languages: string[],
-  allowedLanguages: Set<string>
-): boolean => {
-  return languages.some((lang) => allowedLanguages.has(lang));
-};
-
 const buildCoverUrl = (edition: EditionData): string => {
   const coverId = edition.covers?.[0];
   return coverId
@@ -86,7 +73,6 @@ const createExternalBook = (
   edition: EditionData,
   work: WorkSearchDoc,
   isbn: string,
-  languages: string[],
   coverUrl: string,
   description: string
 ): ExternalBook => {
@@ -96,12 +82,25 @@ const createExternalBook = (
     author:
       work.author_name?.[0] || edition.authors?.[0]?.name || "Auteur inconnu",
     isbn,
-    language: languages,
+    language: edition.languages,
     publishDate: edition.publish_date,
     cover: coverUrl,
     description: description || undefined,
     publisher: edition.publishers?.[0],
   };
+};
+
+// Filter work results early to avoid unnecessary API calls
+const filterSearchResults = (
+  works: WorkSearchDoc[],
+  searchText: string
+): WorkSearchDoc[] => {
+  const searchLower = searchText.toLowerCase();
+  return works.filter((work) => {
+    const title = (work.title || "").toLowerCase();
+    const author = (work.author_name?.[0] || "").toLowerCase();
+    return title.includes(searchLower) || author.includes(searchLower);
+  });
 };
 
 // -----------------------------
@@ -111,8 +110,6 @@ const createExternalBook = (
 export const searchExternalBooks = async (
   searchText: string
 ): Promise<ExternalBook[]> => {
-  const allowedLanguages = new Set(["fre", "eng", "fr", "en", "fra", "enm"]);
-
   const response = await externalApi.get("/search.json", {
     params: {
       q: searchText,
@@ -124,7 +121,10 @@ export const searchExternalBooks = async (
   const docs: WorkSearchDoc[] = response.data.docs || [];
   const books: ExternalBook[] = [];
 
-  for (const work of docs) {
+  // Filter early on search results before fetching editions
+  const filteredDocs = filterSearchResults(docs, searchText);
+
+  for (const work of filteredDocs) {
     if (!work.edition_key || work.edition_key.length === 0) continue;
 
     const editionKey = work.edition_key[0];
@@ -137,9 +137,6 @@ export const searchExternalBooks = async (
       const isbn = edition.isbn_13?.[0] || "";
       if (!isbn) continue;
 
-      const languages = extractLanguages(edition);
-      if (!isLanguageAllowed(languages, allowedLanguages)) continue;
-
       const coverUrl = buildCoverUrl(edition);
       const description = await fetchDescription(edition, isbn);
 
@@ -148,7 +145,6 @@ export const searchExternalBooks = async (
           edition,
           work,
           isbn,
-          languages,
           coverUrl,
           description
         )
