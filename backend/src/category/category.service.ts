@@ -1,26 +1,44 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Inject, NotFoundException } from '@nestjs/common';
 import { CreateCategoryDto } from './dto/create-category.dto';
-import { UpdateCategoryDto } from './dto/update-category.dto';
+import * as schema from 'src/db/schema';
+import { eq, is } from 'drizzle-orm';
+import { NodePgDatabase } from 'drizzle-orm/node-postgres';
+import type { Category } from './types/category';
 
 @Injectable()
 export class CategoryService {
-  create(createCategoryDto: CreateCategoryDto) {
-    return 'This action adds a new category';
+  constructor(@Inject('DRIZZLE') private readonly db: NodePgDatabase<typeof schema>) {}
+
+  async create(createCategoryDto: CreateCategoryDto): Promise<Category> {
+    const [newCategory] = await this.db
+      .insert(schema.category)
+      .values({ ...createCategoryDto, isActive: createCategoryDto.isActive ?? true })
+      .returning();
+    return newCategory as Category;
   }
 
-  findAll() {
-    return `This action returns all category`;
+  async findAll(): Promise<Category[]> {
+    return this.db.select().from(schema.category).execute()
+  .then(categories =>
+    categories.map(c => ({ ...c, isActive: c.isActive ?? true }))
+  );
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} category`;
-  }
+  async findOne(id: number): Promise<Category> {
+    const [oneCategory] = await this.db
+      .select()
+      .from(schema.category)
+      .where(eq(schema.category.id, id))
+      .execute();
 
-  update(id: number, updateCategoryDto: UpdateCategoryDto) {
-    return `This action updates a #${id} category`;
-  }
+    if (!oneCategory) {
+      throw new NotFoundException(`Category with ID ${id} not found`);
+    }
 
-  remove(id: number) {
-    return `This action removes a #${id} category`;
+    // Ensure isActive is a boolean (convert null to false) to match Category type
+    return {
+      ...oneCategory,
+      isActive: oneCategory.isActive ?? false,
+    };
   }
 }
