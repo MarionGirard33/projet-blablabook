@@ -72,7 +72,7 @@ const profilePage = createRoute({
     if (isLoading) return <div>Loading...</div>;
     if (!data) return <div>Utilisateur non trouvé</div>;
 
-    return <ProfilePage userId={data.id} />;
+    return <ProfilePage currentUser={currentUser} />;
   },
 });
 
