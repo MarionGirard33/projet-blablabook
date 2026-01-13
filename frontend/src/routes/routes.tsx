@@ -32,7 +32,6 @@ const protectedRoute = createRoute({
       throw redirect({ to: "/login" });
     }
   },
-  component: ({ children }: { children?: React.ReactNode }) => <>{children}</>,
 });
 
 // HOME ROUTE
@@ -68,10 +67,12 @@ const profilePage = createRoute({
   getParentRoute: () => protectedRoute,
   path: "/profile",
   component: () => {
-    const { data } = useCurrentUser();
-    if (data) {
-      return <ProfilePage userId={data?.id} />;
-    }
+    const { data, isLoading } = useCurrentUser();
+
+    if (isLoading) return <div>Loading...</div>;
+    if (!data) return <div>Utilisateur non trouvé</div>;
+
+    return <ProfilePage userId={data.id} />;
   },
 });
 
