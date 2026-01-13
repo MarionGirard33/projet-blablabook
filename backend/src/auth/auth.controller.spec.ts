@@ -5,6 +5,7 @@ import { INestApplication } from '@nestjs/common';
 import request from 'supertest'; // import par défaut
 import { Server } from 'http';
 import { AuthGuard } from './auth.guard';
+import { LoginResponseDto } from './dto/login-response.dto';
 
 // FONCTION HELPER
 const makePostRequest = <T = any>(
@@ -27,7 +28,7 @@ describe('AuthController', () => {
   let app: INestApplication;
 
   const authService = {
-    login: jest.fn(),
+    login: jest.fn<Promise<LoginResponseDto>, [any]>(),
     register: jest.fn(),
     logout: jest.fn(),
     generateJWTToken: jest.fn(),
@@ -65,7 +66,7 @@ describe('AuthController', () => {
     const role = 'USER';
     const image = 'https://randomuser.me/api/portraits/lego/0.jpg';
 
-    const payload = {
+    const payload: LoginResponseDto = {
       id,
       email,
       username,
@@ -74,7 +75,7 @@ describe('AuthController', () => {
     };
 
     // mock des fonctions utiliser
-    authService.login.mockResolvedValue(payload);
+    authService.login.mockResolvedValue(payload); // mock de la réponse du authService
     authService.generateJWTToken.mockResolvedValue('mock-jwt-token');
     authService.generateRefreshToken.mockResolvedValue('mock-refresh-token');
     authService.generateCookiesConfig.mockReturnValue({
@@ -86,28 +87,27 @@ describe('AuthController', () => {
       return makePostRequest(app, '/auth/login', 200, payload);
     });
 
-    it('should return user data', async () => {
+    it('should return public user fields', async () => {
       return makePostRequest(app, '/auth/login', 200, payload).expect((res) => {
-        expect(res.body).toHaveProperty('id');
-        expect(res.body).toHaveProperty('email');
-        expect(res.body).toHaveProperty('username');
-        expect(res.body).toHaveProperty('role');
-        expect(res.body).toHaveProperty('image');
+        // check qu'on retourne uniquement les champs définis dans le test
+        expect(res.body).toEqual({
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+          id: expect.any(Number),
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+          email: expect.any(String),
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+          username: expect.any(String),
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+          role: expect.any(String),
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+          image: expect.anything(),
+        });
       });
     });
 
-    it("souldn't return password, createdAt, updatedAt", async () => {
-      return makePostRequest(app, '/auth/login', 200, payload).expect((res) => {
-        expect(res.body).not.toHaveProperty('password');
-        expect(res.body).not.toHaveProperty('createdAt');
-        expect(res.body).not.toHaveProperty('updatedAt');
-        expect(res.body).not.toHaveProperty('deletedAt');
-      });
-    });
-
+    // TODO: revoir le test du cookie
     it('should send jwt_cookie and refresh_token', async () => {
       return makePostRequest(app, '/auth/login', 200, payload).expect((res) => {
-        // TODO: revoir ce test
         const setCookieHeader = res.headers['set-cookie'];
         expect(Array.isArray(setCookieHeader)).toBe(true);
         // Expect exactly two cookies to be set
@@ -121,22 +121,5 @@ describe('AuthController', () => {
         expect(cookiesString).toContain('HttpOnly');
       });
     });
-
-    // it('should exist and return 200', async () => {
-    //   authService.login.mockResolvedValue({
-    //     accessToken: 'token',
-    //     user: { id: 1, email: 'test@test.com' },
-    //   });
-
-    //   return request(app.getHttpServer() as Server)
-    //     .post('/auth/login')
-    //     .send({ email: 'test@test.com', password: '12345678' })
-    //     .expect(200)
-    //     .expect((res: { body: LoginResponse }) => {
-    //       expect(res.body).toHaveProperty('accessToken');
-    //       expect(res.body).toHaveProperty('user');
-    //       expect(res.body.user.email).toBe('test@test.com');
-    //     });
-    // });
   });
 });

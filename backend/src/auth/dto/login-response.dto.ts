@@ -35,14 +35,14 @@ export class LoginResponseDto {
   image: string | null;
 
   @Exclude()
-  password: string;
+  password?: string;
 
   @Exclude()
-  createdAt: Date;
+  createdAt?: Date;
 
   @Exclude()
-  updatedAt: Date;
+  updatedAt?: Date;
 
   @Exclude()
-  deletedAt: Date | null;
+  deletedAt?: Date | null;
 }
