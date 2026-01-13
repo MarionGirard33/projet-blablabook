@@ -5,6 +5,7 @@ import {
   CardDescription,
   CardContent,
 } from "@/components/ui/card";
+import { useRouter } from "@tanstack/react-router";
 import type { ExternalBook } from "../@types/externalBooks";
 
 export default function BookCardCarousel({
@@ -12,7 +13,9 @@ export default function BookCardCarousel({
 }: {
   readonly book: ExternalBook;
 }) {
-  const cover = book.cover_id || book.cover_i;
+  const cover = book.cover || book.cover_i;
+
+  const router = useRouter();
 
   let languageLabel = "Langue inconnue";
   if (Array.isArray(book.language) && book.language.length > 0) {
@@ -26,7 +29,15 @@ export default function BookCardCarousel({
   }
 
   return (
-    <Card className="flex flex-col items-center rounded-xl gap-0 overflow-hidden shadow w-full h-full p-0 min-h-96">
+    <Card
+      className="flex flex-col items-center rounded-xl gap-0 overflow-hidden shadow w-full h-full p-0 min-h-96 cursor-pointer"
+      onClick={() =>
+        router.navigate({
+          to: "/books/$isbn",
+          params: { isbn: book.isbn },
+        })
+      }
+    >
       <CardHeader className="w-full flex flex-col items-center p-4">
         {cover ? (
           <img
@@ -44,7 +55,7 @@ export default function BookCardCarousel({
           {book.title}
         </CardTitle>
         <CardDescription className="text-sm text-gray-700 text-center line-clamp-1">
-          {book.author_name ? book.author_name.join(", ") : "Auteur inconnu"}
+          {book.author ? book.author : "Auteur inconnu"}
         </CardDescription>
       </CardHeader>
       <CardContent className="w-full flex flex-col items-center px-4 pb-0">
@@ -52,12 +63,7 @@ export default function BookCardCarousel({
           {languageLabel}
         </p>
         <p className="text-xs text-gray-500 mb-1 text-center">
-          {book.first_publish_year
-            ? `Première publication : ${book.first_publish_year}`
-            : ""}
-        </p>
-        <p className="text-xs text-gray-500 mb-0 text-center">
-          {book.edition_count ? `${book.edition_count} édition(s)` : ""}
+          {book.publishDate ? `Première publication : ${book.publishDate}` : ""}
         </p>
       </CardContent>
     </Card>
