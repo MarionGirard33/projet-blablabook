@@ -55,14 +55,14 @@ const loginPage = createRoute({
   component: () => <LoginPage />,
 });
 
-// LIBRARY ROUTE
+// LIBRARY ROUTE (protected)
 const libraryRoute = createRoute({
   getParentRoute: () => protectedRoute,
   path: "/library",
   component: () => <LibraryPage />,
 });
 
-// PROFILE ROUTE
+// PROFILE ROUTE (protected)
 const profilePage = createRoute({
   getParentRoute: () => protectedRoute,
   path: "/profile",
