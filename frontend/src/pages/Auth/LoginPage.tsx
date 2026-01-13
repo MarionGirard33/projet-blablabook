@@ -1,9 +1,9 @@
+import type { BackendErrorResponse } from "@/@types/form";
 import api from "@/api/axios";
 import FormAction from "@/components/Form/FormAction/FormAction";
 import FormField from "@/components/Form/FormFields/FormField";
 import FormGlobalError from "@/components/Form/FormGlobalError";
 import FormTitle from "@/components/Form/FormTitle";
-import type { BackendErrorResponse } from "@/components/Form/Types/form.type";
 import { useAuthStore } from "@/stores/authStore";
 import { useForm } from "@tanstack/react-form";
 import { useMutation } from "@tanstack/react-query";
