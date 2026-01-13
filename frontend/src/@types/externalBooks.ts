@@ -11,6 +11,7 @@ export type ExternalBook = {
   language: string[];
   publishDate?: string;
   cover?: string;
+  cover_i?: string;
   description?: string;
   publisher?: string;
 };
@@ -32,8 +33,9 @@ export interface WorkSearchDoc {
   edition_key?: string[];
 }
 
-export type GetRandomExternalBooksParams = {
-  type: "random" | "category";
+export type GetExternalBooksParams = {
+  type: "random" | "searchText" | "category";
+  searchText?: string;
   categoryName?: string;
 };
 
