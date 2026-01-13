@@ -10,6 +10,7 @@ export class CategoryController {
 
   @Post()
   @ApiResponse({ status: 201, description: 'Category created successfully', type: CategoryResponseDto })
+  @ApiResponse({ status: 409, description: 'Category with this name already exists' })
   @ApiBody({ type: CreateCategoryDto })
   async create(@Body() createCategoryDto: CreateCategoryDto): Promise<CategoryResponseDto> {
     const newCategory = await this.categoryService.create(createCategoryDto);
