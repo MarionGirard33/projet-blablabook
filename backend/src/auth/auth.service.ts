@@ -22,7 +22,7 @@ import {
   UserJoinRefreshToken,
 } from './types/token.type';
 import { db } from 'src/db';
-import { refreshToken, users } from 'src/db/schema';
+import { refreshToken, user } from 'src/db/schema';
 import { CookieOptions } from 'express';
 import { eq } from 'drizzle-orm';
 
@@ -247,7 +247,7 @@ export class AuthService {
     const result = await db
       .select()
       .from(refreshToken)
-      .leftJoin(users, eq(refreshToken.userId, users.id))
+      .leftJoin(user, eq(refreshToken.userId, user.id))
       .where(eq(refreshToken.token, hashedToken));
     return result[0] ?? null;
   }

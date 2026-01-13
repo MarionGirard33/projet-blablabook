@@ -41,9 +41,7 @@ export const useAddBook = (userId?: number) => {
         // Fallbacks ensure minimal valid payloads if external fields are missing
         name: externalBook.title || "Unknown Title",
         author: externalBook.author || "Unknown Author",
-        isbn: Array.isArray(externalBook.isbn)
-          ? externalBook.isbn[0] || "N/A"
-          : externalBook.isbn || "N/A",
+        isbn: externalBook.isbn || "N/A",
         coverId: externalBook.cover || "default_cover.png",
         description:
           externalBook.description || "Pas de description pour ce livre",

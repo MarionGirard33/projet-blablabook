@@ -5,7 +5,7 @@ import HomePage from "@/pages/HomePage";
 import NotFound from "@/pages/NotFound";
 import LibraryPage from "@/pages/LibraryPage";
 import ProfilePage from "@/pages/ProfilePage/ProfilePage";
-import BookDetails from "@/pages/BookDetails";
+import BookDetails from "@/pages/Book/BookDetails";
 import {
   createRouter,
   createRootRoute,
@@ -49,18 +49,18 @@ const registerPage = createRoute({
   component: () => <RegisterPage />,
 });
 
-// LIBRARY ROUTE
-const libraryRoute = createRoute({
-  getParentRoute: () => protectedRoute,
-  path: "/library",
-  component: () => <LibraryPage />,
-});
-
 // LOGIN ROUTE
 const loginPage = createRoute({
   getParentRoute: () => rootRoute,
   path: "/login",
   component: () => <LoginPage />,
+});
+
+// LIBRARY ROUTE
+const libraryRoute = createRoute({
+  getParentRoute: () => protectedRoute,
+  path: "/library",
+  component: () => <LibraryPage />,
 });
 
 // PROFILE ROUTE
