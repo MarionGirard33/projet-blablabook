@@ -7,6 +7,7 @@ export function useCurrentUser() {
   return {
     data: user,
     isLoading: false,
-    isError: !isAuthenticated, 
+    isError: !isAuthenticated,
+    isAuthenticated,
   };
 }
