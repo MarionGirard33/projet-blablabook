@@ -8,7 +8,7 @@ import type {
   EditionData,
 } from "../@types/externalBooks";
 import externalApi from "./axiosExternal";
-import type { GetRandomExternalBooksParams } from "@/@types/externalBooks";
+import type { GetExternalBooksParams } from "@/@types/externalBooks";
 import { getRandomQuery } from "../lib/utils";
 
 // -----------------------------
@@ -29,42 +29,28 @@ const parseDescription = (desc: any): string => {
 };
 
 // -----------------------------
-// SEARCH RANDOM BOOK
-// -----------------------------
-
-export function getRandomExternalBooks(params: GetRandomExternalBooksParams) {
-  let url = "/search.json";
-  let query: Record<string, string> = {};
-
-  const randomKey = getRandomQuery();
-
-  if (params.type === "random") {
-    query.q = randomKey;
-    query.sort = "random";
-    query.limit = "10";
-  } else if (params.type === "category") {
-    if (!params.categoryName) {
-      throw new Error("No category provided for category search.");
-    }
-    query.q = params.categoryName;
-    query.limit = "10";
-  }
-
-  return externalApi.get(url, { params: query });
-}
-
-// -----------------------------
-// SEARCH BY TITLE OR AUTHOR
+// SEARCH EXTERNAL BOOK WITH SEARCH BY TITLE OR AUTHOR, RANDOM OR BY CATEGORY)
 // -----------------------------
 
 export const searchExternalBooks = async (
-  searchText: string
+  params: GetExternalBooksParams
 ): Promise<ExternalBook[]> => {
   const allowedLanguages = new Set(["fre", "eng", "fr", "en", "fra", "enm"]);
+  let q = "";
+
+  if (params.type === "random") {
+    q = getRandomQuery();
+  } else if (params.type === "searchText") {
+    if (!params.searchText) throw new Error("Missing search text");
+    q = params.searchText;
+  } else if (params.type === "category") {
+    if (!params.categoryName) throw new Error("Missing category name");
+    q = params.categoryName;
+  }
 
   const response = await externalApi.get("/search.json", {
     params: {
-      q: searchText,
+      q,
       limit: 20,
       fields: "key,title,author_name,edition_key",
     },
