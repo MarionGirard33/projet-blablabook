@@ -40,6 +40,70 @@ const getWorkDescription = async (workKey: string): Promise<string> => {
   return desc;
 };
 
+const extractLanguages = (edition: EditionData): string[] => {
+  return (
+    edition.languages?.map((l) => l.key.split("/").pop() || "en") || ["en"]
+  );
+};
+
+const isLanguageAllowed = (
+  languages: string[],
+  allowedLanguages: Set<string>
+): boolean => {
+  return languages.some((lang) => allowedLanguages.has(lang));
+};
+
+const buildCoverUrl = (edition: EditionData): string => {
+  const coverId = edition.covers?.[0];
+  return coverId
+    ? `https://covers.openlibrary.org/b/id/${coverId}-M.jpg`
+    : DEFAULT_COVER;
+};
+
+const fetchDescription = async (
+  edition: EditionData,
+  isbn: string
+): Promise<string> => {
+  try {
+    const workKeyFromEdition = edition.works?.[0]?.key;
+
+    if (workKeyFromEdition) {
+      return await getWorkDescription(workKeyFromEdition);
+    }
+
+    const dataIsbn = await getOpenLibIsbnData(isbn);
+    const workKey = dataIsbn.works?.[0]?.key;
+    if (workKey) {
+      return await getWorkDescription(workKey);
+    }
+  } catch (err) {
+    console.warn(`Failed to fetch description for ISBN ${isbn}:`, err);
+  }
+  return "";
+};
+
+const createExternalBook = (
+  edition: EditionData,
+  work: WorkSearchDoc,
+  isbn: string,
+  languages: string[],
+  coverUrl: string,
+  description: string
+): ExternalBook => {
+  return {
+    key: edition.key,
+    title: edition.title,
+    author:
+      work.author_name?.[0] || edition.authors?.[0]?.name || "Auteur inconnu",
+    isbn,
+    language: languages,
+    publishDate: edition.publish_date,
+    cover: coverUrl,
+    description: description || undefined,
+    publisher: edition.publishers?.[0],
+  };
+};
+
 // -----------------------------
 // SEARCH BY TITLE OR AUTHOR
 // -----------------------------
@@ -70,55 +134,25 @@ export const searchExternalBooks = async (
       );
       const edition = editionResponse.data;
 
-      // Extract ISBN
       const isbn = edition.isbn_13?.[0] || "";
       if (!isbn) continue;
 
-      // Extract and filter languages
-      const languages = edition.languages?.map(
-        (l) => l.key.split("/").pop() || "en"
-      ) || ["en"];
-      if (!languages.some((lang) => allowedLanguages.has(lang))) continue;
+      const languages = extractLanguages(edition);
+      if (!isLanguageAllowed(languages, allowedLanguages)) continue;
 
-      // Build cover URL
-      const coverId = edition.covers?.[0];
-      const coverUrl = coverId
-        ? `https://covers.openlibrary.org/b/id/${coverId}-M.jpg`
-        : DEFAULT_COVER;
+      const coverUrl = buildCoverUrl(edition);
+      const description = await fetchDescription(edition, isbn);
 
-      // Get description, prefer work key from edition, fallback to ISBN lookup
-      let description = "";
-      try {
-        const workKeyFromEdition = edition.works?.[0]?.key;
-
-        if (workKeyFromEdition) {
-          description = await getWorkDescription(workKeyFromEdition);
-        } else {
-          const dataIsbn = await getOpenLibIsbnData(isbn);
-          const workKey = dataIsbn.works?.[0]?.key;
-          if (workKey) {
-            description = await getWorkDescription(workKey);
-          }
-        }
-      } catch (err) {
-        console.warn(`Failed to fetch description for ISBN ${isbn}:`, err);
-      }
-
-      // Create ExternalBook object
-      books.push({
-        key: edition.key,
-        title: edition.title,
-        author:
-          work.author_name?.[0] ||
-          edition.authors?.[0]?.name ||
-          "Auteur inconnu",
-        isbn,
-        language: languages,
-        publishDate: edition.publish_date,
-        cover: coverUrl,
-        description: description || undefined,
-        publisher: edition.publishers?.[0],
-      });
+      books.push(
+        createExternalBook(
+          edition,
+          work,
+          isbn,
+          languages,
+          coverUrl,
+          description
+        )
+      );
     } catch (err) {
       console.warn(`Failed to fetch edition ${editionKey}:`, err);
     }
