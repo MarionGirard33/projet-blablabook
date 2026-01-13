@@ -7,9 +7,9 @@ import { useForm } from "@tanstack/react-form";
 import FormTitle from "@/components/Form/FormTitle";
 import FormField from "@/components/Form/FormFields/FormField";
 import FormAction from "@/components/Form/FormAction/FormAction";
-import type { BackendErrorResponse } from "@/components/Form/Types/form.type";
 import { useState } from "react";
 import FormGlobalError from "@/components/Form/FormGlobalError";
+import type { BackendErrorResponse } from "@/@types/form";
 
 const schema = z
   .object({
