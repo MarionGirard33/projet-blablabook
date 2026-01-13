@@ -79,8 +79,8 @@ export const userCategory = pgTable(
       .references(() => user.id, { onDelete: 'cascade' })
       .notNull()
   },
-  // prevent duplicate cotegory for user
-  (t) => [unique('unique_categroy_user').on(t.userId, t.categoryId)],
+  // prevent duplicate category for user
+  (t) => [unique('unique_category_user').on(t.userId, t.categoryId)],
 );
 
 export const listBook = pgTable(
