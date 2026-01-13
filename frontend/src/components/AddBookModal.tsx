@@ -67,13 +67,10 @@ export function AddBookModal({ isOpen, onClose, userId }: AddBookModalProps) {
 
   const navigate = useNavigate();
 
-  // Navigate to internal book details page using the work id
+  // Navigate to internal book details page using the ISBN
   const handleCardClick = (book: ExternalBook) => {
-    // Extract the last segment of the key (e.g., “works/OL82586W” -> “OL82586W”)
-    const rawKey = book.key?.toString() ?? "";
-    const id = rawKey.includes("/") ? rawKey.split("/").pop() : rawKey;
-    if (!id) return;
-    navigate({ to: `/books/${id}` });
+    if (!book.isbn) return;
+    navigate({ to: `/books/${book.isbn}` });
   };
 
   // Check if a book result is already in the library
