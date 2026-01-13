@@ -56,4 +56,29 @@ export class CategoryService {
       isActive: oneCategory.isActive ?? false,
     };
   }
+
+  async findOrCreateByName(name: string): Promise<Category> {
+    const [existingCategory] = await this.db
+      .select()
+      .from(schema.category)
+      .where(eq(schema.category.name, name))
+      .execute();
+
+    if (existingCategory) {
+      return {
+        ...existingCategory,
+        isActive: existingCategory.isActive ?? true,
+      };
+    }
+
+    const [newCategory] = await this.db
+      .insert(schema.category)
+      .values({ name, isActive: true })
+      .returning();
+
+    return {
+      ...newCategory,
+      isActive: newCategory.isActive ?? true,
+    };
+  }
 }
