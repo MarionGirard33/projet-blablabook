@@ -1,4 +1,4 @@
-import type { User } from "./@types/user";
+import type { User } from "../../@types/user";
 import UpdateUserForm from "./UpdateUserForm";
 import { X } from "lucide-react";
 

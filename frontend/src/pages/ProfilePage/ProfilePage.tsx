@@ -1,43 +1,18 @@
-import { useState } from "react";
-import { Pencil } from "lucide-react";
-import ProfilePageModal from "./ProfilePageModale";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import type { User } from "./@types/user";
-import { Button } from "@/components/ui/button";
-import api from "@/api/axios";
-import { useDeleteUser } from "./mutation/deleteUser.mutation";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { useAuthStore } from "@/stores/authStore";
+  import { useState } from "react";
+  import { Pencil } from "lucide-react";
+  import ProfilePageModal from "./ProfilePageModale";
+  import { useQueryClient } from "@tanstack/react-query";
+  import type { User } from "../../@types/user";
+  import { Button } from "@/components/ui/button";
+  import { useDeleteUser } from "./mutation/deleteUser.mutation";
+  import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
-export default function ProfilePage({ userId }: { userId: number }) {
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  export default function ProfilePage({ currentUser }: { currentUser: User }) {
+    const queryClient = useQueryClient();
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    
+    const deleteUserMutation = useDeleteUser(currentUser.id);
 
-  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
-  const queryClient = useQueryClient();
-
-  const {
-    data: user,
-    isLoading,
-    isError,
-    error,
-  } = useQuery<User, Error>({
-    queryKey: ["user", userId],
-    enabled: isAuthenticated,
-    queryFn: async () => {
-      const res = await api.get<User>(`/user/${userId}`);
-      return res.data;
-    },
-  });
-
-  const deleteUserMutation = useDeleteUser(userId);
-
-  if (!isAuthenticated) {
-    return null;
-  }
-
-  if (isLoading) return <div>Loading...</div>;
-  if (isError) return <div>{error.message}</div>;
-  if (!user) return null;
 
   return (
     <div className="flex w-full flex-col items-center justify-center py-6 md:py-0">
@@ -60,27 +35,26 @@ export default function ProfilePage({ userId }: { userId: number }) {
             </button>
           </div>
 
-          {/* Image */}
-          <Avatar className="w-28 h-28 mx-auto mb-16 border border-bookbeige shadow">
-            {user.image && (
-              <AvatarImage
-                src={`/images/${user.image}`}
-                alt={`Avatar de ${user.username}`}
-              />
-            )}
-            <AvatarFallback className="text-4xl bg-bookbeige/50 font-bold">
-              {user.username ? user.username[0].toUpperCase() : "X"}
-            </AvatarFallback>
-          </Avatar>
-          {/* Infos utilisateur alignées */}
-          <div className="grid grid-cols-[max-content_1fr] gap-x-4 md:gap-x-8 lg:gap-x-12 gap-y-2 md:w-[400px] lg:w-[400px] mx-auto">
-            <span className="font-semibold">Nom d'utilisateur :</span>
-            <span className="break-words min-w-0">{user?.username}</span>
+            {/* Image */}
+            <Avatar className="w-28 h-28 mx-auto mb-16 border border-bookbeige shadow">
+              {currentUser.image && (
+                <AvatarImage
+                  src={`/images/${currentUser.image}`}
+                  alt={`Avatar de ${currentUser.username}`}
+                />
+              )}
+              <AvatarFallback className="text-4xl bg-bookbeige/50 font-bold">
+                {currentUser.username ? currentUser.username[0].toUpperCase() : "X"}
+              </AvatarFallback>
+            </Avatar>
+            {/* Infos utilisateur alignées */}
+              <div className="grid grid-cols-[max-content_1fr] gap-x-4 md:gap-x-8 lg:gap-x-12 gap-y-2 md:w-[400px] lg:w-[400px] mx-auto">
 
-            <span className="font-semibold">Email :</span>
-            <span className="break-words min-w-0">
-              {user?.email.toLowerCase()}
-            </span>
+              <span className="font-semibold">Nom d'utilisateur :</span>
+              <span className="break-words min-w-0">{currentUser?.username}</span>
+
+              <span className="font-semibold">Email :</span>
+              <span className="break-words min-w-0">{currentUser?.email.toLowerCase()}</span>
 
             <span className="font-semibold">Mot de passe :</span>
             <span className="tracking-widest break-words min-w-0">
@@ -103,14 +77,14 @@ export default function ProfilePage({ userId }: { userId: number }) {
         </Button>
       </div>
 
-      {/* Modale */}
-      {isModalOpen && user && (
-        <ProfilePageModal
-          userId={userId}
-          onClose={() => setIsModalOpen(false)}
-          onUpdate={(updatedUser) => {
+        {/* Modale */}
+        {isModalOpen && currentUser && (
+          <ProfilePageModal
+            userId={currentUser.id}
+            onClose={() => setIsModalOpen(false)}
+            onUpdate={(updatedUser) => {
             // au lieu de setUser (useEffect)
-            queryClient.setQueryData(["user", userId], updatedUser);
+            queryClient.setQueryData(["user", currentUser.id], updatedUser);
           }}
         />
       )}

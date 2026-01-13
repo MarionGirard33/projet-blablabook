@@ -2,7 +2,7 @@ export type User = {
   id: number;
   username: string;
   email: string;
-  image?: string;
+  image?: string | null;
 }
 
 export type UpdateUserInput = {

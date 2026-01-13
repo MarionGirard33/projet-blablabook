@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import api from "@/api/axios";
-import type { UpdateUserInput } from "../@types/user";
+import type { UpdateUserInput } from "../../../@types/user";
 
 export const useUpdateUser = (userId: number, options?: { onSuccess?: () => void }) => {
   const queryClient = useQueryClient();
