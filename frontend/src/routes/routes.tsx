@@ -5,7 +5,7 @@ import HomePage from "@/pages/HomePage";
 import NotFound from "@/pages/NotFound";
 import LibraryPage from "@/pages/LibraryPage";
 import ProfilePage from "@/pages/ProfilePage/ProfilePage";
-import BookDetails from "@/pages/BookDetails";
+import BookDetails from "@/pages/Book/BookDetails";
 import { useAuthStore } from "@/stores/authStore";
 
 import {

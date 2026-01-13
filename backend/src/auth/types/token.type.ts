@@ -1,0 +1,31 @@
+import { CookieOptions } from 'express';
+import { refreshToken, user } from 'src/db/schema';
+
+export type TokenSelect = typeof refreshToken.$inferSelect;
+export type TokenInsert = typeof refreshToken.$inferInsert;
+
+export type JwtPayload = {
+  sub: number;
+  userRole: string;
+};
+
+export type TokenExtractorData = {
+  jwtCookie: string | null;
+  refreshTokenCookie: string | null;
+};
+
+export type CookiesConfig = {
+  jwtCookieConfig: CookieOptions;
+  refreshCookieConfig: CookieOptions;
+};
+
+export type RotateTokensData = {
+  newJwtToken: string;
+  newRefreshToken: string;
+  user: JwtPayload;
+};
+
+export type UserJoinRefreshToken = {
+  user: typeof user.$inferSelect | null;
+  refresh_token: typeof refreshToken.$inferSelect;
+};
