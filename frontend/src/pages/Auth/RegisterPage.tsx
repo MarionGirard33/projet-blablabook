@@ -100,7 +100,7 @@ export default function RegisterPage() {
 
   return (
     <form
-      className="w-150 flex flex-col items-center"
+      className=" w-70 md:w-150 flex flex-col items-center mx-auto"
       onSubmit={(e) => {
         e.preventDefault();
         e.stopPropagation();
