@@ -8,16 +8,19 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
 } from "./ui/dropdown-menu";
+import type { BookStatus } from "../@types/books";
 
-// Define the possible book statuses
-export type BookStatus = "Lu" | "En cours" | "À lire" | null;
 
+// Define type for status configuration
+export type StatusConfig = {
+  icon: React.ElementType;
+};
 // Props for the BookStatusAction component
 interface BookStatusActionProps {
-  status: BookStatus;
+  status?: BookStatus;
   onAddToLibrary: () => void;
   isAdding?: boolean;
-  onChangeStatus?: (status: Exclude<BookStatus, null>) => void;
+  onChangeStatus?: (status: BookStatus) => void;
   isUpdatingStatus?: boolean; 
 }
 
@@ -31,31 +34,21 @@ export const BookStatusAction: React.FC<BookStatusActionProps> = ({
 }) => {
 
   // Map each status to a label, icon, and styling
-  const statusConfig: Record<string, { label: string; icon: any; style: string; iconColor: string }> = {
+  const statusConfig: Record<BookStatus, StatusConfig> = {
     "Lu": { 
-      label: "Livre lu", 
       icon: CheckCircle, 
-      style: "bg-emerald-50 border-emerald-200 text-emerald-800",
-      iconColor: "text-emerald-600 bg-emerald-100"
     },
     "En cours": { 
-      label: "Lecture en cours", 
-      icon: BookOpen, 
-      style: "bg-blue-50 border-blue-200 text-blue-800",
-      iconColor: "text-blue-600 bg-blue-100"
+      icon: BookOpen,
     },
     "À lire": { 
-      label: "À lire", 
-      icon: Clock, 
-      style: "bg-amber-50 border-amber-200 text-amber-800",
-      iconColor: "text-amber-600 bg-amber-100"
+      icon: Clock,
     },
   };
 
   // If the book has a status, display it with a dropdown for updating
   if (status && statusConfig[status]) {
-    const config = statusConfig[status];
-    const Icon = config.icon;
+    const Icon = statusConfig[status].icon;
 
     // Determine badge variant for UI
     let badgeVariant: "success" | "warning" | "default" = "default";

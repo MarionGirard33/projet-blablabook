@@ -1,19 +1,20 @@
 import { Link } from "@tanstack/react-router";
 import { ArrowLeft, Loader2 } from "lucide-react";
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { addBookToUserList } from "../api/books";
-import { useCurrentUser } from "../hooks/useCurrentUser";
-import { useUserBooks } from "../hooks/useUserBooks";
-import { bookDetailsRoute } from "../routes/routes";
-import { getFullExternalBook } from "../api/externalBooks";
+import { addBookToUserList } from "../../api/books";
+import { useCurrentUser } from "../../hooks/useCurrentUser";
+import { useUserBooks } from "../../hooks/useUserBooks";
+import { bookDetailsRoute } from "../../routes/routes";
+import { getFullExternalBook } from "../../api/externalBooks";
 
-import type { ExternalBookDisplayData } from "../@types/externalBooks";
+import type { ExternalBookDisplayData } from "../../@types/externalBooks";
 
-import { BookCover } from "../components/BookCover";
-import { BookHeaderInfo } from "../components/BookHeaderInfo";
-import { BookDataGrid } from "../components/BookDataGrid";
-import { BookStatusAction } from "../components/BookStatusAction";
-import { Button } from "../components/ui/button";
+import { BookCover } from "../../components/BookCover";
+import { BookHeaderInfo } from "../../components/BookHeaderInfo";
+import { BookDataGrid } from "../../components/BookDataGrid";
+import { BookStatusAction } from "../../components/BookStatusAction";
+import { Button } from "../../components/ui/button";
+import type { BookStatus } from "@/@types/books";
 
 // --- MAIN COMPONENT ---
 const BookDetails = () => {
@@ -73,11 +74,8 @@ const BookDetails = () => {
     if (book) addBookMutation.mutate(book);
   };
 
-  // Check if the book is already in the user's library
-  const isInLibrary = userBooks.some((b) => b.isbn === book?.isbn);
-
   // Handler to change the status of a book in the user's library
-  const handleChangeStatus = (newStatus: "Lu" | "En cours" | "À lire") => {
+  const handleChangeStatus = (newStatus: BookStatus) => {
     const userBook = userBooks.find((b) => b.isbn === book?.isbn);
     if (userBook?.id) updateStatus({ bookId: userBook.id, status: newStatus, currentBook: userBook });
   };
@@ -147,9 +145,9 @@ const BookDetails = () => {
           </div>
           <div className="lg:col-span-1 w-full lg:sticky lg:top-6">
             <BookStatusAction
-              status={isInLibrary ? (userBooks.find((b) => b.isbn === book.isbn)?.status ?? null) : null}
+              status={userBooks.find((b) => b.isbn === book.isbn)?.status}
               onAddToLibrary={handleAddToLibrary}
-              isAdding={addBookMutation.status === "pending"}
+              isAdding={addBookMutation.isPending}
               onChangeStatus={handleChangeStatus}
               isUpdatingStatus={isUpdatingStatus}
             />
