@@ -26,6 +26,20 @@ const parseDescription = (desc: any): string => {
   return "";
 };
 
+// Simple in-memory cache to avoid fetching the same work twice
+const workDescriptionCache = new Map<string, string>();
+
+const getWorkDescription = async (workKey: string): Promise<string> => {
+  if (workDescriptionCache.has(workKey)) {
+    return workDescriptionCache.get(workKey) as string;
+  }
+
+  const dataWork = await getOpenLibWorkData(workKey);
+  const desc = parseDescription(dataWork.description);
+  workDescriptionCache.set(workKey, desc);
+  return desc;
+};
+
 // -----------------------------
 // SEARCH BY TITLE OR AUTHOR
 // -----------------------------
@@ -72,14 +86,19 @@ export const searchExternalBooks = async (
         ? `https://covers.openlibrary.org/b/id/${coverId}-M.jpg`
         : DEFAULT_COVER;
 
-      // Get description via ISBN lookup
+      // Get description, prefer work key from edition, fallback to ISBN lookup
       let description = "";
       try {
-        const dataIsbn = await getOpenLibIsbnData(isbn);
-        const workKey = dataIsbn.works?.[0]?.key;
-        if (workKey) {
-          const dataWork = await getOpenLibWorkData(workKey);
-          description = parseDescription(dataWork.description);
+        const workKeyFromEdition = edition.works?.[0]?.key;
+
+        if (workKeyFromEdition) {
+          description = await getWorkDescription(workKeyFromEdition);
+        } else {
+          const dataIsbn = await getOpenLibIsbnData(isbn);
+          const workKey = dataIsbn.works?.[0]?.key;
+          if (workKey) {
+            description = await getWorkDescription(workKey);
+          }
         }
       } catch (err) {
         console.warn(`Failed to fetch description for ISBN ${isbn}:`, err);
