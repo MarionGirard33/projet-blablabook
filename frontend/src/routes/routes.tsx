@@ -67,12 +67,12 @@ const profilePage = createRoute({
   getParentRoute: () => protectedRoute,
   path: "/profile",
   component: () => {
-    const { data, isLoading } = useCurrentUser();
+    const { data: currentUser, isLoading, isError } = useCurrentUser();
 
-    if (isLoading) return <div>Loading...</div>;
-    if (!data) return <div>Utilisateur non trouvé</div>;
+    if (isLoading) return <div>Chargement...</div>;
+    if (isError) return <div>Impossible de charger le profil</div>;
 
-    return <ProfilePage currentUser={currentUser} />;
+    return <ProfilePage currentUser={currentUser!} />;
   },
 });
 
