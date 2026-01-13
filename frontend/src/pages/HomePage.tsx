@@ -3,43 +3,34 @@ import Hero from "@/components/Hero";
 import SearchBar from "@/components/SearchBar";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
-import {
-  getRandomExternalBooks,
-  searchExternalBooks,
-} from "@/api/externalBooks";
+import { searchExternalBooks } from "@/api/externalBooks";
 import type { ExternalBook } from "@/@types/externalBooks";
 
 export default function HomePage() {
   const [search, setSearch] = useState("");
 
   const { data: searchResults = [] } = useQuery<ExternalBook[]>({
-    enabled: false,
     queryKey: ["externalBooks", search],
-    queryFn: () => searchExternalBooks(search),
+    queryFn: () =>
+      searchExternalBooks({ type: "searchText", searchText: search }),
   });
 
   const { data: randomResults = [] } = useQuery({
     queryKey: ["random-external-books"],
-    queryFn: () =>
-      getRandomExternalBooks({ type: "random" }).then(
-        (res) => res.data.docs || []
-      ),
+    queryFn: () => searchExternalBooks({ type: "random" }),
   });
 
-  const { data: categoryResults = [] } = useQuery({
-    queryKey: ["category-external-books", "bestsellers"],
+  const { data: byCategoryResults = [] } = useQuery({
+    queryKey: ["by-category-external-books"],
     queryFn: () =>
-      getRandomExternalBooks({
-        type: "category",
-        categoryName: "bestsellers",
-      }).then((res) => res.data.docs || []),
+      searchExternalBooks({ type: "category", categoryName: "bestsellers" }),
   });
 
   return (
     <div className="flex-col w-full">
       <Hero />
       <SearchBar onSearch={setSearch} />
-      {search.length >= 3 && searchResults.length > 0 ? (
+      {search.length >= 3 ? (
         <BookCarousel
           title={`Résultats pour "${search}"`}
           books={searchResults}
@@ -47,7 +38,7 @@ export default function HomePage() {
       ) : (
         <>
           <BookCarousel title={"Suggestions Aléatoire"} books={randomResults} />
-          <BookCarousel title={"Le top du top"} books={categoryResults} />
+          <BookCarousel title={"Le top du top"} books={byCategoryResults} />
         </>
       )}
     </div>
