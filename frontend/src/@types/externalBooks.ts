@@ -8,7 +8,7 @@ export type ExternalBook = {
   title: string;
   author: string;
   isbn: string;
-  language: string[];
+  language?: Array<{ key: string }>;
   publishDate?: string;
   cover?: string;
   description?: string;
@@ -28,6 +28,7 @@ export interface EditionData {
 }
 
 export interface WorkSearchDoc {
+  title: string;
   author_name?: string[];
   edition_key?: string[];
 }
