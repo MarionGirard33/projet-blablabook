@@ -8,12 +8,12 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogClose,
   DialogDescription,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Check, Search, X } from "lucide-react";
+import { Check, Search } from "lucide-react";
+import { Loader } from "@/components/Loader";
 
 import { useQuery } from "@tanstack/react-query";
 import { getUserBooks } from "@/api/books";
@@ -102,20 +102,16 @@ export function AddBookModal({ isOpen, onClose, userId }: AddBookModalProps) {
           <DialogTitle className="text-2xl font-semibold">
             Rechercher un livre
           </DialogTitle>
-
-          {/* Close button (asChild to keep semantics of the child button) */}
-          <DialogClose asChild>
-            <button className="absolute top-3 right-3 text-gray-500 hover:text-gray-800">
-              <X size={22} />
-            </button>
-          </DialogClose>
         </DialogHeader>
 
         <div className="flex gap-2 mb-4 mt-2">
           <Input
             placeholder="Rechercher un livre..."
             value={query}
-            onChange={(e) => setQuery(e.target.value)}
+            onChange={(e) => {
+              setQuery(e.target.value);
+              if (hasSearched) setHasSearched(false);
+            }}
             className="flex-1"
           />
 
@@ -128,7 +124,7 @@ export function AddBookModal({ isOpen, onClose, userId }: AddBookModalProps) {
           </Button>
         </div>
 
-        {isFetching && <p>Chargement...</p>}
+        {isFetching && <Loader className="text-sm" />}
 
         {/* Empty state: show message only after an explicit search */}
         {!isFetching && hasSearched && results.length === 0 && (
