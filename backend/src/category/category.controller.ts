@@ -1,9 +1,8 @@
 import { Controller, Get, Post, Body, Param, ParseIntPipe } from '@nestjs/common';
-import { ApiTags, ApiResponse } from '@nestjs/swagger';
+import { ApiTags, ApiResponse, ApiBody } from '@nestjs/swagger';
 import { CategoryService } from './category.service';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { CategoryResponseDto } from './dto/category-response.dto';
-import { Category } from './types/category';
 @ApiTags('category')
 @Controller('category')
 export class CategoryController {
@@ -11,6 +10,7 @@ export class CategoryController {
 
   @Post()
   @ApiResponse({ status: 201, description: 'Category created successfully', type: CategoryResponseDto })
+  @ApiBody({ type: CreateCategoryDto })
   async create(@Body() createCategoryDto: CreateCategoryDto): Promise<CategoryResponseDto> {
     const newCategory = await this.categoryService.create(createCategoryDto);
     return {
