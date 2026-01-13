@@ -124,7 +124,7 @@ Go to: [http://localhost:8080](http://localhost:8080)
 │   ├── src/
 │   │   ├── auth/        # Authentication
 │   │   ├── books/       # Books management
-│   │   ├── users/       # Users management
+│   │   ├── user/        # Users management
 │   │   ├── db/          # Database config and Drizzle schema
 │   │   └── main.ts      # Entry point
 │   ├── Dockerfile
