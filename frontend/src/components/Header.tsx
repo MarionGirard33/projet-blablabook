@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import { Menu, X, Book } from "lucide-react";
-import { Avatar } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -26,6 +26,8 @@ export default function Header() {
           <Book className="h-8 w-8" />
           <span className="font-bold text-xl">Blablabook</span>
         </Link>
+
+        {/* Desktop nav */}
         <nav className="hidden md:flex items-center gap-4">
           <Link to="/" className="hover:underline">
             Accueil
@@ -35,23 +37,18 @@ export default function Header() {
               <Link to="/library" className="hover:underline">
                 Librairie
               </Link>
-              <div className="hidden md:flex items-center">
+              <div className="hidden md:flex items-center ">
                 <DropdownMenu>
                   <DropdownMenuTrigger className="cursor-pointer" asChild>
-                    <Avatar>
-                      {user.avatarUrl ? (
-                        <img
-                          src={user.avatarUrl}
-                          alt={user.username}
-                          className="w-8 h-8 rounded-full"
-                        />
-                      ) : (
-                        <img
-                          src="https://cdn-icons-png.flaticon.com/512/29/29302.png"
-                          alt="Book avatar"
-                          className="w-8 h-8 rounded-full bg-gray-200"
-                        />
-                      )}
+                    <Avatar className="w-8 h-8 border border-bookbeige">
+                      <AvatarImage
+                        key={user.image}
+                        src={user.image ? `/images/${user.image}` : undefined}
+                        alt={`Avatar de ${user.username || "X"}`}
+                      />
+                      <AvatarFallback className="bg-bookbeige/50 border border-bookbeige font-bold">
+                        {user.username ? user.username[0].toUpperCase() : "X"}
+                      </AvatarFallback>
                     </Avatar>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
@@ -62,7 +59,10 @@ export default function Header() {
                     </DropdownMenuItem>
                     <DropdownMenuItem
                       className="text-red-500"
-                      onClick={() => logout()}
+                      onClick={() => {
+                        logout();
+                        navigate({ to: "/" });
+                      }}
                     >
                       Déconnexion
                     </DropdownMenuItem>
@@ -76,43 +76,49 @@ export default function Header() {
             </Link>
           )}
         </nav>
-        <button className="md:hidden" onClick={() => setOpen(true)}>
-          <Menu />
-        </button>
+          
+        {/* Mobile avatar ou burger */}
+        <div className="flex items-center md:hidden">
+          <button onClick={() => setOpen(true)}>
+            {user ? (
+              <Avatar className="w-10 h-10 cursor-pointer border border-bookbeige">
+                <AvatarImage
+                  src={user.image ? `/images/${user.image}` : undefined}
+                  alt={`Avatar de ${user.username || "X"}`}
+                />
+                <AvatarFallback>
+                  {user.username ? user.username[0].toUpperCase() : "X"}
+                </AvatarFallback>
+              </Avatar>
+            ) : (
+              <Menu className="cursor-pointer" />
+            )}
+          </button>
+        </div>
+        {/* Mobile menu overlay */}
         {open && (
-          <div className="fixed inset-0 z-50 bg-black bg-opacity-50 flex flex-col">
-            <button className="self-end m-4" onClick={() => setOpen(false)}>
-              <X color="white" />
+          <div className="fixed inset-0 z-50 bg-black bg-opacity-50 flex flex-col p-4">
+            <button className="self-end text-white text-2xl cursor-pointer" onClick={() => setOpen(false)}>
+              <X size={28} />
             </button>
             <nav className="flex flex-col items-center gap-6 mt-20">
-              <Link
-                to="/"
-                className="text-white text-xl"
-                onClick={() => setOpen(false)}
-              >
+              <Link to="/" className="text-white text-xl" onClick={() => setOpen(false)}>
                 Accueil
               </Link>
               {user ? (
                 <>
-                  <Link
-                    to="/library"
-                    className="text-white text-xl"
-                    onClick={() => setOpen(false)}
-                  >
+                  <Link to="/library" className="text-white text-xl" onClick={() => setOpen(false)}>
                     Librairie
                   </Link>
-                  <Link
-                    to="/profile"
-                    className="text-white text-xl"
-                    onClick={() => setOpen(false)}
-                  >
-                    {user.username ?? "Profil"}
+                  <Link to="/profile" className="text-white text-xl" onClick={() => setOpen(false)}>
+                    {"Mon profil"}
                   </Link>
                   <Button
                     variant="destructive"
                     className="text-white"
                     onClick={() => {
                       logout();
+                      navigate({ to: "/" });
                       setOpen(false);
                     }}
                   >
@@ -120,9 +126,11 @@ export default function Header() {
                   </Button>
                 </>
               ) : (
-                <Link to="/login" onClick={() => setOpen(false)}>
-                  <Button>Se connecter</Button>
-                </Link>
+                <>
+                  <Link to="/login" onClick={() => setOpen(false)}>
+                    <Button>Se connecter</Button>
+                  </Link>
+                </>
               )}
             </nav>
           </div>

@@ -28,8 +28,8 @@ export default function LoginPage() {
   // state for global error if request is failed
   const [globalError, setGlobalError] = useState<string | null>(null);
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const mutation = useMutation<
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     any,
     AxiosError<BackendErrorResponse>,
     LoginFormData
@@ -116,7 +116,7 @@ export default function LoginPage() {
       </form.Field>
 
       <p className="text-sm text-center mt-4">
-        Pas encore de compte ?{" "}
+        Pas encore de compte ?{" "}
         <Link
           to="/register"
           className="text-blue-600 underline hover:text-blue-800"

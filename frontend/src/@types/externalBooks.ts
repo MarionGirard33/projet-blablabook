@@ -5,23 +5,38 @@ export type ExternalBookCarouselProps = {
 
 export type ExternalBook = {
   key: string;
-  author_name: string[];
-  first_publish_year?: number;
-  language: string[];
   title: string;
-  cover_id?: number;
-  cover_i?: number;
-  edition_count?: number;
+  author: string;
   isbn: string;
+  language: string[];
+  publishDate?: string;
+  cover?: string;
+  description?: string;
+  publisher?: string;
 };
 
-export type GetExternalBooksParams = {
-  type: "random" | "category" | "search";
+export interface EditionData {
+  key: string;
+  title: string;
+  authors?: Array<{ name?: string }>;
+  isbn_13?: string[];
+  languages?: Array<{ key: string }>;
+  publish_date?: string;
+  covers?: number[];
+  works?: Array<{ key: string }>;
+  publishers?: string[];
+}
+
+export interface WorkSearchDoc {
+  author_name?: string[];
+  edition_key?: string[];
+}
+
+export type GetRandomExternalBooksParams = {
+  type: "random" | "category";
   categoryName?: string;
-  searchText?: string;
 };
 
-// Todo revoir type @mohini
 export type ExternalBookDisplayData = {
   title: string;
   authors: string[];
@@ -33,4 +48,25 @@ export type ExternalBookDisplayData = {
   pages: number;
   language: string;
   categories: string[];
-}
+};
+
+export type ExternalApiIsbnResponse = {
+  title: string;
+  covers?: number[];
+  authors?: Array<{ key: string }>;
+  works?: Array<{ key: string }>;
+  publishers?: string[];
+  publish_date?: string;
+  number_of_pages?: number;
+  languages?: Array<{ key: string }>;
+};
+
+export type ExternalApiWorkResponse = {
+  description?: string | { value: string };
+  subjects?: string[];
+  covers?: number[];
+};
+
+export type ExternalApiAuthorResponse = {
+  name: string;
+};

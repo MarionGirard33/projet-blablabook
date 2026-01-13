@@ -1,14 +1,7 @@
 import { Label } from "@radix-ui/react-label";
-import type { AnyFieldApi } from "@tanstack/react-form"
 import FormFieldInfo from "./FormFieldInfo";
 import FormInput from "./FormInput";
-
-type FormFieldProps = {
-  readonly field: AnyFieldApi;
-  readonly type: string;
-  readonly label: string;
-  readonly placeholder: string;
-}
+import type { FormFieldProps } from "@/@types/form";
 
 export default function FormField({ field, type, label, placeholder }: FormFieldProps) {
   return (
