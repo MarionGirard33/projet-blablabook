@@ -1,5 +1,5 @@
 import { CookieOptions } from 'express';
-import { refreshToken, users } from 'src/db/schema';
+import { refreshToken, user } from 'src/db/schema';
 
 export type TokenSelect = typeof refreshToken.$inferSelect;
 export type TokenInsert = typeof refreshToken.$inferInsert;
@@ -26,6 +26,6 @@ export type RotateTokensData = {
 };
 
 export type UserJoinRefreshToken = {
-  user: typeof users.$inferSelect | null;
+  user: typeof user.$inferSelect | null;
   refresh_token: typeof refreshToken.$inferSelect;
 };
