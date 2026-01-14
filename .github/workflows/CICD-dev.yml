@@ -36,12 +36,6 @@ jobs:
       # génère le dossier dist du front
       - run: npm run build
 
-      # Stocke le build du frontend comme artifact
-      - name: Upload frontend build
-        uses: actions/upload-artifact@v4
-        with:
-          name: frontend-build
-          path: dist
 
 ### BACK CI ###
   ci-backend:
@@ -76,6 +70,11 @@ jobs:
     runs-on: ubuntu-latest
     needs: [ci-frontend, ci-backend]
 
+    env:
+    DB_NAME: ${{ secrets.DB_NAME }}
+    DB_USER: ${{ secrets.DB_USER }}
+    DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+
     steps:
       # Clone le repo
       - uses: actions/checkout@v4
@@ -84,9 +83,20 @@ jobs:
       - name: Check Docker
         run: docker --version
 
-      # Build et lance les containers
-      - name: Build & run docker-compose
-        run: docker compose up -d --build
+      - name: Start docker-compose
+        run: docker-compose --env-file .env -f docker-compose.yml up -d --build
+
+      - name: Wait for Postgres
+        run: |
+          until docker exec postgres pg_isready -U blablabook; do
+            echo "Waiting for postgres..."
+            sleep 5
+          done
+
+
+      - name: Run backend tests
+        run: docker exec backend npm run test
+
 
       # Vérifie que les containers tournent
       - name: Docker status
