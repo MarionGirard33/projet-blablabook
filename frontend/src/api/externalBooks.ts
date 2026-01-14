@@ -4,10 +4,12 @@ import type {
   ExternalApiIsbnResponse,
   ExternalApiWorkResponse,
   ExternalApiAuthorResponse,
+  GetExternalBooksParams,
   WorkSearchDoc,
   EditionData,
 } from "../@types/externalBooks";
 import externalApi from "./axiosExternal";
+import { getRandomQuery } from "../lib/utils";
 
 // -----------------------------
 // CONSTANTS
@@ -104,15 +106,27 @@ const filterSearchResults = (
 };
 
 // -----------------------------
-// SEARCH BY TITLE OR AUTHOR
+// SEARCH EXTERNAL BOOK WITH SEARCH BY TITLE OR AUTHOR, RANDOM OR BY CATEGORY)
 // -----------------------------
 
 export const searchExternalBooks = async (
-  searchText: string
+  params: GetExternalBooksParams
 ): Promise<ExternalBook[]> => {
+  let q = "";
+
+  if (params.type === "random") {
+    q = getRandomQuery();
+  } else if (params.type === "searchText") {
+    if (!params.searchText) throw new Error("Missing search text");
+    q = params.searchText;
+  } else if (params.type === "category") {
+    if (!params.categoryName) throw new Error("Missing category name");
+    q = params.categoryName;
+  }
+
   const response = await externalApi.get("/search.json", {
     params: {
-      q: searchText,
+      q,
       limit: 20,
       fields: "key,title,author_name,edition_key",
     },
@@ -120,6 +134,11 @@ export const searchExternalBooks = async (
 
   const docs: WorkSearchDoc[] = response.data.docs || [];
   const books: ExternalBook[] = [];
+
+  let searchText = "";
+  if (params.type === "searchText") {
+    searchText = params.searchText || "";
+  }
 
   // Filter early on search results before fetching editions
   const filteredDocs = filterSearchResults(docs, searchText);
@@ -141,13 +160,7 @@ export const searchExternalBooks = async (
       const description = await fetchDescription(edition, isbn);
 
       books.push(
-        createExternalBook(
-          edition,
-          work,
-          isbn,
-          coverUrl,
-          description
-        )
+        createExternalBook(edition, work, isbn, coverUrl, description)
       );
     } catch (err) {
       console.warn(`Failed to fetch edition ${editionKey}:`, err);

@@ -34,9 +34,9 @@ export interface WorkSearchDoc {
 }
 
 export type GetExternalBooksParams = {
-  type: "random" | "category" | "search";
-  categoryName?: string;
+  type: "random" | "searchText" | "category";
   searchText?: string;
+  categoryName?: string;
 };
 
 export type ExternalBookDisplayData = {
