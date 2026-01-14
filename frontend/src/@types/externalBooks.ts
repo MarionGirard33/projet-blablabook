@@ -1,8 +1,3 @@
-export type ExternalBookCarouselProps = {
-  title: string;
-  books: Array<ExternalBook>;
-};
-
 export type ExternalBook = {
   key: string;
   title: string;
@@ -13,6 +8,25 @@ export type ExternalBook = {
   cover?: string;
   description?: string;
   publisher?: string;
+};
+
+export type SearchParamsSeeAllPage = {
+  title: string;
+  mode: "random" | "category";
+  categoryName?: string;
+};
+
+export type UseExternalBooksOptions = {
+  mode: "search" | "random" | "category";
+  param?: string;
+};
+
+export type ExternalBookCarouselProps = {
+  title: string;
+  books: Array<ExternalBook>;
+  isLoading: boolean;
+  mode?: "random" | "category";
+  categoryName?: string;
 };
 
 export interface EditionData {
