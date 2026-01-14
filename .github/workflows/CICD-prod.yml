@@ -172,6 +172,7 @@ jobs:
         run: cp frontend/dist/index.html frontend/dist/200.html
       
       - name: Deploy to Surge
+      # ne pas oublier de mettre SURGE_DOMAIN et SURGE_TOKEN dans le secret de GitHub
         run: |
           npm install -g surge
           surge frontend/dist ${{ secrets.SURGE_DOMAIN }} \
