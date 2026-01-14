@@ -6,7 +6,4 @@ export class CategoryResponseDto {
 
   @ApiProperty()
   name: string;
-
-  @ApiProperty()
-  isActive: boolean;
 }
