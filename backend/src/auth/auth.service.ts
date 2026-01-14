@@ -200,8 +200,6 @@ export class AuthService {
     return result || null;
   }
 
-
-
   async rotateTokens(refreshToken: string): Promise<RotateTokensData> {
     // hash for find token in DB
     const hashedIncomingToken = createHash('sha256')
