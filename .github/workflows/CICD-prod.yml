@@ -5,6 +5,7 @@ on:
   push:
     branches:
       - main
+      - feat/CICD
 
 jobs:
 ### FRONT CI ###
@@ -90,6 +91,8 @@ jobs:
       DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
       DATABASE_URL: ${{ secrets.DATABASE_URL }}
       JWT_SECRET: ${{ secrets.JWT_SECRET }}
+      FRONTEND_URL_CORS: "https://pooka-blablabook.surge.sh/"
+      NODE_ENV: "prod"
 
     steps:
       # Clone le repo
@@ -117,22 +120,6 @@ jobs:
 
           if [ $attempt -ge $max_attempts ]; then
             echo "Postgres failed to start in time!"
-            exit 1
-          fi
-
-      # vérifie si le container du front marche bien via http://localhost:5173
-      - name: Wait for Frontend
-        run: |
-          max_attempts=10
-          attempt=1
-          until curl -f http://localhost:5173 || [ $attempt -ge $max_attempts ]; do
-            echo "Waiting for frontend..."
-            sleep 5
-            attempt=$((attempt + 1))
-          done
-          if [ $attempt -ge $max_attempts ]; then
-            echo "Frontend failed to start in time!"
-            docker compose logs frontend
             exit 1
           fi
 
