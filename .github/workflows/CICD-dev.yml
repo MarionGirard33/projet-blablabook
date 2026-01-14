@@ -71,3 +71,30 @@ jobs:
       - run: docker build -t blablabook-back .
 
 
+### DOCKER CI ###
+  ci-docker:
+    runs-on: ubuntu-latest
+    needs: [ci-frontend, ci-backend]
+
+    steps:
+      # Clone le repo
+      - uses: actions/checkout@v4
+
+      # Vérifie la version de Docker
+      - name: Check Docker
+        run: docker --version
+
+      # Build et lance les containers
+      - name: Build & run docker-compose
+        run: docker compose up -d --build
+
+      # Vérifie que les containers tournent
+      - name: Docker status
+        run: docker compose ps
+
+      # Stop proprement
+      - name: Stop containers
+        run: docker compose down
+
+
+
