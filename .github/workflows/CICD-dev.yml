@@ -84,6 +84,8 @@ jobs:
       DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
       DATABASE_URL: ${{ secrets.DATABASE_URL }}
       JWT_SECRET: ${{ secrets.JWT_SECRET }}
+      FRONTEND_URL_CORS: "http://localhost:5173"
+      NODE_ENV: "dev"
 
     steps:
       # Clone le repo
