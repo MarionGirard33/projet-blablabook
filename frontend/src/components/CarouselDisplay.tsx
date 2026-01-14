@@ -44,10 +44,12 @@ export default function CarouselDisplay({
           variant="link"
           className="text-lg flex items-center gap-2"
         >
+          {/*
           <Link to="/see-all">
             Voir tout
             <ArrowRight />
           </Link>
+          */}
         </Button>
       </div>
       <Carousel
