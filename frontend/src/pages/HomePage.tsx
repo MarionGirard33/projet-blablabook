@@ -38,6 +38,7 @@ export default function HomePage() {
         title={`Résultats pour "${search}"`}
         books={searchResults}
         isLoading={isSearchLoading}
+        seeAllButton={false}
       />
     );
   } else {
@@ -48,6 +49,7 @@ export default function HomePage() {
           books={randomResults}
           mode={"random"}
           isLoading={isRandomLoading}
+          seeAllButton={true}
         />
         <CarouselDisplay
           title={"Tendances du moment"}
@@ -55,6 +57,7 @@ export default function HomePage() {
           mode={"category"}
           categoryName={"bestsellers"}
           isLoading={isCategoryLoading}
+          seeAllButton={true}
         />
       </>
     );

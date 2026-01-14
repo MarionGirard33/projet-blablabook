@@ -25,6 +25,7 @@ export type ExternalBookCarouselProps = {
   title: string;
   books: Array<ExternalBook>;
   isLoading: boolean;
+  seeAllButton?: boolean;
   mode?: "random" | "category";
   categoryName?: string;
 };

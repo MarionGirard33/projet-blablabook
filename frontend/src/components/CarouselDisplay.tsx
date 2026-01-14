@@ -35,30 +35,33 @@ export default function CarouselDisplay({
   mode,
   categoryName,
   isLoading,
+  seeAllButton,
 }: Readonly<ExternalBookCarouselProps>) {
   return (
     <section className="my-8">
       <div className="flex mb-4 items-center justify-between">
         <h2 className="text-lg font-bold">{title}</h2>
-        <Button
-          disabled={!!isLoading}
-          asChild
-          variant="link"
-          className="text-lg flex items-center gap-2"
-        >
-          <Link
-            to="/see-all"
-            className={`${isLoading ? "opacity-40 pointer-events-none" : ""} transition-opacity duration-200 flex items-center gap-2`}
-            search={
-              mode === "category"
-                ? { mode, categoryName: categoryName, title }
-                : { mode, title }
-            }
+        {seeAllButton && (
+          <Button
+            disabled={!!isLoading}
+            asChild
+            variant="link"
+            className="text-lg flex items-center gap-2"
           >
-            Voir tout
-            <ArrowRight />
-          </Link>
-        </Button>
+            <Link
+              to="/see-all"
+              className={`${isLoading ? "opacity-40 pointer-events-none" : ""} transition-opacity duration-200 flex items-center gap-2`}
+              search={
+                mode === "category"
+                  ? { mode, categoryName: categoryName, title }
+                  : { mode, title }
+              }
+            >
+              Voir tout
+              <ArrowRight />
+            </Link>
+          </Button>
+        )}
       </div>
       <Carousel
         opts={{
