@@ -71,7 +71,7 @@ jobs:
     needs: [ci-frontend, ci-backend]
     defaults:
       run:
-        working-directory: projet-blablabook 
+        working-directory: .
 
     env:
       DB_NAME: ${{ secrets.DB_NAME }}
