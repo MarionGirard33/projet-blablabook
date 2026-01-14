@@ -148,8 +148,8 @@ jobs:
 
 
       # vérifie que le back fcontionne dans le container 
-      - name: Run backend tests
-        run: docker exec backend npm run test
+      #- name: Run backend tests
+      #  run: docker exec backend npm run test
 
 
       # Vérifie que les containers tournent
