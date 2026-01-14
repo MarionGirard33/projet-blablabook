@@ -4,11 +4,11 @@ import type {
   ExternalApiIsbnResponse,
   ExternalApiWorkResponse,
   ExternalApiAuthorResponse,
+  GetExternalBooksParams,
   WorkSearchDoc,
   EditionData,
 } from "../@types/externalBooks";
 import externalApi from "./axiosExternal";
-import type { GetExternalBooksParams } from "@/@types/externalBooks";
 import { getRandomQuery } from "../lib/utils";
 
 // -----------------------------
