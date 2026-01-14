@@ -84,16 +84,64 @@ jobs:
         run: docker --version
 
       - name: Start docker-compose
-        run: docker-compose --env-file .env -f docker-compose.yml up -d --build
+        # injecte les env GitHub directement dans le shell
+        # le | c'est pour un script multi lignes
+        run: |
+          export DB_NAME=$DB_NAME
+          export DB_USER=$DB_USER
+          export DB_PASSWORD=$DB_PASSWORD
+          docker-compose -f docker-compose.yml up -d --build
 
+      # vérifie si on accède à Postgres via le container postgres
       - name: Wait for Postgres
         run: |
-          until docker exec postgres pg_isready -U blablabook; do
+          max_attempts=10
+          attempt=1
+          until docker exec postgres pg_isready -U blablabook || [ $attempt -ge $max_attempts ]; do
             echo "Waiting for postgres..."
             sleep 5
+            attempt=$((attempt + 1))
           done
 
+          if [ $attempt -ge $max_attempts ]; then
+            echo "Postgres failed to start in time!"
+            exit 1
+          fi
 
+      # vérifie si le container du front marche bien via http://localhost:5173
+      - name: Wait for Frontend
+        run: |
+          max_attempts=10
+          attempt=1
+          until curl -f http://localhost:5173 || [ $attempt -ge $max_attempts ]; do
+            echo "Waiting for frontend..."
+            sleep 5
+            attempt=$((attempt + 1))
+          done
+          if [ $attempt -ge $max_attempts ]; then
+            echo "Frontend failed to start in time!"
+            docker compose logs frontend
+            exit 1
+          fi
+
+      # vérifie si le container du back marche bien via http://localhost:3000/health
+      - name: Wait for Backend
+        run: |
+          max_attempts=10
+          attempt=1
+          until docker exec backend curl -f http://localhost:3000/health || [ $attempt -ge $max_attempts ]; do
+            echo "Waiting for backend..."
+            sleep 5
+            attempt=$((attempt + 1))
+          done
+          if [ $attempt -ge $max_attempts ]; then
+            echo "Backend failed to start in time!"
+            docker compose logs backend
+            exit 1
+          fi
+
+
+      # vérifie que le back fcontionne dans le container 
       - name: Run backend tests
         run: docker exec backend npm run test
 
