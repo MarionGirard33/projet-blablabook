@@ -32,19 +32,29 @@ function BookCardSkeleton() {
 export default function CarouselDisplay({
   title,
   books,
+  mode,
+  categoryName,
+  isLoading,
 }: Readonly<ExternalBookCarouselProps>) {
-  const isLoading = books.length === 0;
-
   return (
     <section className="my-8">
       <div className="flex mb-4 items-center justify-between">
         <h2 className="text-lg font-bold">{title}</h2>
         <Button
+          disabled={!!isLoading}
           asChild
           variant="link"
           className="text-lg flex items-center gap-2"
         >
-          <Link to="/see-all">
+          <Link
+            to="/see-all"
+            className={`${isLoading ? "opacity-40 pointer-events-none" : ""} transition-opacity duration-200 flex items-center gap-2`}
+            search={
+              mode === "category"
+                ? { mode, categoryName: categoryName, title }
+                : { mode, title }
+            }
+          >
             Voir tout
             <ArrowRight />
           </Link>
