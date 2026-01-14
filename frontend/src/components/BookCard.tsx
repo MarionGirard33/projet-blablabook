@@ -42,7 +42,10 @@ export function BookCard({ book, onRemove, onStatusChange }: Props) {
       return (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <button className="absolute top-3 left-3 px-3 py-1 text-xs font-semibold rounded-full shadow bg-bookcream text-bookdark hover:bg-bookcream/90 transition-colors flex items-center gap-1">
+            <button
+              onClick={(e) => e.stopPropagation()}
+              className="absolute top-3 left-3 px-3 py-1 text-xs font-semibold rounded-full shadow bg-bookcream text-bookdark hover:bg-bookcream/90 transition-colors flex items-center gap-1"
+            >
               {book.status}
               <ChevronDown size={12} />
             </button>
@@ -51,7 +54,10 @@ export function BookCard({ book, onRemove, onStatusChange }: Props) {
             {statuses.map((status) => (
               <DropdownMenuItem
                 key={status}
-                onClick={() => onStatusChange(status)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onStatusChange(status);
+                }}
                 className="cursor-pointer"
               >
                 {status}
@@ -93,7 +99,10 @@ export function BookCard({ book, onRemove, onStatusChange }: Props) {
 
         {/* Delete button: removes the book from the user's list */}
         <button
-          onClick={onRemove}
+          onClick={(e) => {
+            e.stopPropagation();
+            onRemove();
+          }}
           className="absolute top-3 right-3 p-1 bg-white/80 rounded-full shadow hover:bg-white transition"
         >
           <Trash2 size={16} className="text-red-600" />

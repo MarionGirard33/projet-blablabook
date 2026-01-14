@@ -28,47 +28,11 @@ const parseDescription = (desc: any): string => {
   return "";
 };
 
-// Simple in-memory cache to avoid fetching the same work twice
-const workDescriptionCache = new Map<string, string>();
-
-const getWorkDescription = async (workKey: string): Promise<string> => {
-  if (workDescriptionCache.has(workKey)) {
-    return workDescriptionCache.get(workKey) as string;
-  }
-
-  const dataWork = await getOpenLibWorkData(workKey);
-  const desc = parseDescription(dataWork.description);
-  workDescriptionCache.set(workKey, desc);
-  return desc;
-};
-
 const buildCoverUrl = (edition: EditionData): string => {
   const coverId = edition.covers?.[0];
   return coverId
     ? `https://covers.openlibrary.org/b/id/${coverId}-M.jpg`
     : DEFAULT_COVER;
-};
-
-const fetchDescription = async (
-  edition: EditionData,
-  isbn: string
-): Promise<string> => {
-  try {
-    const workKeyFromEdition = edition.works?.[0]?.key;
-
-    if (workKeyFromEdition) {
-      return await getWorkDescription(workKeyFromEdition);
-    }
-
-    const dataIsbn = await getOpenLibIsbnData(isbn);
-    const workKey = dataIsbn.works?.[0]?.key;
-    if (workKey) {
-      return await getWorkDescription(workKey);
-    }
-  } catch (err) {
-    console.warn(`Failed to fetch description for ISBN ${isbn}:`, err);
-  }
-  return "";
 };
 
 const createExternalBook = (
@@ -157,11 +121,8 @@ export const searchExternalBooks = async (
       if (!isbn) continue;
 
       const coverUrl = buildCoverUrl(edition);
-      const description = await fetchDescription(edition, isbn);
 
-      books.push(
-        createExternalBook(edition, work, isbn, coverUrl, description)
-      );
+      books.push(createExternalBook(edition, work, isbn, coverUrl, ""));
     } catch (err) {
       console.warn(`Failed to fetch edition ${editionKey}:`, err);
     }
