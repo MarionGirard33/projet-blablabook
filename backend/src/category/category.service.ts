@@ -1,9 +1,8 @@
-import { Injectable, Inject, NotFoundException, ConflictException, Logger } from '@nestjs/common';
-import { CreateCategoryDto } from './dto/create-category.dto';
+import { Injectable, Inject, NotFoundException, Logger } from '@nestjs/common';
 import * as schema from 'src/db/schema';
-import { eq } from 'drizzle-orm';
+import { eq , and} from 'drizzle-orm';
 import { NodePgDatabase } from 'drizzle-orm/node-postgres';
-import type { Category } from './types/category';
+import { CategoryResponseDto } from './dto/category-response.dto';
 
 @Injectable()
 export class CategoryService {
@@ -12,59 +11,50 @@ export class CategoryService {
   constructor(@Inject('DRIZZLE') private readonly db: NodePgDatabase<typeof schema>) {}
 
   /**
-   * Create a new category. Throws ConflictException if name already exists.
-   */
-  async create(createCategoryDto: CreateCategoryDto): Promise<Category> {
-    try {
-      const [newCategory] = await this.db
-        .insert(schema.category)
-        .values({ ...createCategoryDto, isActive: createCategoryDto.isActive ?? true })
-        .returning();
-
-      return this.ensureIsActive(newCategory);
-    } catch (err: any) {
-      this.logger.error('Error creating category', err);
-
-      const pgErrorCode = err?.code || err?.cause?.code;
-      if (pgErrorCode === '23505') {
-        throw new ConflictException(
-          `Category with name "${createCategoryDto.name}" already exists`,
-        );
-      }
-
-      throw err;
-    }
-  }
-
-  /**
    * Find all categories
    */
-  async findAll(): Promise<Category[]> {
-    const categories = await this.db.select().from(schema.category).execute();
-    return categories.map(this.ensureIsActive);
+  async findAll(): Promise<CategoryResponseDto[]> {
+    const categories = await this.db
+      .select()
+      .from(schema.category)
+      .where(eq(schema.category.isActive, true))
+      .execute();
+
+    return categories.map(c => ({
+      id: c.id,
+      name: c.name,
+    }));
   }
 
   /**
    * Find one category by ID
    */
-  async findOne(id: number): Promise<Category> {
+  async findOne(id: number): Promise<CategoryResponseDto> {
     const [category] = await this.db
       .select()
       .from(schema.category)
-      .where(eq(schema.category.id, id))
+      .where(
+        and(
+          eq(schema.category.id, id),
+          eq(schema.category.isActive, true)
+        ),
+      )
       .execute();
 
     if (!category) {
       throw new NotFoundException(`Category with ID ${id} not found`);
     }
 
-    return this.ensureIsActive(category);
+    return {
+      id: category.id,
+      name: category.name,
+    };
   }
 
   /**
    * Find a category by name or create it if it doesn't exist
    */
-  async findOrCreateByName(name: string): Promise<Category> {
+  async findOrCreateByName(name: string): Promise<CategoryResponseDto> {
     const [existingCategory] = await this.db
       .select()
       .from(schema.category)
@@ -72,24 +62,20 @@ export class CategoryService {
       .execute();
 
     if (existingCategory) {
-      return this.ensureIsActive(existingCategory);
+      return {
+        id: existingCategory.id,
+        name: existingCategory.name,
+      };
     }
 
     const [newCategory] = await this.db
       .insert(schema.category)
-      .values({ name, isActive: true })
+      .values({ name })
       .returning();
 
-    return this.ensureIsActive(newCategory);
-  }
-
-  /**
-   * Ensure `isActive` is always boolean
-   */
-  private ensureIsActive(category: any): Category {
     return {
-      ...category,
-      isActive: category.isActive ?? true,
+      id: newCategory.id,
+      name: newCategory.name,
     };
   }
 }
