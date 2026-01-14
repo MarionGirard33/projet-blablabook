@@ -16,14 +16,3 @@ GET {{baseUrl}}/category/{{categoryId}}
 Content-Type: application/json
 
 ###
-
-### Create a new category
-POST {{baseUrl}}/category
-Content-Type: application/json
-
-{
-  "name": "Science Fiction",
-  "isActive": true
-}
-
-###
