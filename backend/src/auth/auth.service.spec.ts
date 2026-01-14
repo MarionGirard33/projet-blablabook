@@ -15,6 +15,7 @@ describe('AuthService', () => {
   };
 
   beforeEach(async () => {
+    jest.clearAllMocks();
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         AuthService, // fournis le vrai service
@@ -26,7 +27,7 @@ describe('AuthService', () => {
     authService = module.get<AuthService>(AuthService);
 
     // mock argon2
-    verifyMock = jest.spyOn(argon2, 'verify').mockResolvedValue(true);
+    verifyMock = jest.spyOn(argon2, 'verify');
     jest.spyOn(argon2, 'hash').mockResolvedValue('hashed-password');
   });
 
@@ -60,20 +61,34 @@ describe('AuthService', () => {
       password,
     };
 
-    it('should return user', async () => {
+    it('should return user if login is valid', async () => {
       userServiceMock.getUserByUsername.mockResolvedValue(resolvedValue);
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+      verifyMock.mockResolvedValueOnce(true);
 
       const result = await authService.login(payload);
-
+      expect(verifyMock).toHaveBeenCalledWith(resolvedValue.password, password);
       expect(result).toBe(resolvedValue);
     });
 
-    it('should call argon.verify() for check password', async () => {
-      await authService.login(payload);
-      expect(verifyMock).toHaveBeenCalledWith(resolvedValue.password, password);
+    it('should throw error if user not exist', async () => {
+      userServiceMock.getUserByUsername.mockResolvedValue(null);
+
+      await expect(
+        // eslint-disable-next-line prettier/prettier
+        authService.login({ username: 'unknow', password })
+      ).rejects.toThrow('username or password is invalid');
+      expect(verifyMock).not.toHaveBeenCalled();
     });
 
-    // TODO: ajouter un check de throw error si user n'est pas trouvé 
-    // TODO: ajouter un check de throw error si password est invalide
+    it('should throw error UnauthorizedError if password is not valid', async () => {
+      userServiceMock.getUserByUsername.mockResolvedValue(resolvedValue);
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+      verifyMock.mockResolvedValueOnce(false);
+
+      await expect(
+        authService.login({ username, password: 'not_valid_password' }),
+      ).rejects.toThrow('username or password is invalid');
+    });
   });
 });
