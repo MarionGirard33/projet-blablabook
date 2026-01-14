@@ -1,0 +1,10 @@
+
+Todo:
+  ☐ Test register controller 
+
+  ☐ Test register service 
+    ✔ Happy path : le nouvel utilisateur est créer (test fonction hash est bien appele + objet retour) @done(26-01-14 15:09)
+    ✔ Test si une erreur est thow si le password est pas confirmer @done(26-01-14 15:09)
+    ✔ test erreur si l'utilisateur ou l'username exste déjà @done(26-01-14 15:09)
+    ✔ test erreur throw si hash échoue @done(26-01-14 15:09)
+    ✔ test si erreur throw si creation a echouer @done(26-01-14 15:09)

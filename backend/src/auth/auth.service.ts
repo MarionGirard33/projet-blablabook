@@ -39,7 +39,7 @@ export class AuthService {
     const user = await this.userService.getUserByUsername(payload.username);
     if (!user) {
       console.error('Login attempt failed');
-      throw new UnauthorizedException("username or password is invalid");
+      throw new UnauthorizedException('username or password is invalid');
     }
 
     let isPasswordValid: boolean;
@@ -56,7 +56,7 @@ export class AuthService {
 
     if (!isPasswordValid) {
       console.error('Login attempt failed');
-      throw new UnauthorizedException("username or password is invalid");
+      throw new UnauthorizedException('username or password is invalid');
     }
 
     return user;

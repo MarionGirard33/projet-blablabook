@@ -105,21 +105,34 @@ describe('AuthController', () => {
       });
     });
 
-    // TODO: revoir le test du cookie
-    it('should send jwt_cookie and refresh_token', async () => {
-      return makePostRequest(app, '/auth/login', 200, payload).expect((res) => {
+    it('should send jwt_cookie and refresh_cookie with HttpOnly flag', async () => {
+      await makePostRequest(app, '/auth/login', 200, payload).expect((res) => {
         const setCookieHeader = res.headers['set-cookie'];
         expect(Array.isArray(setCookieHeader)).toBe(true);
-        // Expect exactly two cookies to be set
         expect(setCookieHeader.length).toBe(2);
 
-        const cookiesString = setCookieHeader.join(';');
-        // Check cookie names and values
-        expect(cookiesString).toContain('jwt_cookie=mock-jwt-token');
-        expect(cookiesString).toContain('refresh_cookie=mock-refresh-token');
-        // Basic flags check from mocked config
-        expect(cookiesString).toContain('HttpOnly');
+        // Vérifie chaque cookie individuellement
+        const jwtCookie = setCookieHeader.find((c) => c.startsWith('jwt_cookie='));
+        const refreshCookie = setCookieHeader.find((c) => c.startsWith('refresh_cookie='));
+
+        expect(jwtCookie).toContain('jwt_cookie=mock-jwt-token');
+        expect(jwtCookie).toContain('HttpOnly');
+        expect(refreshCookie).toContain('refresh_cookie=mock-refresh-token');
+        expect(refreshCookie).toContain('HttpOnly');
       });
     });
+
+    // TODO: ajouter test qui check le code http throw si j'ai un user ou password invalide
+    // TODO: ajouter un test qui check le code HTTP retourner si j'ai une erreur interne
+    // TODO: check si la fonction login du service est bien appeler avec les bon arguments
+//     it('should return 401 if login fails', async () => {
+//   authService.login.mockRejectedValueOnce(new Error('Unauthorized'));
+//   await makePostRequest(app, '/auth/login', 401, payload);
+// });
+
+// it('should call authService.login with correct payload', async () => {
+//   await makePostRequest(app, '/auth/login', 200, payload);
+//   expect(authService.login).toHaveBeenCalledWith(payload);
+// });
   });
 });
