@@ -13,20 +13,7 @@ export default function BookCardCarousel({
 }: {
   readonly book: ExternalBook;
 }) {
-  const cover = book.cover || book.cover_i;
-
   const router = useRouter();
-
-  let languageLabel = "Langue inconnue";
-  if (Array.isArray(book.language) && book.language.length > 0) {
-    if (book.language.includes("fre")) {
-      languageLabel = "Français";
-    } else if (book.language.includes("eng")) {
-      languageLabel = "Anglais";
-    } else {
-      languageLabel = "Autre langue";
-    }
-  }
 
   return (
     <Card
@@ -39,9 +26,9 @@ export default function BookCardCarousel({
       }
     >
       <CardHeader className="w-full flex flex-col items-center p-4">
-        {cover ? (
+        {book.cover ? (
           <img
-            src={`https://covers.openlibrary.org/b/id/${cover}-M.jpg`}
+            src={book.cover}
             alt={book.title}
             className="h-48 w-32 object-cover mb-2 rounded shadow"
             style={{ maxHeight: "12rem", minHeight: "12rem" }}
@@ -59,9 +46,6 @@ export default function BookCardCarousel({
         </CardDescription>
       </CardHeader>
       <CardContent className="w-full flex flex-col items-center px-4 pb-0">
-        <p className="text-xs text-gray-500 mb-1 text-center">
-          {languageLabel}
-        </p>
         <p className="text-xs text-gray-500 mb-1 text-center">
           {book.publishDate ? `Première publication : ${book.publishDate}` : ""}
         </p>

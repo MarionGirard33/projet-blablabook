@@ -38,7 +38,10 @@ export default function HomePage() {
       ) : (
         <>
           <BookCarousel title={"Suggestions Aléatoire"} books={randomResults} />
-          <BookCarousel title={"Le top du top"} books={byCategoryResults} />
+          <BookCarousel
+            title={"Tendances du moment"}
+            books={byCategoryResults}
+          />
         </>
       )}
     </div>
