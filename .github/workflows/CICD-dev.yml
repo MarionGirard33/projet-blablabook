@@ -43,6 +43,11 @@ jobs:
     defaults:
       run:
         working-directory: backend
+
+    env:
+      DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      JWT_SECRET: ${{ secrets.JWT_SECRET }}
+  
     steps:
       # Clone repo
       - uses: actions/checkout@v4
