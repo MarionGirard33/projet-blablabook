@@ -14,7 +14,7 @@ import { useAuthStore } from "@/stores/authStore";
 export default function Header() {
   const user = useAuthStore((state) => state.user);
   const logout = useAuthStore((state) => state.logout);
-  // const user = true;
+
   const [open, setOpen] = useState(false);
 
   const navigate = useNavigate();

@@ -55,7 +55,8 @@ export function AddBookModal({ isOpen, onClose, userId }: AddBookModalProps) {
   } = useQuery<ExternalBook[]>({
     enabled: false, // don't fetch on mount
     queryKey: ["externalBooks", query],
-    queryFn: () => searchExternalBooks(query),
+    queryFn: () =>
+      searchExternalBooks({ type: "searchText", searchText: query }),
   });
 
   // Trigger a search only when input is non-empty
