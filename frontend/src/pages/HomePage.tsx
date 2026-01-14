@@ -1,55 +1,47 @@
-import { getSearchBooks } from "@/api/books";
 import BookCarousel from "@/components/CarouselDisplay";
 import Hero from "@/components/Hero";
 import SearchBar from "@/components/SearchBar";
-import { useState, useEffect } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { useState } from "react";
+import { searchExternalBooks } from "@/api/externalBooks";
+import type { ExternalBook } from "@/@types/externalBooks";
 
 export default function HomePage() {
   const [search, setSearch] = useState("");
 
-  const [randomResults, setRandomResults] = useState([]);
-  const [searchResults, setSearchResults] = useState([]);
-  const [categoryResults, setCategoryResults] = useState([]);
-  const [bestsellersResults, setBestsellersResults] = useState([]);
+  const { data: searchResults = [] } = useQuery<ExternalBook[]>({
+    queryKey: ["externalBooks", search],
+    queryFn: () =>
+      searchExternalBooks({ type: "searchText", searchText: search }),
+  });
 
-  useEffect(() => {
-    if (search.length >= 3) {
-      getSearchBooks({ type: "search", searchText: search }).then((response) =>
-        setSearchResults(response.data)
-      );
-    } else {
-      setSearchResults([]);
-    }
-  }, [search]);
+  const { data: randomResults = [] } = useQuery({
+    queryKey: ["random-external-books"],
+    queryFn: () => searchExternalBooks({ type: "random" }),
+  });
 
-  useEffect(() => {
-    if (!search) {
-      getSearchBooks({ type: "random" }).then((response) =>
-        setRandomResults(response.data)
-      );
-      getSearchBooks({ type: "category", categoryName: "horror" }).then(
-        (response) => setCategoryResults(response.data)
-      );
-      getSearchBooks({ type: "category", categoryName: "bestsellers" }).then(
-        (response) => setBestsellersResults(response.data)
-      );
-    }
-  }, [search]);
+  const { data: byCategoryResults = [] } = useQuery({
+    queryKey: ["by-category-external-books"],
+    queryFn: () =>
+      searchExternalBooks({ type: "category", categoryName: "bestsellers" }),
+  });
 
   return (
     <div className="flex-col w-full">
       <Hero />
       <SearchBar onSearch={setSearch} />
-      {search.length >= 3 && searchResults.length > 0 ? (
+      {search.length >= 3 ? (
         <BookCarousel
           title={`Résultats pour "${search}"`}
           books={searchResults}
         />
       ) : (
         <>
-          <BookCarousel title={"Sélection Aléatoire"} books={randomResults} />
-          <BookCarousel title={"À la une"} books={bestsellersResults} />
-          <BookCarousel title={"Horreur"} books={categoryResults} />
+          <BookCarousel title={"Suggestions Aléatoire"} books={randomResults} />
+          <BookCarousel
+            title={"Tendances du moment"}
+            books={byCategoryResults}
+          />
         </>
       )}
     </div>

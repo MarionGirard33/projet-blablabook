@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Trash2, ChevronDown } from "lucide-react";
 import type { Book } from "../@types/books";
+import { useRouter } from "@tanstack/react-router";
 
 type Props = {
   readonly book: Book;
@@ -22,6 +23,15 @@ export function BookCard({ book, onRemove, onStatusChange }: Props) {
     "En cours",
     "Lu",
   ];
+
+  const router = useRouter();
+
+  function goToBookDetails() {
+    router.navigate({
+      to: "/books/$isbn",
+      params: { isbn: book.isbn },
+    });
+  }
 
   // Render status badge based on whether it's interactive or not
   const renderStatusBadge = () => {
@@ -61,7 +71,10 @@ export function BookCard({ book, onRemove, onStatusChange }: Props) {
   };
 
   return (
-    <Card className="w-full max-w-md shadow-lg relative rounded-xl overflow-hidden p-0 gap-2 flex flex-col">
+    <Card
+      onClick={() => goToBookDetails()}
+      className="w-full max-w-md shadow-lg relative rounded-xl overflow-hidden p-0 gap-2 flex flex-col cursor-pointer"
+    >
       {/* Book cover (fallback placeholder when no cover) */}
       <div className="relative flex-shrink-0">
         {book.coverId ? (
