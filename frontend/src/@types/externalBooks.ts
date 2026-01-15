@@ -13,12 +13,7 @@ export type ExternalBook = {
   cover?: string;
   description?: string;
   publisher?: string;
-
-  cover_i?: number;
-  cover_id?: number;
-  author_name?: string[];
-  first_publish_year?: number;
-  edition_count?: number;
+  categories: string[];
 };
 
 export interface EditionData {
@@ -37,6 +32,7 @@ export interface WorkSearchDoc {
   title: string;
   author_name?: string[];
   edition_key?: string[];
+  subject?: string[];
 }
 
 export type GetExternalBooksParams = {

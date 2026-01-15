@@ -46,7 +46,7 @@ export default function Header() {
                         src={user.image ? `/images/${user.image}` : undefined}
                         alt={`Avatar de ${user.username || "X"}`}
                       />
-                      <AvatarFallback className="bg-bookbeige/50 border border-bookbeige font-bold">
+                      <AvatarFallback className="bg-bookbeige/50 border-bookbeige font-bold">
                         {user.username ? user.username[0].toUpperCase() : "X"}
                       </AvatarFallback>
                     </Avatar>
@@ -86,7 +86,7 @@ export default function Header() {
                   src={user.image ? `/images/${user.image}` : undefined}
                   alt={`Avatar de ${user.username || "X"}`}
                 />
-                <AvatarFallback>
+                <AvatarFallback className="text-xl bg-bookbeige/50 border-bookbeige font-bold">
                   {user.username ? user.username[0].toUpperCase() : "X"}
                 </AvatarFallback>
               </Avatar>

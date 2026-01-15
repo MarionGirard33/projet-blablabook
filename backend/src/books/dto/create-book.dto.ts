@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsString, IsOptional } from 'class-validator';
+import { IsNotEmpty, IsString, IsArray } from 'class-validator';
 
 export class CreateBookDto {
   // Book title
@@ -35,4 +35,10 @@ export class CreateBookDto {
   @IsString()
   @IsNotEmpty()
   publishedAt: string; // Drizzle date type expects a string or Date
+
+  // Categories (required - from external API)
+  @IsArray()
+  @IsString({ each: true })
+  @IsNotEmpty()
+  categories: string[];
 }
