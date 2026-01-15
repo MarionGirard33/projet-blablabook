@@ -56,6 +56,7 @@ const BookDetails = () => {
         isbn: bookData.isbn,
         publishingHouse: bookData.publisher,
         publishedAt: formatDateForDB(bookData.publishedAt),
+        categories: bookData.categories,
       };
       return addBookToUserList(currentUser.id, payload);
     },
