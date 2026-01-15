@@ -13,6 +13,12 @@ export type ExternalBook = {
   cover?: string;
   description?: string;
   publisher?: string;
+
+  cover_i?: number;
+  cover_id?: number;
+  author_name?: string[];
+  first_publish_year?: number;
+  edition_count?: number;
 };
 
 export interface EditionData {
