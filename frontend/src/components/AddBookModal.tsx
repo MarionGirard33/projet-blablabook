@@ -91,7 +91,8 @@ export function AddBookModal({ isOpen, onClose, userId }: AddBookModalProps) {
           h-full
           sm:h-auto
           p-6
-          rounded-none sm:rounded-xl
+          bg-bookcream text-bookdark border border-bookbeige
+          rounded-none sm:rounded-2xl
           overflow-y-auto
         "
       >
@@ -100,7 +101,7 @@ export function AddBookModal({ isOpen, onClose, userId }: AddBookModalProps) {
         </DialogDescription>
 
         <DialogHeader>
-          <DialogTitle className="text-2xl font-semibold">
+          <DialogTitle className="text-2xl md:text-3xl font-semibold text-bookdark">
             Rechercher un livre
           </DialogTitle>
         </DialogHeader>
@@ -113,12 +114,12 @@ export function AddBookModal({ isOpen, onClose, userId }: AddBookModalProps) {
               setQuery(e.target.value);
               if (hasSearched) setHasSearched(false);
             }}
-            className="flex-1"
+            className="flex-1 bg-white border-bookbeige rounded-full shadow-sm focus:ring-2 focus:ring-bookochre/30"
           />
 
           <Button
             onClick={handleSearch}
-            className="flex items-center gap-2 bg-bookterracotta hover:bg-bookochre"
+            className="flex items-center gap-2 bg-bookterracotta hover:bg-bookochre rounded-full shadow"
           >
             <Search size={18} />
             Rechercher
@@ -152,9 +153,9 @@ export function AddBookModal({ isOpen, onClose, userId }: AddBookModalProps) {
                 onClick={() => !alreadyInLibrary && handleCardClick(book)}
                 onKeyDown={handleKeyDown}
                 className={`
-          relative w-full bg-bookcream flex items-center gap-4
-          mb-4 p-3 border rounded-lg text-left
-          ${alreadyInLibrary ? "opacity-50 cursor-default" : "hover:bg-gray-50 cursor-pointer"}
+          relative w-full bg-white/80 flex items-center gap-4
+          mb-4 p-3 border border-bookbeige rounded-xl shadow-sm text-left
+          ${alreadyInLibrary ? "opacity-50 cursor-default" : "hover:bg-white cursor-pointer"}
         `}
               >
                 {/* ✔️ Already in library */}
@@ -170,13 +171,14 @@ export function AddBookModal({ isOpen, onClose, userId }: AddBookModalProps) {
                   <button
                     type="button"
                     onClick={(e) => {
-                      e.stopPropagation(); // prevent triggering the row click
+                      e.stopPropagation();
                       addBookMutation.mutate(book);
                     }}
                     className="
               absolute top-2 right-2
-              p-1 rounded-full
-              bg-bookterracotta text-white
+              w-8 h-8 flex items-center justify-center
+              rounded-full
+              bg-bookterracotta text-white text-lg font-semibold
               hover:bg-bookochre
             "
                     aria-label="Ajouter à la librairie"
@@ -189,10 +191,10 @@ export function AddBookModal({ isOpen, onClose, userId }: AddBookModalProps) {
                   <img
                     src={book.cover}
                     alt={book.title}
-                    className="w-16 h-24 object-cover rounded"
+                    className="w-20 h-32 object-cover rounded flex-shrink-0"
                   />
                 ) : (
-                  <div className="w-16 h-24 bg-gray-200 rounded" />
+                  <div className="w-20 h-32 bg-gray-200 rounded flex-shrink-0" />
                 )}
 
                 <div>
@@ -202,6 +204,11 @@ export function AddBookModal({ isOpen, onClose, userId }: AddBookModalProps) {
                   </p>
                   {book.publishDate && (
                     <p className="text-xs text-gray-500">{book.publishDate}</p>
+                  )}
+                  {book.categories && book.categories.length > 0 && (
+                    <span className="inline-block mt-2 px-3 py-1.5 text-xs font-semibold rounded-full bg-bookterracotta/20 text-bookterracotta border border-bookterracotta/30">
+                      {book.categories[0]}
+                    </span>
                   )}
                 </div>
               </div>

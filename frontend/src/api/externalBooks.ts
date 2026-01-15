@@ -28,20 +28,6 @@ const parseDescription = (desc: any): string => {
   return "";
 };
 
-// Simple in-memory cache to avoid fetching the same work twice
-const workDescriptionCache = new Map<string, string>();
-
-const getWorkDescription = async (workKey: string): Promise<string> => {
-  if (workDescriptionCache.has(workKey)) {
-    return workDescriptionCache.get(workKey) as string;
-  }
-
-  const dataWork = await getOpenLibWorkData(workKey);
-  const desc = parseDescription(dataWork.description);
-  workDescriptionCache.set(workKey, desc);
-  return desc;
-};
-
 const buildCoverUrl = (edition: EditionData): string => {
   const coverId = edition.covers?.[0];
   return coverId
@@ -49,34 +35,13 @@ const buildCoverUrl = (edition: EditionData): string => {
     : DEFAULT_COVER;
 };
 
-const fetchDescription = async (
-  edition: EditionData,
-  isbn: string
-): Promise<string> => {
-  try {
-    const workKeyFromEdition = edition.works?.[0]?.key;
-
-    if (workKeyFromEdition) {
-      return await getWorkDescription(workKeyFromEdition);
-    }
-
-    const dataIsbn = await getOpenLibIsbnData(isbn);
-    const workKey = dataIsbn.works?.[0]?.key;
-    if (workKey) {
-      return await getWorkDescription(workKey);
-    }
-  } catch (err) {
-    console.warn(`Failed to fetch description for ISBN ${isbn}:`, err);
-  }
-  return "";
-};
-
 const createExternalBook = (
   edition: EditionData,
   work: WorkSearchDoc,
   isbn: string,
   coverUrl: string,
-  description: string
+  description: string,
+  categories?: string[]
 ): ExternalBook => {
   return {
     key: edition.key,
@@ -89,6 +54,7 @@ const createExternalBook = (
     cover: coverUrl,
     description: description || undefined,
     publisher: edition.publishers?.[0],
+    categories: categories || undefined,
   };
 };
 
@@ -128,7 +94,7 @@ export const searchExternalBooks = async (
     params: {
       q,
       limit: 20,
-      fields: "key,title,author_name,edition_key",
+      fields: "key,title,author_name,edition_key,subject",
     },
   });
 
@@ -157,11 +123,9 @@ export const searchExternalBooks = async (
       if (!isbn) continue;
 
       const coverUrl = buildCoverUrl(edition);
-      const description = await fetchDescription(edition, isbn);
+      const categories = work.subject || [];
 
-      books.push(
-        createExternalBook(edition, work, isbn, coverUrl, description)
-      );
+      books.push(createExternalBook(edition, work, isbn, coverUrl, "", categories));
     } catch (err) {
       console.warn(`Failed to fetch edition ${editionKey}:`, err);
     }
