@@ -3,7 +3,7 @@ import { vi } from 'vitest';
 vi.mock('@tanstack/react-router', async (importActual) => {
   const actual = await importActual();
   return {
-    ...actual,
+    ...actual!,
     useNavigate: () => vi.fn(),
   };
 });
@@ -18,10 +18,8 @@ import userEvent from '@testing-library/user-event';
 import api from '@/api/axios';
 
 describe("Login Page", async () => {
-  // On déclare une variable pour le client de requêtes React Query
   let queryClient: QueryClient;
 
-  // Avant chaque test, on crée un nouveau QueryClient pour isoler l'état
   beforeEach(() => {
     queryClient = new QueryClient({
       defaultOptions: {
@@ -93,7 +91,7 @@ describe("Login Page", async () => {
       const usernameInput = screen.getAllByRole('textbox')[0];
       const passwordInput = container.querySelector('input[type="password"]');
       await userEvent.type(usernameInput, 'testuser');
-      await userEvent.type(passwordInput, 'testpass');
+      await userEvent.type(passwordInput!, 'testpass');
       expect(usernameInput).toHaveValue('testuser');
       expect(passwordInput).toHaveValue('testpass');
     });
@@ -112,7 +110,7 @@ describe("Login Page", async () => {
       const usernameInput = screen.getAllByRole('textbox')[0];
       const passwordInput = container.querySelector('input[type="password"]');
       await userEvent.type(usernameInput, 'testuser');
-      await userEvent.type(passwordInput, 'testpass');
+      await userEvent.type(passwordInput!, 'testpass');
       await userEvent.click(screen.getByText('Soumettre'));
       expect(postSpy).toHaveBeenCalledWith('/auth/login', { username: 'testuser', password: 'testpass' });
       postSpy.mockRestore();
@@ -124,7 +122,7 @@ describe("Login Page", async () => {
       const usernameInput = screen.getAllByRole('textbox')[0];
       const passwordInput = container.querySelector('input[type="password"]');
       await userEvent.type(usernameInput, 'testuser');
-      await userEvent.type(passwordInput, 'testpass');
+      await userEvent.type(passwordInput!, 'testpass');
       await userEvent.click(screen.getByText('Soumettre'));
       expect(await screen.findByText(/Erreur serveur/)).toBeInTheDocument();
       expect(passwordInput).toHaveValue('');
@@ -137,7 +135,7 @@ describe("Login Page", async () => {
       const usernameInput = screen.getAllByRole('textbox')[0];
       const passwordInput = container.querySelector('input[type="password"]');
       await userEvent.type(usernameInput, 'testuser');
-      await userEvent.type(passwordInput, 'testpass');
+      await userEvent.type(passwordInput!, 'testpass');
       await userEvent.click(screen.getByText('Soumettre'));
       expect(await screen.findByText(/Accueil|Bienvenue|Home/i)).toBeInTheDocument();
       postSpy.mockRestore();
