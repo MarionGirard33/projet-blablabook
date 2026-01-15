@@ -90,7 +90,7 @@ jobs:
       DATABASE_URL: ${{ secrets.DATABASE_URL }}
       JWT_SECRET: ${{ secrets.JWT_SECRET }}
       FRONTEND_URL_CORS: "http://localhost:5173"
-      BACKEND_URL: "http://localhost:3000"
+      VITE_BACKEND_URL: "http://localhost:3000"
       NODE_ENV: "dev"
 
     steps:
