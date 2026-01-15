@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useNavigate } from "@tanstack/react-router";
+import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import { Menu, X, Book } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -16,8 +16,12 @@ export default function Header() {
   const logout = useAuthStore((state) => state.logout);
 
   const [open, setOpen] = useState(false);
+  const { location } = useRouterState();
 
   const navigate = useNavigate();
+
+  const isActive = (path: string) =>
+    location.pathname === path ? "font-bold border-primary" : "";
 
   return (
     <header className=" px-4 py-4 bg-white shadow relative">
@@ -29,12 +33,12 @@ export default function Header() {
 
         {/* Desktop nav */}
         <nav className="hidden md:flex items-center gap-4">
-          <Link to="/" className="hover:underline">
+          <Link to="/" className={isActive("/")}>
             Accueil
           </Link>
           {user ? (
             <>
-              <Link to="/library" className="hover:underline">
+              <Link to="/library" className={`${isActive("/library")}`}>
                 Ma bibliothèque
               </Link>
               <div className="hidden md:flex items-center ">
@@ -53,12 +57,13 @@ export default function Header() {
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
                     <DropdownMenuItem
+                      className={`${isActive("/profile")}`}
                       onClick={() => navigate({ to: "/profile" })}
                     >
                       Profil
                     </DropdownMenuItem>
                     <DropdownMenuItem
-                      className="text-red-500"
+                      className="text-red-500 font-semibold"
                       onClick={() => {
                         logout();
                         navigate({ to: "/" });
