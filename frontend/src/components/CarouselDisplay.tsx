@@ -5,12 +5,12 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
-import { Link } from "@tanstack/react-router";
 import type { ExternalBookCarouselProps } from "../@types/externalBooks";
 import { Button } from "./ui/button";
-import { ArrowRight } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import BookCardCarousel from "./BookCardCarousel";
+import { Link } from "@tanstack/react-router";
+import { ArrowRight } from "lucide-react";
 
 function BookCardSkeleton() {
   return (
