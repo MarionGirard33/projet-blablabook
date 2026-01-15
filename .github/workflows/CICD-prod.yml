@@ -187,8 +187,10 @@ jobs:
     needs: ci-docker
     runs-on: ubuntu-latest
     steps:
-      - name: Deploy to Render
-        uses: render-examples/deploy-to-render@v1
-        with:
-          api-key: ${{ secrets.RENDER_API_KEY }}
-          service-id: ${{ secrets.RENDER_SERVICE_ID }}  
+      - name: Trigger Render deploy via API
+        run: |
+          curl -X POST \
+            -H "Authorization: Bearer ${{ secrets.RENDER_API_KEY }}" \
+            -H "Content-Type: application/json" \
+            -d '{"clearCache": true}' \
+            https://api.render.com/deploy/srv-${{ secrets.RENDER_SERVICE_ID }}
