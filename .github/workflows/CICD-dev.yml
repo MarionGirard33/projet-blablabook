@@ -33,7 +33,7 @@ jobs:
 
       # installe les dépendances du front
       - name: Frontend CI
-        run: npm ci
+        run: npm install
 
 
       # génère le dossier dist du front
