@@ -94,7 +94,7 @@ jobs:
       DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
       DATABASE_URL: ${{ secrets.DATABASE_URL }}
       JWT_SECRET: ${{ secrets.JWT_SECRET }}
-      FRONTEND_URL_CORS: "https://pooka-blablabook.surge.sh/"
+      FRONTEND_URL_CORS: "https://pooka-blablabook.surge.sh"
       VITE_BACKEND_URL: ${{ secrets.VITE_BACKEND_URL }}
       NODE_ENV: "prod"
 
