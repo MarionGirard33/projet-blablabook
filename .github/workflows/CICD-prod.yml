@@ -33,9 +33,11 @@ jobs:
       - name: Frontend CI
         run: npm ci
 
-
-      # génère le dossier dist du front
-      - run: npm run build
+      # build du front avec l'URL du back
+      - name: Build frontend with backend URL
+        run: |
+          export VITE_BACKEND_URL=${{ secrets.VITE_BACKEND_URL }}
+          npm run build
 
       # Sauvegarde le build pour le déploiement
       - name: Upload build artifacts
