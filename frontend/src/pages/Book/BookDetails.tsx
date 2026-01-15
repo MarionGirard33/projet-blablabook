@@ -56,6 +56,7 @@ const BookDetails = () => {
         isbn: bookData.isbn,
         publishingHouse: bookData.publisher,
         publishedAt: formatDateForDB(bookData.publishedAt),
+        categories: bookData.categories,
       };
       return addBookToUserList(currentUser.id, payload);
     },
@@ -114,7 +115,7 @@ const BookDetails = () => {
           className="inline-flex items-center text-sm font-medium text-muted-foreground hover:text-primary transition-colors"
         >
           <ArrowLeft className="mr-2 h-4 w-4" />
-          Retour à la recherche
+          Retour
         </Link>
       </div>
 

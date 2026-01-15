@@ -1,9 +1,17 @@
-import { Injectable, Logger, HttpException, HttpStatus } from '@nestjs/common';
-import { db } from '../db';
-import { book, list, listBook } from '../db/schema';
+import {
+  Injectable,
+  Inject,
+  Logger,
+  HttpException,
+  HttpStatus,
+} from '@nestjs/common';
+import { book, list, listBook, bookCategory, category } from '../db/schema';
+import * as schema from '../db/schema';
+import { NodePgDatabase } from 'drizzle-orm/node-postgres';
 import { CreateBookDto } from './dto/create-book.dto';
 import { eq, and, desc } from 'drizzle-orm';
 import { BookSelect, ListBookSelect } from './types/books';
+import { CategoryService } from '../category/category.service';
 /**
  * BooksService encapsulates CRUD-like operations around books and user lists.
  * It reads/writes through Drizzle ORM and computes transient fields like status.
@@ -11,6 +19,11 @@ import { BookSelect, ListBookSelect } from './types/books';
 @Injectable()
 export class BooksService {
   private readonly logger = new Logger(BooksService.name);
+
+  constructor(
+    @Inject('DRIZZLE') private readonly db: NodePgDatabase<typeof schema>,
+    private readonly categoryService: CategoryService,
+  ) {}
   /**
    * Compute reading status without using nested ternaries to satisfy Sonar.
    */
@@ -27,7 +40,7 @@ export class BooksService {
    * @returns Array of persisted book records
    */
   async findAllBooks(): Promise<BookSelect[]> {
-    return db.select().from(book);
+    return this.db.select().from(book);
   }
   /**
    * Get all books belonging to a specific user's list, enriched with a computed
@@ -36,7 +49,7 @@ export class BooksService {
    * @returns Array of user's books with transient status
    */
   async findUserBooks(userId: number): Promise<BookSelect[]> {
-    const rows = await db
+    const rows = await this.db
       .select({
         id: book.id,
         name: book.name,
@@ -58,11 +71,19 @@ export class BooksService {
       .where(eq(list.userId, userId))
       .orderBy(desc(listBook.addedAt));
 
-    // Compute "status" dynamically based on reading dates, avoiding nested ternaries
-    return rows.map((b) => ({
-      ...b,
-      status: this.computeStatus(b.readStart, b.readEnd),
-    }));
+    // Compute status and attach categories for each book
+    const booksWithCategories = await Promise.all(
+      rows.map(async (b) => {
+        const categories = await this.getCategoriesForBook(b.id);
+        return {
+          ...b,
+          status: this.computeStatus(b.readStart, b.readEnd),
+          categories: categories.map((c) => c.name),
+        };
+      }),
+    );
+
+    return booksWithCategories as BookSelect[];
   }
 
   /**
@@ -82,7 +103,7 @@ export class BooksService {
       );
 
       // Check if the book already exists by ISBN to avoid duplicates
-      const found = await db
+      const found = await this.db
         .select()
         .from(book)
         .where(eq(book.isbn, createBookDto.isbn));
@@ -91,7 +112,7 @@ export class BooksService {
 
       // Insert new book if not found
       if (!existingBook) {
-        const inserted = await db
+        const inserted = await this.db
           .insert(book)
           .values({
             name: createBookDto.name,
@@ -109,7 +130,7 @@ export class BooksService {
       }
 
       // Retrieve (or lazily create) the user's list
-      const userListFound = await db
+      const userListFound = await this.db
         .select()
         .from(list)
         .where(eq(list.userId, userId));
@@ -118,7 +139,7 @@ export class BooksService {
 
       // Create list if it does not exist
       if (!userList) {
-        const created = await db
+        const created = await this.db
           .insert(list)
           .values({
             name: 'My List',
@@ -130,13 +151,21 @@ export class BooksService {
       }
 
       // Link book to list in the join table
-      await db
+      await this.db
         .insert(listBook)
         .values({
           bookId: existingBook.id,
           listId: userList.id,
         })
         .returning();
+
+      // Process categories if provided
+      if (createBookDto.categories && createBookDto.categories.length > 0) {
+        await this.assignCategoriesFromNames(
+          existingBook.id,
+          createBookDto.categories,
+        );
+      }
 
       return existingBook;
     } catch (err) {
@@ -166,7 +195,7 @@ export class BooksService {
     bookId: number,
   ): Promise<ListBookSelect[] | null> {
     // Retrieve user list
-    const userListFound = await db
+    const userListFound = await this.db
       .select()
       .from(list)
       .where(eq(list.userId, userId));
@@ -176,7 +205,7 @@ export class BooksService {
     if (!userList) return null;
 
     // Delete relation from listBook
-    const deleted = await db
+    const deleted = await this.db
       .delete(listBook)
       .where(and(eq(listBook.bookId, bookId), eq(listBook.listId, userList.id)))
       .returning();
@@ -201,7 +230,7 @@ export class BooksService {
   ): Promise<BookSelect> {
     try {
       // Find user's list
-      const userListFound = await db
+      const userListFound = await this.db
         .select()
         .from(list)
         .where(eq(list.userId, userId));
@@ -213,7 +242,7 @@ export class BooksService {
       }
 
       // Update the listBook entry with new dates
-      const updated = await db
+      const updated = await this.db
         .update(listBook)
         .set({
           readStart,
@@ -233,7 +262,10 @@ export class BooksService {
       }
 
       // Fetch the full book data to return
-      const bookData = await db.select().from(book).where(eq(book.id, bookId));
+      const bookData = await this.db
+        .select()
+        .from(book)
+        .where(eq(book.id, bookId));
 
       if (!bookData || bookData.length === 0) {
         throw new HttpException('Book not found', HttpStatus.NOT_FOUND);
@@ -260,5 +292,54 @@ export class BooksService {
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
+  }
+
+  /**
+   * Get all categories for a specific book
+   * @param bookId Book ID
+   * @returns Array of categories
+   */
+  async getCategoriesForBook(
+    bookId: number,
+  ): Promise<{ id: number; name: string }[]> {
+    const categories = await this.db
+      .select({
+        id: category.id,
+        name: category.name,
+      })
+      .from(bookCategory)
+      .innerJoin(category, eq(category.id, bookCategory.categoryId))
+      .where(eq(bookCategory.bookId, bookId))
+      .orderBy(bookCategory.id)
+      .execute();
+
+    return categories;
+  }
+
+  /**
+   * Assign categories from category names (find or create, then link)
+   * @param bookId Book ID
+   * @param categoryNames Array of category names from external API
+   */
+  async assignCategoriesFromNames(
+    bookId: number,
+    categoryNames: string[],
+  ): Promise<void> {
+    if (!categoryNames || categoryNames.length === 0) return;
+
+    for (const name of categoryNames) {
+      const cat = await this.categoryService.findOrCreateByName(name);
+
+      // Insert association
+      await this.db
+        .insert(bookCategory)
+        .values({ bookId, categoryId: cat.id })
+        .onConflictDoNothing()
+        .execute();
+    }
+
+    this.logger.log(
+      `Assigned ${categoryNames.length} categories to book ${bookId}`,
+    );
   }
 }
