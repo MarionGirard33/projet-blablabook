@@ -19,10 +19,16 @@ export default function HomePage() {
       mode: "random",
     });
 
-  const { data: byCategoryResults = [], isLoading: isCategoryLoading } =
+  const { data: bestSellerResults = [], isLoading: isBestSellerLoading } =
     useExternalBooks({
       mode: "category",
       param: "bestsellers",
+    });
+
+  const { data: horrorResults = [], isLoading: isHorrorLoading } =
+    useExternalBooks({
+      mode: "category",
+      param: "horror",
     });
 
   let content;
@@ -53,10 +59,18 @@ export default function HomePage() {
         />
         <CarouselDisplay
           title={"Tendances du moment"}
-          books={byCategoryResults}
+          books={bestSellerResults}
           mode={"category"}
           categoryName={"bestsellers"}
-          isLoading={isCategoryLoading}
+          isLoading={isBestSellerLoading}
+          seeAllButton={true}
+        />
+        <CarouselDisplay
+          title={"Frissons et Horreur"}
+          books={horrorResults}
+          mode={"category"}
+          categoryName={"horror"}
+          isLoading={isHorrorLoading}
           seeAllButton={true}
         />
       </>
