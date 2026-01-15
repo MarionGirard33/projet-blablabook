@@ -181,3 +181,14 @@ jobs:
           npm install -g surge
           surge frontend/dist ${{ secrets.SURGE_DOMAIN }} \
             --token ${{ secrets.SURGE_TOKEN }}
+
+### DEPLOY BACKEND TO RENDER ###
+  deploy-backend:
+    needs: ci-docker
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to Render
+        uses: render-examples/deploy-to-render@v1
+        with:
+          api-key: ${{ secrets.RENDER_API_KEY }}
+          service-id: ${{ secrets.RENDER_SERVICE_ID }}  
