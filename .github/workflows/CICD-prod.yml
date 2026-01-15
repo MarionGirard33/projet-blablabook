@@ -6,6 +6,7 @@ on:
     branches:
       - main
       - feat/CICD
+      - feat/deploy-backend
 
 jobs:
 ### FRONT CI ###
@@ -92,6 +93,7 @@ jobs:
       DATABASE_URL: ${{ secrets.DATABASE_URL }}
       JWT_SECRET: ${{ secrets.JWT_SECRET }}
       FRONTEND_URL_CORS: "https://pooka-blablabook.surge.sh/"
+      BACKEND_URL: ${{ secrets.BACKEND_URL }}
       NODE_ENV: "prod"
 
     steps:

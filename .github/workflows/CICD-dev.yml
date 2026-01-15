@@ -6,6 +6,11 @@ on:
     branches:
       - dev
       - feat/CICD
+      - feat/deploy-backend
+# à chaque pull request vers dev ce workflow va se lancer
+  pull_request:
+    branches:
+      - dev
 
 jobs:
 ### FRONT CI ###
@@ -85,6 +90,7 @@ jobs:
       DATABASE_URL: ${{ secrets.DATABASE_URL }}
       JWT_SECRET: ${{ secrets.JWT_SECRET }}
       FRONTEND_URL_CORS: "http://localhost:5173"
+      BACKEND_URL: "http://localhost:3000"
       NODE_ENV: "dev"
 
     steps:
