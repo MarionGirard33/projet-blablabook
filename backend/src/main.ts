@@ -34,7 +34,6 @@ async function bootstrap() {
   SwaggerModule.setup('api', app, documentFactory);
 
   await app.listen(process.env.PORT ?? 3000);
-  console.log(`link to docs: ${process.env.FRONTEND_URL_CORS}`);
 }
 
 // best practice
