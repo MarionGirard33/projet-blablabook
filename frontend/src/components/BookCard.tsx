@@ -42,7 +42,10 @@ export function BookCard({ book, onRemove, onStatusChange }: Props) {
       return (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <button className="absolute top-3 left-3 px-3 py-1 text-xs font-semibold rounded-full shadow bg-bookcream text-bookdark hover:bg-bookcream/90 transition-colors flex items-center gap-1">
+            <button
+              onClick={(e) => e.stopPropagation()}
+              className="absolute top-3 left-3 px-3 py-1 text-xs font-semibold rounded-full shadow bg-bookcream text-bookdark hover:bg-bookcream/90 transition-colors flex items-center gap-1"
+            >
               {book.status}
               <ChevronDown size={12} />
             </button>
@@ -51,7 +54,10 @@ export function BookCard({ book, onRemove, onStatusChange }: Props) {
             {statuses.map((status) => (
               <DropdownMenuItem
                 key={status}
-                onClick={() => onStatusChange(status)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onStatusChange(status);
+                }}
                 className="cursor-pointer"
               >
                 {status}
@@ -88,12 +94,21 @@ export function BookCard({ book, onRemove, onStatusChange }: Props) {
           <div className="bg-gray-200 w-full h-48 animate-pulse" />
         )}
 
+        {book.categories && book.categories.length > 0 && (
+          <span className="absolute bottom-3 right-3 px-3 py-1.5 text-xs font-semibold rounded-full shadow bg-bookcream text-bookdark">
+            {book.categories[0]}
+          </span>
+        )}
+
         {/* Status badge: displays reading status if available with dropdown to change it */}
         {renderStatusBadge()}
 
         {/* Delete button: removes the book from the user's list */}
         <button
-          onClick={onRemove}
+          onClick={(e) => {
+            e.stopPropagation();
+            onRemove();
+          }}
           className="absolute top-3 right-3 p-1 bg-white/80 rounded-full shadow hover:bg-white transition"
         >
           <Trash2 size={16} className="text-red-600" />
@@ -105,9 +120,10 @@ export function BookCard({ book, onRemove, onStatusChange }: Props) {
           <h3 className="font-semibold text-lg">{book.name}</h3>
           <p className="text-sm text-gray-600">{book.author}</p>
           {book.description && (
-            <div className="mt-2 max-h-32 overflow-y-auto pr-2">
-              {/* Scroll container to prevent card overflow with long descriptions */}
-              <p className="text-sm text-gray-700">{book.description}</p>
+            <div className="mt-2 max-h-32 overflow-y-auto overflow-x-hidden pr-2">
+              <p className="text-sm text-gray-700 text-justify">
+                {book.description}
+              </p>
             </div>
           )}
         </div>
