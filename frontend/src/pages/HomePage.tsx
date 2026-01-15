@@ -83,7 +83,7 @@ export default function HomePage() {
         <Hero />
         <SearchBar onSearch={setSearch} />
       </div>
-      {content}
+      <div className="min-h-[500px]">{content}</div>
     </div>
   );
 }
