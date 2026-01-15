@@ -2,7 +2,7 @@ import * as argon2 from 'argon2';
 import { eq, or, and, isNull, ilike, not } from 'drizzle-orm';
 import { user } from '../db/schema';
 import { Injectable, NotFoundException, UnprocessableEntityException } from '@nestjs/common';
-import { db } from 'src/db';
+import { db } from '../db/index';
 import { plainToInstance } from 'class-transformer';
 import { UpdateUserResponseDto } from './dto/update-user.response.dto';
 import { UpdateUserRequestDto } from './dto/update-user.request.dto';
