@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { plainToInstance } from 'class-transformer';
 import { RegisterRequestDto } from './dto/register-request.dto';
-import { UserService } from 'src/user/user.service';
+import { UserService } from '../user/user.service';
 import argon2 from 'argon2';
 import { UserInsert } from 'src/user/types/user';
 import { RegisterResponseDto } from './dto/register-response.dto';
@@ -21,8 +21,8 @@ import {
   TokenSelect,
   UserJoinRefreshToken,
 } from './types/token.type';
-import { db } from 'src/db';
-import { refreshToken, user } from 'src/db/schema';
+import { db } from '../db/index';
+import { refreshToken, user } from '../db/schema';
 import { CookieOptions } from 'express';
 import { eq } from 'drizzle-orm';
 
@@ -39,7 +39,7 @@ export class AuthService {
     const user = await this.userService.getUserByUsername(payload.username);
     if (!user) {
       console.error('Login attempt failed');
-      throw new UnauthorizedException("nom d'utilisateur ou mot de passe invalide");
+      throw new UnauthorizedException('username or password is invalid');
     }
 
     let isPasswordValid: boolean;
@@ -56,7 +56,7 @@ export class AuthService {
 
     if (!isPasswordValid) {
       console.error('Login attempt failed');
-      throw new UnauthorizedException("nom d'utilisateur ou mot de passe invalide");
+      throw new UnauthorizedException('username or password is invalid');
     }
 
     return user;
@@ -199,8 +199,6 @@ export class AuthService {
       .where(eq(refreshToken.token, token));
     return result || null;
   }
-
-
 
   async rotateTokens(refreshToken: string): Promise<RotateTokensData> {
     // hash for find token in DB

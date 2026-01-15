@@ -7,6 +7,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { addBookToUserList } from "@/api/books";
 import type { CreateBookDto, Book } from "@/@types/books";
 import type { ExternalBook } from "@/@types/externalBooks";
+import { getOpenLibIsbnData, getOpenLibWorkData } from "@/api/externalBooks";
 
 /**
  * Normalize various `publishDate` shapes (full date, year-only, invalid) to
@@ -34,8 +35,33 @@ export const useAddBook = (userId?: number) => {
 
   return useMutation<Book, Error, ExternalBook>({
     // Map the external book payload into our backend DTO, then call the API
-    mutationFn: (externalBook) => {
+    mutationFn: async (externalBook) => {
       if (!userId) throw new Error("UserId is required");
+
+      // Fetch description only when adding the book
+      let description = externalBook.description || "";
+
+      if (!description && externalBook.isbn) {
+        try {
+          const dataIsbn = await getOpenLibIsbnData(externalBook.isbn);
+          const workKey = dataIsbn.works?.[0]?.key;
+
+          if (workKey) {
+            const dataWork = await getOpenLibWorkData(workKey);
+            if (dataWork.description) {
+              description =
+                typeof dataWork.description === "string"
+                  ? dataWork.description
+                  : dataWork.description.value || "";
+            }
+          }
+        } catch (err) {
+          console.warn(
+            `Failed to fetch description for ${externalBook.isbn}:`,
+            err
+          );
+        }
+      }
 
       const createBookDto: CreateBookDto = {
         // Fallbacks ensure minimal valid payloads if external fields are missing
@@ -43,10 +69,10 @@ export const useAddBook = (userId?: number) => {
         author: externalBook.author || "Unknown Author",
         isbn: externalBook.isbn || "N/A",
         coverId: externalBook.cover || "default_cover.png",
-        description:
-          externalBook.description || "Pas de description pour ce livre",
+        description: description || "Pas de description pour ce livre",
         publishingHouse: externalBook.publisher || "Unknown publisher",
         publishedAt: toIsoDate(externalBook.publishDate),
+        categories: externalBook.categories || "Unknown category",
       };
 
       return addBookToUserList(userId, createBookDto);
