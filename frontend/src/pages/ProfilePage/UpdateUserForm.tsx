@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { useForm } from "@tanstack/react-form";
 import { useUpdateUser } from "./mutation/updateUser.mutation";
-import type { UpdateUserInput } from "./@types/user";
+import type { UpdateUserInput } from "../../@types/user";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { useAuthStore } from "@/stores/authStore";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";

@@ -7,9 +7,9 @@ import { useForm } from "@tanstack/react-form";
 import FormTitle from "@/components/Form/FormTitle";
 import FormField from "@/components/Form/FormFields/FormField";
 import FormAction from "@/components/Form/FormAction/FormAction";
-import type { BackendErrorResponse } from "@/components/Form/Types/form.type";
 import { useState } from "react";
 import FormGlobalError from "@/components/Form/FormGlobalError";
+import type { BackendErrorResponse } from "@/@types/form";
 
 const schema = z
   .object({
@@ -100,7 +100,7 @@ export default function RegisterPage() {
 
   return (
     <form
-      className="w-150 flex flex-col items-center"
+      className=" w-70 md:w-150 flex flex-col items-center mx-auto"
       onSubmit={(e) => {
         e.preventDefault();
         e.stopPropagation();

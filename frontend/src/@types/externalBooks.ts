@@ -4,51 +4,39 @@ export type ExternalBookCarouselProps = {
 };
 
 export type ExternalBook = {
-  key: string; // book/ ex: "OL55900058M"
+  key: string;
   title: string;
   author: string;
-  isbn: string; // isbn_13
-  language: string[];
+  isbn: string;
+  language?: Array<{ key: string }>;
   publishDate?: string;
   cover?: string;
   description?: string;
   publisher?: string;
 };
 
-export type DescriptionField = string | { value: string };
-
-export interface LanguageRef {
-  key: string;
-}
-
-export interface WorkRef {
-  key: string;
-}
-
 export interface EditionData {
   key: string;
   title: string;
   authors?: Array<{ name?: string }>;
   isbn_13?: string[];
-  languages?: LanguageRef[];
+  languages?: Array<{ key: string }>;
   publish_date?: string;
   covers?: number[];
-  works?: WorkRef[];
+  works?: Array<{ key: string }>;
   publishers?: string[];
 }
 
-export interface WorkData {
+export interface WorkSearchDoc {
+  title: string;
   author_name?: string[];
-}
-
-export interface WorkSearchDoc extends WorkData {
   edition_key?: string[];
 }
 
 export type GetExternalBooksParams = {
-  type: "random" | "category" | "search";
-  categoryName?: string;
+  type: "random" | "searchText" | "category";
   searchText?: string;
+  categoryName?: string;
 };
 
 export type ExternalBookDisplayData = {
@@ -63,14 +51,24 @@ export type ExternalBookDisplayData = {
   language: string;
   categories: string[];
 };
-}
+
+export type ExternalApiIsbnResponse = {
+  title: string;
+  covers?: number[];
+  authors?: Array<{ key: string }>;
+  works?: Array<{ key: string }>;
+  publishers?: string[];
+  publish_date?: string;
+  number_of_pages?: number;
+  languages?: Array<{ key: string }>;
+};
 
 export type ExternalApiWorkResponse = {
   description?: string | { value: string };
   subjects?: string[];
   covers?: number[];
-}
+};
 
 export type ExternalApiAuthorResponse = {
   name: string;
-}
+};
