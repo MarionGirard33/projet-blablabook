@@ -40,22 +40,26 @@ export const useAddBook = (userId?: number) => {
 
       // Fetch description only when adding the book
       let description = externalBook.description || "";
-      
+
       if (!description && externalBook.isbn) {
         try {
           const dataIsbn = await getOpenLibIsbnData(externalBook.isbn);
           const workKey = dataIsbn.works?.[0]?.key;
-          
+
           if (workKey) {
             const dataWork = await getOpenLibWorkData(workKey);
             if (dataWork.description) {
-              description = typeof dataWork.description === "string" 
-                ? dataWork.description 
-                : dataWork.description.value || "";
+              description =
+                typeof dataWork.description === "string"
+                  ? dataWork.description
+                  : dataWork.description.value || "";
             }
           }
         } catch (err) {
-          console.warn(`Failed to fetch description for ${externalBook.isbn}:`, err);
+          console.warn(
+            `Failed to fetch description for ${externalBook.isbn}:`,
+            err
+          );
         }
       }
 
@@ -68,6 +72,7 @@ export const useAddBook = (userId?: number) => {
         description: description || "Pas de description pour ce livre",
         publishingHouse: externalBook.publisher || "Unknown publisher",
         publishedAt: toIsoDate(externalBook.publishDate),
+        categories: externalBook.categories || "Unknown category",
       };
 
       return addBookToUserList(userId, createBookDto);

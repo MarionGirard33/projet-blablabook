@@ -7,6 +7,7 @@ export interface CreateBookDto {
   isbn: string;
   publishingHouse: string;
   publishedAt: string; // YYYY-MM-DD
+  categories: string[];
 }
 
 export interface Book {
@@ -22,7 +23,5 @@ export interface Book {
   status?: BookStatus;
   readStart?: string;
   readEnd?: string;
+  categories: string[];
 }
-
-
-

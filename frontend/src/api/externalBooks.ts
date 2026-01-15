@@ -40,7 +40,8 @@ const createExternalBook = (
   work: WorkSearchDoc,
   isbn: string,
   coverUrl: string,
-  description: string
+  description: string,
+  categories?: string[]
 ): ExternalBook => {
   return {
     key: edition.key,
@@ -53,6 +54,7 @@ const createExternalBook = (
     cover: coverUrl,
     description: description || undefined,
     publisher: edition.publishers?.[0],
+    categories: categories || undefined,
   };
 };
 
@@ -92,7 +94,7 @@ export const searchExternalBooks = async (
     params: {
       q,
       limit: 20,
-      fields: "key,title,author_name,edition_key",
+      fields: "key,title,author_name,edition_key,subject",
     },
   });
 
@@ -121,8 +123,9 @@ export const searchExternalBooks = async (
       if (!isbn) continue;
 
       const coverUrl = buildCoverUrl(edition);
+      const categories = work.subject || [];
 
-      books.push(createExternalBook(edition, work, isbn, coverUrl, ""));
+      books.push(createExternalBook(edition, work, isbn, coverUrl, "", categories));
     } catch (err) {
       console.warn(`Failed to fetch edition ${editionKey}:`, err);
     }
