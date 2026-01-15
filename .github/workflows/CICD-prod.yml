@@ -33,7 +33,7 @@ jobs:
 
       # installe les dépendances du front
       - name: Frontend CI
-        run: npm install
+        run: npm ci
 
       # build du front avec l'URL du back
       - name: Build frontend with backend URL
