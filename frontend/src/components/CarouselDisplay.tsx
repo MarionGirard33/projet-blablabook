@@ -9,6 +9,8 @@ import type { ExternalBookCarouselProps } from "../@types/externalBooks";
 import { Button } from "./ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import BookCardCarousel from "./BookCardCarousel";
+import { ArrowRight } from "lucide-react";
+import { Link } from "@tanstack/react-router";
 
 function BookCardSkeleton() {
   return (
