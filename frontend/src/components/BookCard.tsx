@@ -77,57 +77,59 @@ export function BookCard({ book, onRemove, onStatusChange }: Props) {
   };
 
   return (
-    <Card
+    <div
+      className="w-full max-w-md transform hover:scale-101 transition-transform duration-500 cursor-pointer"
       onClick={() => goToBookDetails()}
-      className="w-full max-w-md shadow-lg relative rounded-xl overflow-hidden p-0 gap-2 flex flex-col cursor-pointer"
     >
-      {/* Book cover (fallback placeholder when no cover) */}
-      <div className="relative flex-shrink-0">
-        {book.coverId ? (
-          <img
-            //src={`https://covers.openlibrary.org/b/id/${book.coverId}-M.jpg`}
-            src={book.coverId} // dev
-            alt={book.name}
-            className="w-full h-48 object-cover"
-          />
-        ) : (
-          <div className="bg-gray-200 w-full h-48 animate-pulse" />
-        )}
-
-        {book.categories && book.categories.length > 0 && (
-          <span className="absolute bottom-3 right-3 px-3 py-1.5 text-xs font-semibold rounded-full shadow bg-bookcream text-bookdark">
-            {book.categories[0]}
-          </span>
-        )}
-
-        {/* Status badge: displays reading status if available with dropdown to change it */}
-        {renderStatusBadge()}
-
-        {/* Delete button: removes the book from the user's list */}
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            onRemove();
-          }}
-          className="absolute top-3 right-3 p-1 bg-white/80 rounded-full shadow hover:bg-white transition"
-        >
-          <Trash2 size={16} className="text-red-600" />
-        </button>
-      </div>
-
-      <CardContent className="px-4 pt-0 pb-4 flex flex-col items-start">
-        <div className="text-left w-full">
-          <h3 className="font-semibold text-lg">{book.name}</h3>
-          <p className="text-sm text-gray-600">{book.author}</p>
-          {book.description && (
-            <div className="mt-2 max-h-32 overflow-y-auto overflow-x-hidden pr-2">
-              <p className="text-sm text-gray-700 text-justify">
-                {book.description}
-              </p>
-            </div>
+      <Card className="w-full shadow-lg relative rounded-xl overflow-hidden p-0 gap-2 flex flex-col h-full">
+        {/* Book cover (fallback placeholder when no cover) */}
+        <div className="relative flex-shrink-0">
+          {book.coverId ? (
+            <img
+              //src={`https://covers.openlibrary.org/b/id/${book.coverId}-M.jpg`}
+              src={book.coverId} // dev
+              alt={book.name}
+              className="w-full h-48 object-cover"
+            />
+          ) : (
+            <div className="bg-gray-200 w-full h-48 animate-pulse" />
           )}
+
+          {book.categories && book.categories.length > 0 && (
+            <span className="absolute bottom-3 right-3 px-3 py-1.5 text-xs font-semibold rounded-full shadow bg-bookcream text-bookdark">
+              {book.categories[0]}
+            </span>
+          )}
+
+          {/* Status badge: displays reading status if available with dropdown to change it */}
+          {renderStatusBadge()}
+
+          {/* Delete button: removes the book from the user's list */}
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              onRemove();
+            }}
+            className="absolute top-3 right-3 p-1 bg-white/80 rounded-full shadow hover:bg-white transition"
+          >
+            <Trash2 size={16} className="text-red-600" />
+          </button>
         </div>
-      </CardContent>
-    </Card>
+
+        <CardContent className="px-4 pt-0 pb-4 flex flex-col items-start">
+          <div className="text-left w-full">
+            <h3 className="font-semibold text-lg">{book.name}</h3>
+            <p className="text-sm text-gray-600">{book.author}</p>
+            {book.description && (
+              <div className="mt-2 max-h-32 overflow-y-auto overflow-x-hidden pr-2">
+                <p className="text-sm text-gray-700 text-justify">
+                  {book.description}
+                </p>
+              </div>
+            )}
+          </div>
+        </CardContent>
+      </Card>
+    </div>
   );
 }
