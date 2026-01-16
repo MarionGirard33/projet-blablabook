@@ -54,7 +54,7 @@ const createExternalBook = (
     cover: coverUrl,
     description: description || undefined,
     publisher: edition.publishers?.[0],
-    categories: categories || undefined,
+    categories: categories || [],
   };
 };
 

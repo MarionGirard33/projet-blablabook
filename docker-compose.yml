@@ -1,6 +1,7 @@
 services:
   # PostgreSQL service
   postgres:
+    container_name: postgres
     image: postgres:16-alpine
     environment:
       # Database environment variables
@@ -33,7 +34,6 @@ services:
       # Drizzle url
       - DATABASE_URL=${DATABASE_URL}
       - JWT_SECRET=${JWT_SECRET}
-      - FRONTEND_URL_CORS=${FRONTEND_URL_CORS}
       # - REDIS_HOST=${REDIS_HOST}
       # - REDIS_PORT=${REDIS_PORT}
       - CHOKIDAR_USEPOLLING=true
@@ -64,6 +64,8 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile.dev
+    environment:
+      - VITE_BACKEND_URL=http://localhost:3000
     ports:
       # Publish frontend port to host for direct browser access
       - "5173:5173"
