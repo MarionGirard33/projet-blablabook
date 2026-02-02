@@ -22,23 +22,6 @@ export default function HomePage() {
     };
   }
 
-  console.log(
-    "Livres internes - random :",
-    (internalBooks || []).filter((book) => book.categories?.includes("random")),
-  );
-
-  console.log(
-    "Livres internes - bestsellers :",
-    (internalBooks || []).filter((book) =>
-      book.categories?.includes("bestsellers"),
-    ),
-  );
-
-  console.log(
-    "Livres internes - horror :",
-    (internalBooks || []).filter((book) => book.categories?.includes("horror")),
-  );
-
   useEffect(() => {
     getBooks().then((books: Book[]) => {
       setInternalBooks(books);
