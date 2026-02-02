@@ -1,7 +1,7 @@
 // Frontend client for our internal backend Book APIs.
 // Wraps axios calls and provides typed responses.
 import type { GetExternalBooksParams } from "../@types/externalBooks";
-import type { CreateBookDto, Book } from "../@types/books";
+import type { CreateBookDto, BookRow } from "../@types/books";
 import api from "./axios";
 
 // -----------------------------
@@ -22,14 +22,14 @@ export function getSearchBooks(params: GetExternalBooksParams) {
 }
 
 /** Get all books persisted in the backend `book` table. */
-export const getBooks = async (): Promise<Book[]> => {
-  const response = await api.get<Book[]>("/books");
+export const getBooks = async (): Promise<BookRow[]> => {
+  const response = await api.get<BookRow[]>("/books");
   return response.data;
 };
 
 /** Get all books from a specific user's library (with computed status). */
-export const getUserBooks = async (userId: number): Promise<Book[]> => {
-  const response = await api.get<Book[]>(`/books/library/${userId}`);
+export const getUserBooks = async (userId: number): Promise<BookRow[]> => {
+  const response = await api.get<BookRow[]>(`/books/library/${userId}`);
   return response.data;
 };
 
@@ -39,19 +39,22 @@ export const getUserBooks = async (userId: number): Promise<Book[]> => {
  */
 export const addBookToUserList = async (
   userId: number,
-  bookData: CreateBookDto
-): Promise<Book> => {
-  const response = await api.post<Book>(`/books/library/${userId}`, bookData);
+  bookData: CreateBookDto,
+): Promise<BookRow> => {
+  const response = await api.post<BookRow>(
+    `/books/library/${userId}`,
+    bookData,
+  );
   return response.data;
 };
 
 /** Remove a book from a user's list by unlinking it on the backend. */
 export const removeBookFromUserList = async (
   userId: number,
-  bookId: number
+  bookId: number,
 ): Promise<{ id: number }[]> => {
   const response = await api.delete<{ id: number }[]>(
-    `/books/library/${userId}/book/${bookId}`
+    `/books/library/${userId}/book/${bookId}`,
   );
   return response.data;
 };
@@ -67,8 +70,8 @@ export const updateBookStatus = async (
   userId: number,
   bookId: number,
   status: "Lu" | "En cours" | "À lire",
-  currentBook: Book
-): Promise<Book> => {
+  currentBook: BookRow,
+): Promise<BookRow> => {
   const now = new Date().toISOString();
 
   let readStart: string | null;
@@ -80,18 +83,22 @@ export const updateBookStatus = async (
     readEnd = null;
   } else if (status === "En cours") {
     // Start reading: set start date if not already set, clear end date
-    readStart = currentBook.readStart || now;
+    readStart = currentBook.readStart
+      ? currentBook.readStart.toISOString()
+      : now;
     readEnd = null;
   } else {
     // "Lu": Mark as finished
     // Keep existing readStart or set to now if never started
-    readStart = currentBook.readStart || now;
+    readStart = currentBook.readStart
+      ? currentBook.readStart.toISOString()
+      : now;
     readEnd = now;
   }
 
-  const response = await api.patch<Book>(
+  const response = await api.patch<BookRow>(
     `/books/library/${userId}/book/${bookId}/status`,
-    { readStart, readEnd }
+    { readStart, readEnd },
   );
   return response.data;
 };

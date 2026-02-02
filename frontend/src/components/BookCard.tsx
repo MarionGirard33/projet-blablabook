@@ -8,11 +8,11 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Trash2, ChevronDown } from "lucide-react";
-import type { Book } from "../@types/books";
+import type { BookRow } from "../@types/books";
 import { useRouter } from "@tanstack/react-router";
 
 type Props = {
-  readonly book: Book;
+  readonly book: BookRow;
   readonly onRemove: () => void;
   readonly onStatusChange?: (newStatus: "Lu" | "En cours" | "À lire") => void;
 };

@@ -3,6 +3,7 @@ import { renderHook, waitFor } from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { describe, expect, it, vi, afterEach, type Mock } from "vitest";
 import type { ExternalBook } from "@/@types/externalBooks";
+import type { BookRow } from "@/@types/books";
 import { useAddBook } from "./useAddBook";
 
 vi.mock("@/api/books", () => ({
@@ -47,6 +48,26 @@ const baseExternalBook: ExternalBook = {
   categories: ["Fiction"],
 };
 
+/**
+ * Factory function to create complete BookRow mock data matching Drizzle types.
+ */
+const createMockBookRow = (overrides?: Partial<BookRow>): BookRow => ({
+  id: 1,
+  name: "Test Book",
+  author: "Jane Doe",
+  isbn: "1234567890",
+  coverId: "cover.jpg",
+  description: "A short description",
+  publishingHouse: "Test Publisher",
+  publishedAt: "2023-05-01",
+  categories: ["Fiction"],
+  readStart: null,
+  readEnd: null,
+  addedAt: new Date(),
+  status: "À lire",
+  ...overrides,
+});
+
 afterEach(() => {
   vi.clearAllMocks();
 });
@@ -54,17 +75,17 @@ afterEach(() => {
 describe("useAddBook", () => {
   it("throws when userId is missing", async () => {
     const { wrapper } = createWrapper();
-    const { result } = renderHook(() => useAddBook(undefined), { wrapper });
+    const { result } = renderHook(() => useAddBook(), { wrapper });
 
     await expect(result.current.mutateAsync(baseExternalBook)).rejects.toThrow(
-      "UserId is required"
+      "UserId is required",
     );
   });
 
   it("maps external book data and calls backend", async () => {
     const { wrapper } = createWrapper();
     const { result } = renderHook(() => useAddBook(7), { wrapper });
-    const backendBook = { id: 1, name: "Test Book" } as any;
+    const backendBook = createMockBookRow({ id: 1 });
     (addBookToUserList as Mock).mockResolvedValueOnce(backendBook);
 
     await result.current.mutateAsync(baseExternalBook);
@@ -84,7 +105,9 @@ describe("useAddBook", () => {
   it("fetches missing description from OpenLibrary", async () => {
     const { wrapper } = createWrapper();
     const { result } = renderHook(() => useAddBook(5), { wrapper });
-    (addBookToUserList as Mock).mockResolvedValueOnce({ id: 2 } as any);
+    (addBookToUserList as Mock).mockResolvedValueOnce(
+      createMockBookRow({ id: 2 }),
+    );
 
     (getOpenLibIsbnData as Mock).mockResolvedValueOnce({
       works: [{ key: "/works/OL123W" }],
@@ -107,7 +130,7 @@ describe("useAddBook", () => {
       5,
       expect.objectContaining({
         description: "Fetched description",
-      })
+      }),
     );
   });
 
@@ -115,7 +138,9 @@ describe("useAddBook", () => {
     const { wrapper, queryClient } = createWrapper();
     const invalidateSpy = vi.spyOn(queryClient, "invalidateQueries");
     const { result } = renderHook(() => useAddBook(9), { wrapper });
-    (addBookToUserList as Mock).mockResolvedValueOnce({ id: 3 } as any);
+    (addBookToUserList as Mock).mockResolvedValueOnce(
+      createMockBookRow({ id: 3 }),
+    );
 
     await result.current.mutateAsync(baseExternalBook);
 

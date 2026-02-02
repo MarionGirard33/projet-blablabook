@@ -5,7 +5,7 @@
  */
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { addBookToUserList } from "@/api/books";
-import type { CreateBookDto, Book } from "@/@types/books";
+import type { CreateBookDto, BookRow } from "@/@types/books";
 import type { ExternalBook } from "@/@types/externalBooks";
 import { getOpenLibIsbnData, getOpenLibWorkData } from "@/api/externalBooks";
 
@@ -33,7 +33,7 @@ const toIsoDate = (publishDate?: string): string => {
 export const useAddBook = (userId?: number) => {
   const queryClient = useQueryClient();
 
-  return useMutation<Book, Error, ExternalBook>({
+  return useMutation<BookRow, Error, ExternalBook>({
     // Map the external book payload into our backend DTO, then call the API
     mutationFn: async (externalBook) => {
       if (!userId) throw new Error("UserId is required");
@@ -58,7 +58,7 @@ export const useAddBook = (userId?: number) => {
         } catch (err) {
           console.warn(
             `Failed to fetch description for ${externalBook.isbn}:`,
-            err
+            err,
           );
         }
       }

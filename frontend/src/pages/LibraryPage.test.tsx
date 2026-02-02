@@ -1,6 +1,7 @@
 import { expect, it, describe, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import type { BookRow } from "@/@types/books";
 import LibraryPage from "@/pages/LibraryPage";
 
 vi.mock("@/components/AddBookModal", () => ({
@@ -8,17 +9,35 @@ vi.mock("@/components/AddBookModal", () => ({
 }));
 
 vi.mock("@/components/BookCard", () => ({
-  BookCard: ({ book }: any) => <div>{book.name}</div>,
+  BookCard: ({ book }: { book: { name: string } }) => <div>{book.name}</div>,
 }));
 
 vi.mock("@/stores/authStore", () => ({
   useAuthStore: () => ({ user: { id: 1 } }),
 }));
 
+// Factory function to create BookRow test data
+const createBookRow = (overrides?: Partial<BookRow>): BookRow => ({
+  id: 1,
+  name: "Test Book",
+  coverId: "cover.jpg",
+  author: "Test Author",
+  description: "Test description",
+  isbn: "123",
+  publishingHouse: "Test Publisher",
+  publishedAt: "2023-01-01",
+  categories: [],
+  readStart: null,
+  readEnd: null,
+  addedAt: new Date(),
+  status: "À lire",
+  ...overrides,
+});
+
 // Static test data
 const { useUserBooksMock } = vi.hoisted(() => {
-  const booksFixture = [
-    {
+  const booksFixture: BookRow[] = [
+    createBookRow({
       id: 1,
       name: "Alpha",
       status: "Lu",
@@ -28,9 +47,8 @@ const { useUserBooksMock } = vi.hoisted(() => {
       isbn: "111",
       publishingHouse: "Publisher 1",
       publishedAt: "2023-01-01",
-      categories: [],
-    },
-    {
+    }),
+    createBookRow({
       id: 2,
       name: "Beta",
       status: "En cours",
@@ -40,9 +58,8 @@ const { useUserBooksMock } = vi.hoisted(() => {
       isbn: "222",
       publishingHouse: "Publisher 2",
       publishedAt: "2023-02-01",
-      categories: [],
-    },
-    {
+    }),
+    createBookRow({
       id: 3,
       name: "Gamma",
       status: "À lire",
@@ -52,8 +69,7 @@ const { useUserBooksMock } = vi.hoisted(() => {
       isbn: "333",
       publishingHouse: "Publisher 3",
       publishedAt: "2023-03-01",
-      categories: [],
-    },
+    }),
   ];
 
   const useUserBooksMock = vi.fn(() => ({

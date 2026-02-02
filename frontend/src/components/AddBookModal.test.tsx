@@ -41,11 +41,12 @@ vi.mock("@tanstack/react-router", () => ({
 }));
 
 const setupDefaultQueries = () => {
-  useQueryMock.mockImplementation((options: any) => {
-    if (options?.queryKey?.[0] === "userBooks") {
+  useQueryMock.mockImplementation((options: Record<string, unknown>) => {
+    const queryKey = Array.isArray(options?.queryKey) ? options.queryKey : [];
+    if (queryKey[0] === "userBooks") {
       return { data: [], isFetching: false, refetch: vi.fn() };
     }
-    if (options?.queryKey?.[0] === "externalBooks") {
+    if (queryKey[0] === "externalBooks") {
       return { data: [mockBook], isFetching: false, refetch: refetchMock };
     }
     return { data: [], isFetching: false, refetch: vi.fn() };
@@ -97,11 +98,12 @@ describe("AddBookModal", () => {
   it("shows empty state after search with no results", async () => {
     const user = userEvent.setup();
 
-    useQueryMock.mockImplementation((options: any) => {
-      if (options?.queryKey?.[0] === "userBooks") {
+    useQueryMock.mockImplementation((options: Record<string, unknown>) => {
+      const queryKey = Array.isArray(options?.queryKey) ? options.queryKey : [];
+      if (queryKey[0] === "userBooks") {
         return { data: [], isFetching: false, refetch: vi.fn() };
       }
-      if (options?.queryKey?.[0] === "externalBooks") {
+      if (queryKey[0] === "externalBooks") {
         return { data: [], isFetching: false, refetch: vi.fn() };
       }
       return { data: [], isFetching: false, refetch: vi.fn() };
@@ -133,11 +135,12 @@ describe("AddBookModal", () => {
   });
 
   it("shows checkmark when book already in library", () => {
-    useQueryMock.mockImplementation((options: any) => {
-      if (options?.queryKey?.[0] === "userBooks") {
+    useQueryMock.mockImplementation((options: Record<string, unknown>) => {
+      const queryKey = Array.isArray(options?.queryKey) ? options.queryKey : [];
+      if (queryKey[0] === "userBooks") {
         return { data: [{ isbn: "123" }], isFetching: false, refetch: vi.fn() };
       }
-      if (options?.queryKey?.[0] === "externalBooks") {
+      if (queryKey[0] === "externalBooks") {
         return { data: [mockBook], isFetching: false, refetch: refetchMock };
       }
       return { data: [], isFetching: false, refetch: vi.fn() };

@@ -7,6 +7,7 @@ import {
   afterEach,
   type Mock,
 } from "vitest";
+import type { BookRow } from "../@types/books";
 import {
   getSearchBooks,
   getBooks,
@@ -29,6 +30,26 @@ vi.mock("./axios", () => ({
   default: mockApi,
 }));
 
+/**
+ * Factory function to create BookRow test data matching Drizzle types.
+ */
+const createBookRow = (overrides?: Partial<BookRow>): BookRow => ({
+  id: 1,
+  name: "Test Book",
+  author: "Author",
+  isbn: "123",
+  coverId: "cover.jpg",
+  description: "Description",
+  publishingHouse: "House",
+  publishedAt: "2024-01-01",
+  categories: [],
+  readStart: null,
+  readEnd: null,
+  addedAt: new Date(),
+  status: "À lire",
+  ...overrides,
+});
+
 describe("books api", () => {
   beforeEach(() => {
     vi.useFakeTimers();
@@ -47,10 +68,10 @@ describe("books api", () => {
     mockApi.get.mockResolvedValueOnce({ data: responseData });
 
     const params = {
-      type: "searchText",
+      type: "searchText" as const,
       searchText: "hello",
       categoryName: "Fiction",
-    } as any;
+    };
     await getSearchBooks(params);
 
     expect(mockApi.get).toHaveBeenCalledWith("/books/search", {
@@ -83,8 +104,17 @@ describe("books api", () => {
   });
 
   it("adds a book to user list", async () => {
-    const dto = { name: "C" } as any;
-    const created = { id: 3 } as any;
+    const dto = {
+      name: "C",
+      coverId: "cover.jpg",
+      author: "Author C",
+      description: "Description C",
+      isbn: "9876543210",
+      publishingHouse: "Publisher C",
+      publishedAt: "2024-01-01",
+      categories: ["Fiction"],
+    };
+    const created = createBookRow({ id: 3 });
     mockApi.post.mockResolvedValueOnce({ data: created });
 
     const result = await addBookToUserList(4, dto);
@@ -106,16 +136,15 @@ describe("books api", () => {
   it("updates status to 'À lire' by resetting dates", async () => {
     mockApi.patch.mockResolvedValueOnce({ data: { id: 1 } });
 
-    const book = {
-      id: 1,
-      readStart: "2024-01-01",
-      readEnd: "2024-02-01",
-    } as any;
+    const book = createBookRow({
+      readStart: new Date("2024-01-01"),
+      readEnd: new Date("2024-02-01"),
+    });
     await updateBookStatus(2, 1, "À lire", book);
 
     expect(mockApi.patch).toHaveBeenCalledWith(
       "/books/library/2/book/1/status",
-      { readStart: null, readEnd: null }
+      { readStart: null, readEnd: null },
     );
   });
 
@@ -123,12 +152,15 @@ describe("books api", () => {
     vi.setSystemTime(new Date("2024-03-01T00:00:00.000Z"));
     mockApi.patch.mockResolvedValueOnce({ data: { id: 1 } });
 
-    const book = { id: 1, readStart: null, readEnd: null } as any;
+    const book = createBookRow({
+      readStart: null,
+      readEnd: null,
+    });
     await updateBookStatus(2, 1, "En cours", book);
 
     expect(mockApi.patch).toHaveBeenCalledWith(
       "/books/library/2/book/1/status",
-      { readStart: "2024-03-01T00:00:00.000Z", readEnd: null }
+      { readStart: "2024-03-01T00:00:00.000Z", readEnd: null },
     );
   });
 
@@ -136,11 +168,10 @@ describe("books api", () => {
     vi.setSystemTime(new Date("2024-03-02T00:00:00.000Z"));
     mockApi.patch.mockResolvedValueOnce({ data: { id: 1 } });
 
-    const book = {
-      id: 1,
-      readStart: "2024-03-01T00:00:00.000Z",
+    const book = createBookRow({
+      readStart: new Date("2024-03-01T00:00:00.000Z"),
       readEnd: null,
-    } as any;
+    });
     await updateBookStatus(2, 1, "Lu", book);
 
     expect(mockApi.patch).toHaveBeenCalledWith(
@@ -148,7 +179,7 @@ describe("books api", () => {
       {
         readStart: "2024-03-01T00:00:00.000Z",
         readEnd: "2024-03-02T00:00:00.000Z",
-      }
+      },
     );
   });
 });

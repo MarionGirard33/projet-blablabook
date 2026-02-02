@@ -2,7 +2,7 @@ import React from "react";
 import { renderHook, waitFor, act } from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { describe, expect, it, vi, afterEach, type Mock } from "vitest";
-import type { Book } from "@/@types/books";
+import type { BookRow } from "@/@types/books";
 import { useUserBooks } from "./useUserBooks";
 
 vi.mock("@/api/books", () => ({
@@ -34,21 +34,30 @@ afterEach(() => {
   vi.clearAllMocks();
 });
 
+/**
+ * Factory function to create BookRow test data matching Drizzle-generated types.
+ * Ensures all required fields are present with correct types.
+ */
+const createBookRow = (overrides?: Partial<BookRow>): BookRow => ({
+  id: 1,
+  name: "Book A",
+  author: "Author A",
+  isbn: "111",
+  coverId: "a.jpg",
+  description: "desc",
+  publishingHouse: "PH",
+  publishedAt: "2024-01-01",
+  categories: ["Fiction"],
+  readStart: null,
+  readEnd: null,
+  addedAt: new Date("2024-01-15"),
+  status: "À lire",
+  ...overrides,
+});
+
 describe("useUserBooks", () => {
   it("fetches books when userId is provided", async () => {
-    const books: Book[] = [
-      {
-        id: 1,
-        name: "Book A",
-        author: "Author A",
-        isbn: "111",
-        coverId: "a.jpg",
-        description: "desc",
-        publishingHouse: "PH",
-        publishedAt: "2024-01-01",
-        categories: ["Fiction"],
-      } as Book,
-    ];
+    const books: BookRow[] = [createBookRow()];
 
     (getUserBooks as Mock).mockResolvedValueOnce(books);
 
@@ -87,21 +96,16 @@ describe("useUserBooks", () => {
   });
 
   it("updates book status via API", async () => {
-    (updateBookStatus as Mock).mockResolvedValueOnce({ id: 2 } as Book);
+    const updatedBook = createBookRow({
+      id: 2,
+      status: "Lu",
+      readEnd: new Date("2024-02-15"),
+    });
+    (updateBookStatus as Mock).mockResolvedValueOnce(updatedBook);
 
     const { wrapper, queryClient } = createWrapper();
     const invalidateSpy = vi.spyOn(queryClient, "invalidateQueries");
-    const currentBook = {
-      id: 2,
-      name: "Book B",
-      author: "Author B",
-      isbn: "222",
-      coverId: "b.jpg",
-      description: "desc",
-      publishingHouse: "PH",
-      publishedAt: "2024-02-02",
-      categories: ["Fiction"],
-    } as Book;
+    const currentBook = createBookRow({ id: 2 });
 
     const { result } = renderHook(() => useUserBooks(4), { wrapper });
 
