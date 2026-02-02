@@ -13,7 +13,9 @@ export default function SearchBar({ onSearch }: SearchBarProps) {
   const [debouncedQuery] = useDebounce(query, 400);
 
   useEffect(() => {
-    if (debouncedQuery && debouncedQuery.length >= 3) {
+    if (debouncedQuery.length === 0) {
+      onSearch("");
+    } else if (debouncedQuery.length >= 2) {
       onSearch(debouncedQuery);
     }
   }, [debouncedQuery, onSearch]);

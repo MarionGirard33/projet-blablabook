@@ -24,6 +24,7 @@
     "@tanstack/react-router": "^1.139.0",
     "@tanstack/react-router-devtools": "^1.139.0",
     "@testing-library/user-event": "^14.6.1",
+    "@tanstack/react-query-devtools": "^5.91.2",
     "axios": "^1.13.2",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
