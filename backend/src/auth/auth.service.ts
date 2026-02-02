@@ -25,6 +25,7 @@ import { db } from '../db/index';
 import { refreshToken, user } from '../db/schema';
 import { CookieOptions } from 'express';
 import { eq } from 'drizzle-orm';
+import { PasswordService } from '../security/password/password.service';
 
 @Injectable()
 export class AuthService {
@@ -32,6 +33,7 @@ export class AuthService {
   constructor(
     private readonly userService: UserService,
     private readonly jwtService: JwtService,
+    private readonly passwordService: PasswordService,
   ) {}
 
   // LOGIN ================================================
@@ -42,17 +44,10 @@ export class AuthService {
       throw new UnauthorizedException('username or password is invalid');
     }
 
-    let isPasswordValid: boolean;
-    try {
-      isPasswordValid = await argon2.verify(user.password, payload.password);
-    } catch (err) {
-      let errorMessage = 'failed to check the password';
-      if (err instanceof Error) {
-        errorMessage = err.message;
-      }
-      console.error('check password is failed: ', errorMessage);
-      throw new InternalServerErrorException('failed to hash password');
-    }
+    const isPasswordValid = await this.passwordService.checkPassword(
+      user.password,
+      payload.password,
+    );
 
     if (!isPasswordValid) {
       console.error('Login attempt failed');
