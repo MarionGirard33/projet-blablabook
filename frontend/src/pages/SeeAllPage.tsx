@@ -1,10 +1,10 @@
+import type { Book } from "@/@types/books";
 import type { SearchParamsSeeAllPage } from "@/@types/externalBooks";
 import BookCardCarousel from "@/components/BookCardCarousel";
 import SearchBar from "@/components/SearchBar";
 import { useExternalBooks } from "@/hooks/useExternalBooks";
 import { seeAllRoute } from "@/routes/routes";
 import { useMemo, useState } from "react";
-import { Loader2 } from "lucide-react";
 
 export default function SeeAllPage() {
   const searchParams = seeAllRoute.useSearch() as SearchParamsSeeAllPage;
@@ -14,6 +14,7 @@ export default function SeeAllPage() {
   const param = mode === "category" ? categoryName : undefined;
 
   const [query, setQuery] = useState("");
+  const internalBooks = (searchParams.books ?? []) as Book[];
 
   const { data: books = [], isLoading: isBooksLoading } = useExternalBooks({
     mode,
@@ -26,15 +27,17 @@ export default function SeeAllPage() {
     return books.filter(
       (book) =>
         book.title?.toLowerCase().includes(lowerQuery) ||
-        book.author?.toLowerCase().includes(lowerQuery)
+        book.author?.toLowerCase().includes(lowerQuery),
     );
   }, [books, query]);
 
   let content;
   if (isBooksLoading) {
     content = (
-      <div className="flex items-start justify-center py-12">
-        <Loader2 className="h-12 w-12 animate-spin text-primary" />
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+        {internalBooks?.map((book) => (
+          <BookCardCarousel key={book.id} book={book} />
+        ))}
       </div>
     );
   } else if (filteredBooks.length > 0) {

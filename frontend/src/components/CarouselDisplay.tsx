@@ -52,9 +52,9 @@ export default function CarouselDisplay({
               to="/see-all"
               className={`${isLoading ? "opacity-40 pointer-events-none" : ""} transition-opacity duration-200 flex items-center gap-2`}
               search={
-                mode === "category"
+                isLoading && mode === "category"
                   ? { mode, categoryName: categoryName, title }
-                  : { mode, title }
+                  : { mode, title, books }
               }
             >
               Voir tout
