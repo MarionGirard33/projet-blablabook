@@ -1,10 +1,57 @@
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { Test, TestingModule } from '@nestjs/testing';
 import { BooksController } from './books.controller';
 import { BooksService } from './books.service';
+import { book, category, listBook } from '../db/schema';
+
+type BookRow = typeof book.$inferSelect;
+type CategoryRow = typeof category.$inferSelect;
+type ListBookRow = typeof listBook.$inferSelect;
+type UserBook = BookRow & {
+  status: string;
+  categories?: string[];
+  readStart?: Date | null;
+  readEnd?: Date | null;
+};
+
+interface BooksServiceMock {
+  findAllBooks: jest.Mock<Promise<BookRow[]>>;
+  findUserBooks: jest.Mock<Promise<UserBook[]>>;
+  addToUserList: jest.Mock<Promise<BookRow>>;
+  removeFromUserList: jest.Mock<Promise<ListBookRow[] | null>>;
+  updateBookStatus: jest.Mock<Promise<UserBook>>;
+  getCategoriesForBook: jest.Mock<
+    Promise<Array<Pick<CategoryRow, 'id' | 'name'>>>
+  >;
+}
+
+const makeBook = (overrides: Partial<BookRow> = {}): BookRow => ({
+  id: 1,
+  name: 'Book',
+  coverId: 'cover-id',
+  author: 'Author',
+  description: 'Description',
+  isbn: '1234567890',
+  publishingHouse: 'House',
+  publishedAt: '2023-01-01',
+  ...overrides,
+});
+
+const makeListBook = (overrides: Partial<ListBookRow> = {}): ListBookRow => ({
+  id: 1,
+  comment: null,
+  readStart: null,
+  readEnd: null,
+  addedAt: new Date(),
+  updatedAt: new Date(),
+  bookId: 1,
+  listId: 1,
+  ...overrides,
+});
 
 describe('BooksController', () => {
   let controller: BooksController;
-  let mockBooksService: any;
+  let mockBooksService: BooksServiceMock;
 
   beforeEach(async () => {
     // Mock BooksService
@@ -15,7 +62,7 @@ describe('BooksController', () => {
       removeFromUserList: jest.fn(),
       updateBookStatus: jest.fn(),
       getCategoriesForBook: jest.fn(),
-    };
+    } as BooksServiceMock;
 
     const module: TestingModule = await Test.createTestingModule({
       controllers: [BooksController],
@@ -40,9 +87,19 @@ describe('BooksController', () => {
 
   describe('getAllBooks', () => {
     it('should return all books', async () => {
-      const mockBooks = [
-        { id: 1, name: 'Book 1', author: 'Author 1', isbn: '1234567890' },
-        { id: 2, name: 'Book 2', author: 'Author 2', isbn: '0987654321' },
+      const mockBooks: BookRow[] = [
+        makeBook({
+          id: 1,
+          name: 'Book 1',
+          author: 'Author 1',
+          isbn: '1234567890',
+        }),
+        makeBook({
+          id: 2,
+          name: 'Book 2',
+          author: 'Author 2',
+          isbn: '0987654321',
+        }),
       ];
 
       mockBooksService.findAllBooks.mockResolvedValue(mockBooks);
@@ -57,12 +114,14 @@ describe('BooksController', () => {
   describe('getUserBooks', () => {
     it('should return user books with status', async () => {
       const userId = 1;
-      const mockUserBooks = [
+      const mockUserBooks: UserBook[] = [
         {
-          id: 1,
-          name: 'Book 1',
-          author: 'Author 1',
-          isbn: '1234567890',
+          ...makeBook({
+            id: 1,
+            name: 'Book 1',
+            author: 'Author 1',
+            isbn: '1234567890',
+          }),
           status: 'En cours',
           categories: ['Fiction'],
         },
@@ -103,7 +162,16 @@ describe('BooksController', () => {
         categories: ['Fiction'],
       };
 
-      const mockAddedBook = { id: 1, ...createBookDto };
+      const mockAddedBook: BookRow = makeBook({
+        id: 1,
+        name: createBookDto.name,
+        author: createBookDto.author,
+        isbn: createBookDto.isbn,
+        coverId: createBookDto.coverId,
+        description: createBookDto.description,
+        publishingHouse: createBookDto.publishingHouse,
+        publishedAt: createBookDto.publishedAt,
+      });
 
       mockBooksService.addToUserList.mockResolvedValue(mockAddedBook);
 
@@ -148,7 +216,7 @@ describe('BooksController', () => {
     it('should remove a book from user library', async () => {
       const userId = 1;
       const bookId = 1;
-      const mockDeletedRow = { bookId, listId: 1 };
+      const mockDeletedRow: ListBookRow = makeListBook({ bookId, listId: 1 });
 
       mockBooksService.removeFromUserList.mockResolvedValue([mockDeletedRow]);
 
@@ -187,11 +255,13 @@ describe('BooksController', () => {
         readEnd: '2024-02-01',
       };
 
-      const mockUpdatedBook = {
-        id: bookId,
-        name: 'Book 1',
-        author: 'Author 1',
-        isbn: '1234567890',
+      const mockUpdatedBook: UserBook = {
+        ...makeBook({
+          id: bookId,
+          name: 'Book 1',
+          author: 'Author 1',
+          isbn: '1234567890',
+        }),
         status: 'Lu',
         readStart: new Date('2024-01-01'),
         readEnd: new Date('2024-02-01'),
@@ -222,11 +292,13 @@ describe('BooksController', () => {
         readEnd: null,
       };
 
-      const mockUpdatedBook = {
-        id: bookId,
-        name: 'Book 1',
-        author: 'Author 1',
-        isbn: '1234567890',
+      const mockUpdatedBook: UserBook = {
+        ...makeBook({
+          id: bookId,
+          name: 'Book 1',
+          author: 'Author 1',
+          isbn: '1234567890',
+        }),
         status: 'À lire',
         readStart: null,
         readEnd: null,
@@ -257,9 +329,11 @@ describe('BooksController', () => {
         readEnd: null,
       };
 
-      const mockUpdatedBook = {
-        id: bookId,
-        name: 'Book 1',
+      const mockUpdatedBook: UserBook = {
+        ...makeBook({
+          id: bookId,
+          name: 'Book 1',
+        }),
         status: 'En cours',
         readStart: new Date('2024-01-01'),
         readEnd: null,
@@ -286,7 +360,7 @@ describe('BooksController', () => {
   describe('getCategoriesForBook', () => {
     it('should return categories for a book', async () => {
       const bookId = 1;
-      const mockCategories = [
+      const mockCategories: Array<Pick<CategoryRow, 'id' | 'name'>> = [
         { id: 1, name: 'Fiction' },
         { id: 2, name: 'Adventure' },
       ];
