@@ -74,6 +74,12 @@ jobs:
       # Install deps
       - name: Backend ci
         run: npm ci
+        
+      # Synch Drizzle Schema to Db supabase
+      - name: Push Schema to Supabase
+        run: npx drizzle-kit push
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
 
       # Build backend
       - run: npm run build
