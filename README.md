@@ -7,11 +7,21 @@ It allows you to mark books as read, currently reading, or to-read, in a **conta
 
 ## 📚 Table of Contents
 
-1. [🎯 Project Objective](#-project-objective)
-2. [⚙️ Technologies Used](#️-technologies-used)
-3. [🧱 Local Installation and Execution](#-local-installation-and-execution)
-4. [🔧 Useful Commands](#-useful-commands)
-5. [🧭 Project Structure](#-project-structure)
+- [📚 BlablaBook](#-blablabook)
+  - [📚 Table of Contents](#-table-of-contents)
+  - [🎯 Project Objective](#-project-objective)
+  - [⚙️ Technologies Used](#️-technologies-used)
+  - [🧱 Local Installation and Execution](#-local-installation-and-execution)
+    - [1️⃣ Prerequisites](#1️⃣-prerequisites)
+    - [2️⃣ Clone the repository](#2️⃣-clone-the-repository)
+    - [3️⃣ Create a .env file](#3️⃣-create-a-env-file)
+    - [4️⃣ Start the project](#4️⃣-start-the-project)
+    - [5️⃣ Access the services](#5️⃣-access-the-services)
+    - [6️⃣ Verify functionality](#6️⃣-verify-functionality)
+  - [🔧 Useful Commands](#-useful-commands)
+  - [🧭 Project Structure](#-project-structure)
+  - [🧪 Test Plan](#-test-plan)
+    - [🔹 Category Module Validation](#-category-module-validation)
 
 ---
 
@@ -151,3 +161,23 @@ Go to: [http://localhost:8080](http://localhost:8080)
 ├── docker-compose.prod.yml # Production configuration
 └── README.md
 ```
+---
+
+## 🧪 Test Plan
+
+The project follows a testing strategy to ensure data integrity and API reliability.
+
+### 🔹 Category Module Validation
+
+| Test Case | Expected Result | Status |
+| :--- | :--- | :--- |
+| **Get All Categories** | 200: Returns the list of active categories | 🟢 |
+| **Get Category by valid ID** | 200: Returns the specific category object | 🟢 |
+| **Get Category by non-existent ID** | 404: Error "Category with ID X not found" | 🔴 |
+| **Invalid ID format** (e.g., `/abc`) | 400: Validation error (ParseIntPipe) | 🔴 |
+| **Find or Create (Exists)** | Returns existing category without duplication | 🟢 |
+| **Find or Create (New)** | Persists new category in DB and returns it | 🟢 |
+
+> **Note:** Backend tests are performed using **Jest** with a fully mocked Drizzle ORM to isolate business logic from the database layer.
+
+---
