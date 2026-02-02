@@ -7,11 +7,14 @@ import {
 } from "@/components/ui/card";
 import { useRouter } from "@tanstack/react-router";
 import type { ExternalBook } from "../@types/externalBooks";
+import type { Book } from "@/@types/books";
+
+type BookOrExternal = Book | ExternalBook;
 
 export default function BookCardCarousel({
   book,
 }: {
-  readonly book: ExternalBook;
+  readonly book: BookOrExternal;
 }) {
   const router = useRouter();
 
@@ -26,10 +29,10 @@ export default function BookCardCarousel({
       }
     >
       <CardHeader className="w-full flex flex-col items-center p-4">
-        {book.cover ? (
+        {"cover" in book && book.cover ? (
           <img
             src={book.cover}
-            alt={book.title}
+            alt={"title" in book ? book.title : "Book cover"}
             className="h-48 w-32 object-cover mb-2 rounded shadow"
             style={{ maxHeight: "12rem", minHeight: "12rem" }}
           />
@@ -39,7 +42,7 @@ export default function BookCardCarousel({
           </div>
         )}
         <CardTitle className="font-bold text-base mb-1 text-center line-clamp-2">
-          {book.title}
+          {"title" in book ? book.title : ""}
         </CardTitle>
         <CardDescription className="text-sm text-gray-700 text-center line-clamp-1">
           {book.author ? book.author : "Auteur inconnu"}
@@ -47,7 +50,9 @@ export default function BookCardCarousel({
       </CardHeader>
       <CardContent className="w-full flex flex-col items-center px-4 pb-0">
         <p className="text-xs text-gray-500 mb-1 text-center">
-          {book.publishDate ? `Première publication : ${book.publishDate}` : ""}
+          {"publishDate" in book && book.publishDate
+            ? `Première publication : ${book.publishDate}`
+            : ""}
         </p>
       </CardContent>
     </Card>
