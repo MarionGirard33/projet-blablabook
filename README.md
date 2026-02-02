@@ -76,6 +76,15 @@ Create a `.env` file at the project root based on `.env.example`.
 docker-compose up
 ```
 
+### 🌱 Seed the database (books)
+
+This populates the `book` table and links them to the test user's list.
+
+```bash
+cd backend
+npx ts-node src/seed.ts
+```
+
 ### 5️⃣ Access the services
 
 | Service               | URL                                                    |
@@ -96,7 +105,7 @@ Go to: [http://localhost:5173](http://localhost:5173)
 The React interface should display correctly.
 
 **➤ Check Adminer**  
-Go to: [http://localhost:8080](http://localhost:8080)  
+Go to: [http://localhost:8080](http://localhost:8080)
 
 ---
 
