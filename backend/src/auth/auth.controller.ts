@@ -14,7 +14,10 @@ import type { Response } from 'express';
 import { AuthService } from './auth.service';
 import {
   ApiCreatedResponse,
+  ApiInternalServerErrorResponse,
+  ApiOkResponse,
   ApiTags,
+  ApiUnauthorizedResponse,
   ApiUnprocessableEntityResponse,
 } from '@nestjs/swagger';
 import { RegisterResponseDto } from './dto/register-response.dto';
@@ -53,7 +56,16 @@ export class AuthController {
   // par défaut Nest utilise 201 par défaut sur les post
   // HttpCode permet de définir son propre code statut
   @HttpCode(HttpStatus.OK)
-  // TODO: add doc swagger
+  @ApiOkResponse({
+    description: 'User is logged.',
+    type: LoginResponseDto,
+  })
+  @ApiInternalServerErrorResponse({
+    description: 'Internal server',
+  })
+  @ApiUnauthorizedResponse({
+    description: 'User is not authenticated',
+  })
   async login(
     @Body() payload: LoginRequestDto,
     // passthrough allow use cookie and return it
@@ -84,10 +96,12 @@ export class AuthController {
     });
   }
 
-  // TODO: add doc for swagger
   @Post('/logout')
   @UseGuards(AuthGuard) // add the guard for extract cookie
   @HttpCode(HttpStatus.OK) // code 200 for the logout if success
+  @ApiOkResponse({
+    description: 'User is logout and token is destroyed',
+  })
   async logout(
     @Req() request: Request, // allow to use request objet
     @Res({ passthrough: true }) response: Response,
