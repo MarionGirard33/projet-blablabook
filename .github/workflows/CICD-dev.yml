@@ -5,7 +5,6 @@ on:
   push:
     branches:
       - dev
-      - TEST/library-page
   # à chaque pull request vers dev ce workflow va se lancer
   pull_request:
     branches:

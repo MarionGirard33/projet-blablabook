@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { Test, TestingModule } from '@nestjs/testing';
 import { BooksController } from './books.controller';
 import { BooksService } from './books.service';
@@ -62,7 +61,7 @@ describe('BooksController', () => {
       removeFromUserList: jest.fn(),
       updateBookStatus: jest.fn(),
       getCategoriesForBook: jest.fn(),
-    } as BooksServiceMock;
+    } as unknown as BooksServiceMock;
 
     const module: TestingModule = await Test.createTestingModule({
       controllers: [BooksController],
