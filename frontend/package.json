@@ -20,7 +20,7 @@
     "@radix-ui/react-tooltip": "^1.2.8",
     "@tailwindcss/vite": "^4.1.17",
     "@tanstack/react-form": "^1.27.1",
-    "@tanstack/react-query": "^5.90.12",
+    "@tanstack/react-query": "^5.90.20",
     "@tanstack/react-router": "^1.139.0",
     "@tanstack/react-router-devtools": "^1.139.0",
     "@testing-library/user-event": "^14.6.1",
