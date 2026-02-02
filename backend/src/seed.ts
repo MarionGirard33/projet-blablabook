@@ -1,41 +1,11 @@
 import { db } from './db';
-import { user, list, book, listBook } from './db/schema';
+import { book } from './db/schema';
 
 async function seed() {
   console.log('Seeding database...');
 
-  // 1️⃣ Delete old data
-  await db.delete(listBook).execute();
-  await db.delete(book).execute();
-  await db.delete(list).execute();
-  await db.delete(user).execute();
-
-  // 2️⃣ Create test user
-  const [userTable] = await db
-    .insert(user)
-    .values({
-      email: 'test@example.com',
-      password: 'password123',
-      username: 'TestUser',
-      role: 'USER',
-    })
-    .returning();
-
-  if (!userTable) throw new Error("User insert failed");
-
-  // 3️⃣ Create the user list
-  const [userList] = await db
-    .insert(list)
-    .values({
-      name: 'My Reading List',
-      userId: userTable.id,
-    })
-    .returning();
-
-  if (!userList) throw new Error("User list insert failed");
-
-  // 4️⃣ Create books
-  // 4️⃣ Books from OpenLibrary (REAL ISBN)
+  // Create books
+  // Books from OpenLibrary (REAL ISBN)
   const booksToInsert = [
     {
       name: 'Moby-Dick',
@@ -176,41 +146,10 @@ async function seed() {
 
   const insertedBooks = await db.insert(book).values(booksToInsert).returning();
 
-  if (!insertedBooks || insertedBooks.length !== booksToInsert.length) 
-  throw new Error("Books insert failed");
+  if (!insertedBooks || insertedBooks.length !== booksToInsert.length)
+    throw new Error('Books insert failed');
 
-  // 5️⃣ Add each book with different reading status
-  // 5️⃣ Add each book to the user’s list
-  await db
-    .insert(listBook)
-    .values([
-      // À lire
-      ...insertedBooks.slice(0, 5).map((b) => ({
-        listId: userList.id,
-        bookId: b.id,
-        readStart: null,
-        readEnd: null,
-      })),
-
-      // En cours
-      ...insertedBooks.slice(5, 10).map((b) => ({
-        listId: userList.id,
-        bookId: b.id,
-        readStart: new Date('2025-01-01'),
-        readEnd: null,
-      })),
-
-      // Lus
-      ...insertedBooks.slice(10, 15).map((b) => ({
-        listId: userList.id,
-        bookId: b.id,
-        readStart: new Date('2024-10-01'),
-        readEnd: new Date('2024-11-01'),
-      })),
-    ])
-    .execute();
-
-  console.log('Database seeded successfully!');
+  console.log('Database seeded successfully! ✅');
 }
 
 seed()
