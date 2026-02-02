@@ -1,12 +1,49 @@
 import CarouselDisplay from "@/components/CarouselDisplay";
 import Hero from "@/components/Hero";
 import SearchBar from "@/components/SearchBar";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useExternalBooks } from "@/hooks/useExternalBooks";
-import { Loader2 } from "lucide-react";
+import { getBooks } from "@/api/books";
+import type { Book } from "@/@types/books";
+import type { ExternalBook } from "@/@types/externalBooks";
 
 export default function HomePage() {
   const [search, setSearch] = useState("");
+  const [internalBooks, setInternalBooks] = useState<Book[]>();
+
+  function mapBookToExternalBook(book: Book): ExternalBook {
+    return {
+      key: book.id.toString(),
+      title: book.name,
+      author: book.author,
+      cover: book.coverId ?? "",
+      isbn: book.isbn,
+      categories: book.categories,
+    };
+  }
+
+  console.log(
+    "Livres internes - random :",
+    (internalBooks || []).filter((book) => book.categories?.includes("random")),
+  );
+
+  console.log(
+    "Livres internes - bestsellers :",
+    (internalBooks || []).filter((book) =>
+      book.categories?.includes("bestsellers"),
+    ),
+  );
+
+  console.log(
+    "Livres internes - horror :",
+    (internalBooks || []).filter((book) => book.categories?.includes("horror")),
+  );
+
+  useEffect(() => {
+    getBooks().then((books: Book[]) => {
+      setInternalBooks(books);
+    });
+  }, []);
 
   const { data: searchResults = [], isLoading: isSearchLoading } =
     useExternalBooks({
@@ -32,13 +69,7 @@ export default function HomePage() {
     });
 
   let content;
-  if (isSearchLoading) {
-    content = (
-      <div className="flex justify-center items-center h-64">
-        <Loader2 className="h-12 w-12 animate-spin text-primary" />
-      </div>
-    );
-  } else if (searchResults.length > 0) {
+  if (isSearchLoading || searchResults.length > 0) {
     content = (
       <CarouselDisplay
         title={`Résultats pour "${search}"`}
@@ -52,25 +83,41 @@ export default function HomePage() {
       <>
         <CarouselDisplay
           title={"Suggestions Aléatoire"}
-          books={randomResults}
+          books={
+            isRandomLoading
+              ? (internalBooks || []).map(mapBookToExternalBook)
+              : randomResults
+          }
           mode={"random"}
-          isLoading={isRandomLoading}
+          isLoading={!internalBooks}
           seeAllButton={true}
         />
         <CarouselDisplay
           title={"Tendances du moment"}
-          books={bestSellerResults}
+          books={
+            isBestSellerLoading || bestSellerResults.length === 0
+              ? (internalBooks || [])
+                  .filter((book) => book.categories?.includes("bestsellers"))
+                  .map(mapBookToExternalBook)
+              : bestSellerResults
+          }
           mode={"category"}
           categoryName={"bestsellers"}
-          isLoading={isBestSellerLoading}
+          isLoading={!internalBooks}
           seeAllButton={true}
         />
         <CarouselDisplay
           title={"Frissons et Horreur"}
-          books={horrorResults}
+          books={
+            isHorrorLoading || horrorResults.length === 0
+              ? (internalBooks || [])
+                  .filter((book) => book.categories?.includes("horror"))
+                  .map(mapBookToExternalBook)
+              : horrorResults
+          }
           mode={"category"}
           categoryName={"horror"}
-          isLoading={isHorrorLoading}
+          isLoading={!internalBooks}
           seeAllButton={true}
         />
       </>
@@ -83,7 +130,7 @@ export default function HomePage() {
         <Hero />
         <SearchBar onSearch={setSearch} />
       </div>
-      <div className="min-h-[500px]">{content}</div>
+      <div className="min-h-125">{content}</div>
     </div>
   );
 }
