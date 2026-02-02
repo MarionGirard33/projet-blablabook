@@ -76,17 +76,9 @@ export class AuthService {
       }
     }
 
-    let hashedPassword: string;
-    try {
-      hashedPassword = await argon2.hash(payload.password);
-    } catch (err: any) {
-      let errorMessage = 'failed to hash password';
-      if (err instanceof Error) {
-        errorMessage = err.message;
-      }
-      console.error('hash failed during register user', errorMessage);
-      throw new InternalServerErrorException('failed to hash password');
-    }
+    const hashedPassword = await this.passwordService.hashPassword(
+      payload.password,
+    );
 
     const userInputData: UserInsert = {
       email: payload.email,

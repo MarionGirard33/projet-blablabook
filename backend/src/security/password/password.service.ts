@@ -19,7 +19,7 @@ export class PasswordService {
       return await argon2.hash(pwd);
     } catch (err) {
       console.error(err);
-      throw new InternalServerErrorException('Error processing password');
+      throw new InternalServerErrorException('hash failed');
     }
   }
 }

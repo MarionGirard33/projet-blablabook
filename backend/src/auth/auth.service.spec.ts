@@ -4,7 +4,6 @@ import { UserSelect } from 'src/user/types/user';
 import { LoginRequestDto } from './dto/login-request.dto';
 import { UserService } from '../user/user.service';
 import { JwtService } from '@nestjs/jwt';
-import argon2 from 'argon2';
 import { RegisterRequestDto } from './dto/register-request.dto';
 import { PasswordService } from '../security/password/password.service';
 
@@ -20,6 +19,7 @@ describe('AuthService', () => {
 
   const passwordServiceMock = {
     checkPassword: jest.fn(),
+    hashPassword: jest.fn(),
   };
 
   beforeEach(async () => {
@@ -43,7 +43,7 @@ describe('AuthService', () => {
     expect(authService).toBeDefined();
   });
 
-  describe('sevice.login()', () => {
+  describe('AuthService.login()', () => {
     const id = 1;
     const email = 'giz@mail.com';
     const username = 'giz';
@@ -153,6 +153,12 @@ describe('AuthService', () => {
       userServiceMock.createUser.mockResolvedValue(mockNewUser);
 
       const result = await authService.register(payload);
+
+      // On vérifie que le hashage a bien été appelé avec le mot de passe clair
+      expect(passwordServiceMock.hashPassword).toHaveBeenCalledWith(
+        payload.password,
+      );
+
       expect(result).toEqual(resolvedValue);
     });
 
@@ -194,27 +200,6 @@ describe('AuthService', () => {
 
       await expect(authService.register(payload)).rejects.toThrow(
         'password is not confirmed',
-      );
-    });
-
-    it('should throw error if password is not hashed', async () => {
-      const username = 'gizmo';
-      const email = 'gizmo@mail.com';
-      const password = '12345678';
-      const confirmPassword = '12345678';
-
-      const payload: RegisterRequestDto = {
-        username,
-        email,
-        password,
-        confirmPassword,
-      };
-
-      userServiceMock.checkUserExisting.mockResolvedValue(null);
-      jest.spyOn(argon2, 'hash').mockRejectedValue(new Error('hash failed'));
-
-      await expect(authService.register(payload)).rejects.toThrow(
-        'failed to hash password',
       );
     });
 
