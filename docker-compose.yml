@@ -59,6 +59,20 @@ services:
       - ./backend:/app
       - /app/node_modules
 
+  seed:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.dev
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      - DATABASE_URL=${DATABASE_URL}
+    command: npm run seed
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+
   # Frontend service (React + Vite)
   frontend:
     build:
