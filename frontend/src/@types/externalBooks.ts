@@ -1,3 +1,5 @@
+import type { Book } from "@/@types/books";
+
 export type ExternalBook = {
   key: string;
   title: string;
@@ -13,6 +15,7 @@ export type ExternalBook = {
 
 export type SearchParamsSeeAllPage = {
   title: string;
+  books?: Book;
   mode: "random" | "category";
   categoryName?: string;
 };
