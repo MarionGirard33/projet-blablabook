@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useNavigate } from "@tanstack/react-router";
+import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import { Menu, X, Book } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -16,8 +16,12 @@ export default function Header() {
   const logout = useAuthStore((state) => state.logout);
 
   const [open, setOpen] = useState(false);
+  const { location } = useRouterState();
 
   const navigate = useNavigate();
+
+  const isActive = (path: string) =>
+    location.pathname === path ? "font-bold border-primary" : "";
 
   return (
     <header className=" px-4 py-4 bg-white shadow relative">
@@ -29,13 +33,13 @@ export default function Header() {
 
         {/* Desktop nav */}
         <nav className="hidden md:flex items-center gap-4">
-          <Link to="/" className="hover:underline">
+          <Link to="/" className={isActive("/")}>
             Accueil
           </Link>
           {user ? (
             <>
-              <Link to="/library" className="hover:underline">
-                Librairie
+              <Link to="/library" className={`${isActive("/library")}`}>
+                Ma bibliothèque
               </Link>
               <div className="hidden md:flex items-center ">
                 <DropdownMenu>
@@ -53,12 +57,13 @@ export default function Header() {
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
                     <DropdownMenuItem
+                      className={`${isActive("/profile")}`}
                       onClick={() => navigate({ to: "/profile" })}
                     >
                       Profil
                     </DropdownMenuItem>
                     <DropdownMenuItem
-                      className="text-red-500"
+                      className="text-red-500 font-semibold"
                       onClick={() => {
                         logout();
                         navigate({ to: "/" });
@@ -76,8 +81,8 @@ export default function Header() {
             </Link>
           )}
         </nav>
-          
-        {/* Mobile avatar ou burger */}
+
+        {/* Avatar mobile or burger menu */}
         <div className="flex items-center md:hidden">
           <button onClick={() => setOpen(true)}>
             {user ? (
@@ -98,19 +103,34 @@ export default function Header() {
         {/* Mobile menu overlay */}
         {open && (
           <div className="fixed inset-0 z-50 bg-black bg-opacity-50 flex flex-col p-4">
-            <button className="self-end text-white text-2xl cursor-pointer" onClick={() => setOpen(false)}>
+            <button
+              className="self-end text-white text-2xl cursor-pointer"
+              onClick={() => setOpen(false)}
+            >
               <X size={28} />
             </button>
             <nav className="flex flex-col items-center gap-6 mt-20">
-              <Link to="/" className="text-white text-xl" onClick={() => setOpen(false)}>
+              <Link
+                to="/"
+                className="text-white text-xl"
+                onClick={() => setOpen(false)}
+              >
                 Accueil
               </Link>
               {user ? (
                 <>
-                  <Link to="/library" className="text-white text-xl" onClick={() => setOpen(false)}>
+                  <Link
+                    to="/library"
+                    className="text-white text-xl"
+                    onClick={() => setOpen(false)}
+                  >
                     Librairie
                   </Link>
-                  <Link to="/profile" className="text-white text-xl" onClick={() => setOpen(false)}>
+                  <Link
+                    to="/profile"
+                    className="text-white text-xl"
+                    onClick={() => setOpen(false)}
+                  >
                     {"Mon profil"}
                   </Link>
                   <Button
@@ -126,11 +146,9 @@ export default function Header() {
                   </Button>
                 </>
               ) : (
-                <>
-                  <Link to="/login" onClick={() => setOpen(false)}>
-                    <Button>Se connecter</Button>
-                  </Link>
-                </>
+                <Link to="/login" onClick={() => setOpen(false)}>
+                  <Button>Se connecter</Button>
+                </Link>
               )}
             </nav>
           </div>
