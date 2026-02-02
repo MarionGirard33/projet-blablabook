@@ -6,6 +6,7 @@ import { UserService } from '../user/user.service';
 import { JwtService } from '@nestjs/jwt';
 import { RegisterRequestDto } from './dto/register-request.dto';
 import { PasswordService } from '../security/password/password.service';
+import { TokenService } from '../security/token/token.service';
 
 describe('AuthService', () => {
   let authService: AuthService;
@@ -22,6 +23,10 @@ describe('AuthService', () => {
     hashPassword: jest.fn(),
   };
 
+  const tokenServiceMock = {
+    destroyToken: jest.fn(),
+  };
+
   beforeEach(async () => {
     jest.clearAllMocks();
     // skip les log d'erreur déclencher par le test
@@ -33,6 +38,7 @@ describe('AuthService', () => {
         { provide: UserService, useValue: userServiceMock }, // mock du UserService
         { provide: JwtService, useValue: { signAsync: jest.fn() } },
         { provide: PasswordService, useValue: passwordServiceMock },
+        { provide: TokenService, useValue: tokenServiceMock },
       ],
     }).compile();
 

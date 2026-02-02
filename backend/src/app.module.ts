@@ -17,10 +17,10 @@ if (!connectionString) {
     DrizzleModule.forRoot({
       connectionString,
     }),
-    AuthModule, 
-    BooksModule, 
-    UserModule, 
-    CategoryModule
+    AuthModule,
+    BooksModule,
+    UserModule,
+    CategoryModule,
   ],
 
   controllers: [AppController],

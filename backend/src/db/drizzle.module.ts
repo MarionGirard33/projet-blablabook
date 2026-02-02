@@ -8,7 +8,7 @@ export interface DrizzleModuleOptions {
   name?: string;
 }
 
-// Makes this module global so its providers (like the Drizzle DB instance) 
+// Makes this module global so its providers (like the Drizzle DB instance)
 // can be injected in any other module without importing DrizzleModule everywhere
 @Global()
 @Module({})

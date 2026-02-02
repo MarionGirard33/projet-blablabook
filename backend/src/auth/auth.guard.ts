@@ -5,19 +5,20 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService, TokenExpiredError } from '@nestjs/jwt';
-import {
-  JwtPayload,
-  RotateTokensData,
-  TokenExtractorData,
-} from './types/token.type';
 import { Request, Response } from 'express';
 import { AuthService } from './auth.service';
+import { TokenService } from '../security/token/token.service';
+import { TokenExtractorData } from './types';
+import { JwtPayload, RotateTokensData } from 'src/security/token/types';
+import { CookieService } from '../security/cookie/cookie.service';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
   constructor(
     private jwtService: JwtService,
     private authService: AuthService,
+    private tokenService: TokenService,
+    private cookieService: CookieService,
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -53,13 +54,13 @@ export class AuthGuard implements CanActivate {
       // if expiration jwtToken and refreshToken is valid
       if (error instanceof TokenExpiredError && tokens.refreshTokenCookie) {
         // generate cookie config
-        const cookieConfig = this.authService.generateCookiesConfig();
+        const cookieConfig = this.cookieService.generateCookiesConfig();
         // refresh tokens (jwt and refresh)
         try {
           console.log('JWT expired. Attempting auto refresh ...');
           // we refresh tokens
           const rotateToken: RotateTokensData =
-            await this.authService.rotateTokens(tokens.refreshTokenCookie);
+            await this.tokenService.rotateTokens(tokens.refreshTokenCookie);
 
           // update cookie on the response
           response.cookie(
@@ -100,9 +101,9 @@ export class AuthGuard implements CanActivate {
 
   private extractTokenFromCookie(request: Request): TokenExtractorData {
     const jwtCookie =
-      (request.cookies?.['jwt_cookie'] || undefined) ?? null;
+      (request.cookies?.['jwt_cookie'] as string | undefined) ?? null;
     const refreshTokenCookie =
-      (request.cookies?.['refresh_cookie'] || undefined) ?? null;
+      (request.cookies?.['refresh_cookie'] as string | undefined) ?? null;
 
     return {
       jwtCookie,

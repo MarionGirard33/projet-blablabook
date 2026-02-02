@@ -5,23 +5,26 @@ import { UserModule } from 'src/user/user.module';
 import { JwtModule } from '@nestjs/jwt';
 import { PasswordService } from '../security/password/password.service';
 import { CookieService } from 'src/security/cookie/cookie.service';
+import { TokenService } from 'src/security/token/token.service';
+import { TokenRepository } from 'src/security/token/token.respository';
 
 @Module({
-  // controllers => définis le fichier qui gère les requêtes
   controllers: [AuthController],
-  // imports => permet d'importer les modules externe qui doit etre export pour rendre dispo ses méthodes dans le module auth
   imports: [
     UserModule,
-    // set config for jwt
     JwtModule.register({
       global: true,
       secret: process.env.JWT_SECRET || 'mimixlatrix',
       signOptions: { expiresIn: '15m' },
     }),
   ],
-  // définis la classe contenant les méthode de service => use pour importer les différents service
-  providers: [AuthService, PasswordService, CookieService],
-  // rend l'auth disponible pour d'autre module qui l'importe
+  providers: [
+    AuthService,
+    PasswordService,
+    CookieService,
+    TokenService,
+    TokenRepository,
+  ],
   exports: [AuthService],
 })
 export class AuthModule {}
