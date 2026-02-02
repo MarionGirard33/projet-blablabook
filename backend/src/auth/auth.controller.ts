@@ -14,7 +14,10 @@ import type { Response } from 'express';
 import { AuthService } from './auth.service';
 import {
   ApiCreatedResponse,
+  ApiInternalServerErrorResponse,
+  ApiOkResponse,
   ApiTags,
+  ApiUnauthorizedResponse,
   ApiUnprocessableEntityResponse,
 } from '@nestjs/swagger';
 import { RegisterResponseDto } from './dto/register-response.dto';
@@ -52,6 +55,16 @@ export class AuthController {
 
   @Post('/login')
   @HttpCode(HttpStatus.OK)
+  @ApiOkResponse({
+    description: 'User is logged.',
+    type: LoginResponseDto,
+  })
+  @ApiInternalServerErrorResponse({
+    description: 'Internal server',
+  })
+  @ApiUnauthorizedResponse({
+    description: 'User is not authenticated',
+  })
   async login(
     @Body() payload: LoginRequestDto,
     @Res({ passthrough: true }) response: Response,
@@ -77,8 +90,11 @@ export class AuthController {
   }
 
   @Post('/logout')
-  @UseGuards(AuthGuard)
-  @HttpCode(HttpStatus.OK)
+  @UseGuards(AuthGuard) // add the guard for extract cookie
+  @HttpCode(HttpStatus.OK) // code 200 for the logout if success
+  @ApiOkResponse({
+    description: 'User is logout and token is destroyed',
+  })
   async logout(
     @Req() request: Request,
     @Res({ passthrough: true }) response: Response,

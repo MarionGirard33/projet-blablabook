@@ -14,6 +14,7 @@ import {
 } from "@tanstack/react-router";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { useAuthStore } from "@/stores/authStore";
+import SeeAllPage from "@/pages/SeeAllPage";
 
 const rootRoute = createRootRoute({
   component: () => <RootLayout />,
@@ -39,6 +40,13 @@ const homeRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/",
   component: () => <HomePage />,
+});
+
+// SEE ALL ROUTE
+export const seeAllRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/see-all",
+  component: () => <SeeAllPage />,
 });
 
 // AUTH ROUTE
@@ -87,6 +95,7 @@ const routeTree = rootRoute.addChildren([
   homeRoute,
   registerPage,
   loginPage,
+  seeAllRoute,
   bookDetailsRoute,
   protectedRoute.addChildren([libraryRoute, profilePage]),
 ]);
