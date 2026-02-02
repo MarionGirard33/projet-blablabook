@@ -64,6 +64,8 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile.dev
+    environment:
+      - VITE_BACKEND_URL=http://localhost:3000
     ports:
       # Publish frontend port to host for direct browser access
       - "5173:5173"

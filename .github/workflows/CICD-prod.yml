@@ -5,7 +5,10 @@ on:
   push:
     branches:
       - main
-      - feat/CICD
+  pull_request:
+    branches:
+      - main
+      - dev
 
 jobs:
 ### FRONT CI ###
@@ -32,9 +35,11 @@ jobs:
       - name: Frontend CI
         run: npm ci
 
-
-      # génère le dossier dist du front
-      - run: npm run build
+      # build du front avec l'URL du back
+      - name: Build frontend with backend URL
+        run: |
+          export VITE_BACKEND_URL=${{ secrets.VITE_BACKEND_URL }}
+          npm run build
 
       # Sauvegarde le build pour le déploiement
       - name: Upload build artifacts
@@ -91,7 +96,8 @@ jobs:
       DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
       DATABASE_URL: ${{ secrets.DATABASE_URL }}
       JWT_SECRET: ${{ secrets.JWT_SECRET }}
-      FRONTEND_URL_CORS: "https://pooka-blablabook.surge.sh/"
+      FRONTEND_URL_CORS: "https://pooka-blablabook.surge.sh"
+      VITE_BACKEND_URL: ${{ secrets.VITE_BACKEND_URL }}
       NODE_ENV: "prod"
 
     steps:
@@ -177,3 +183,16 @@ jobs:
           npm install -g surge
           surge frontend/dist ${{ secrets.SURGE_DOMAIN }} \
             --token ${{ secrets.SURGE_TOKEN }}
+
+### DEPLOY BACKEND TO RENDER ###
+  deploy-backend:
+    needs: ci-docker
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Render deploy via API
+        run: |
+          curl -X POST \
+            -H "Authorization: Bearer ${{ secrets.RENDER_API_KEY }}" \
+            -H "Content-Type: application/json" \
+            -d '{"clearCache": true}' \
+            https://api.render.com/deploy/srv-${{ secrets.RENDER_SERVICE_ID }}
