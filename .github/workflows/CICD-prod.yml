@@ -5,6 +5,7 @@ on:
   push:
     branches:
       - main
+      - feat/deploy-db
   pull_request:
     branches:
       - main
@@ -74,7 +75,7 @@ jobs:
       # Install deps
       - name: Backend ci
         run: npm ci
-        
+
       # Synch Drizzle Schema to Db supabase
       - name: Push Schema to Supabase
         run: npx drizzle-kit push
