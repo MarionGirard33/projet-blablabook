@@ -1,11 +1,17 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
-import { INestApplication } from '@nestjs/common';
+import {
+  INestApplication,
+  UnauthorizedException,
+  InternalServerErrorException,
+  UnprocessableEntityException,
+} from '@nestjs/common';
 import request from 'supertest'; // import par défaut
 import { Server } from 'http';
 import { AuthGuard } from './auth.guard';
 import { LoginResponseDto } from './dto/login-response.dto';
+import { CookieService } from '../security/cookie/cookie.service';
 
 // FONCTION HELPER
 const makePostRequest = <T = any>(
@@ -33,8 +39,11 @@ describe('AuthController', () => {
     logout: jest.fn(),
     generateJWTToken: jest.fn(),
     generateRefreshToken: jest.fn(),
-    generateCookiesConfig: jest.fn(),
     destroyRefreshToken: jest.fn(),
+  };
+
+  const cookieService = {
+    generateCookiesConfig: jest.fn(),
   };
 
   const mockAuthGuard = {
@@ -44,7 +53,10 @@ describe('AuthController', () => {
   beforeEach(async () => {
     const moduleRef: TestingModule = await Test.createTestingModule({
       controllers: [AuthController],
-      providers: [{ provide: AuthService, useValue: authService }],
+      providers: [
+        { provide: AuthService, useValue: authService },
+        { provide: CookieService, useValue: cookieService },
+      ],
     })
       .overrideGuard(AuthGuard)
       .useValue(mockAuthGuard)
@@ -76,11 +88,11 @@ describe('AuthController', () => {
       image,
     };
 
-    // mock des fonctions utiliser
+    // mock des fonctions utilisées
     authService.login.mockResolvedValue(payload); // mock de la réponse du authService
     authService.generateJWTToken.mockResolvedValue('mock-jwt-token');
     authService.generateRefreshToken.mockResolvedValue('mock-refresh-token');
-    authService.generateCookiesConfig.mockReturnValue({
+    cookieService.generateCookiesConfig.mockReturnValue({
       jwtCookieConfig: { httpOnly: true, secure: false },
       refreshCookieConfig: { httpOnly: true, secure: false },
     });
@@ -92,16 +104,18 @@ describe('AuthController', () => {
     });
 
     it('should return 401 if login fails', async () => {
-      const { UnauthorizedException } = require('@nestjs/common');
-      authService.login.mockRejectedValueOnce(new UnauthorizedException('username or password is invalid'));
+      authService.login.mockRejectedValueOnce(
+        new UnauthorizedException('username or password is invalid'),
+      );
       await makePostRequest(app, '/auth/login', 401, payload).expect((res) => {
         expect(res.body.message).toBe('username or password is invalid');
       });
     });
 
     it('should return 500 if internal error', async () => {
-      const { InternalServerErrorException } = require('@nestjs/common');
-      authService.login.mockRejectedValueOnce(new InternalServerErrorException('internal error'));
+      authService.login.mockRejectedValueOnce(
+        new InternalServerErrorException('internal error'),
+      );
       await makePostRequest(app, '/auth/login', 500, payload).expect((res) => {
         expect(res.body.message).toBe('internal error');
       });
@@ -168,7 +182,6 @@ describe('AuthController', () => {
     });
 
     it('should return 422 if password is not confirmed', async () => {
-      const { UnprocessableEntityException } = require('@nestjs/common');
       authService.register.mockRejectedValue(
         new UnprocessableEntityException('password is not confirmed'),
       );
@@ -181,7 +194,6 @@ describe('AuthController', () => {
     });
 
     it('should return 422 if email already exists', async () => {
-      const { UnprocessableEntityException } = require('@nestjs/common');
       authService.register.mockRejectedValue(
         new UnprocessableEntityException('email is already in use'),
       );
@@ -192,7 +204,6 @@ describe('AuthController', () => {
     });
 
     it('should return 422 if username already exists', async () => {
-      const { UnprocessableEntityException } = require('@nestjs/common');
       authService.register.mockRejectedValue(
         new UnprocessableEntityException('username is already in use'),
       );
@@ -203,7 +214,6 @@ describe('AuthController', () => {
     });
 
     it('should return 500 if password hash fails', async () => {
-      const { InternalServerErrorException } = require('@nestjs/common');
       authService.register.mockRejectedValue(
         new InternalServerErrorException('failed to hash password'),
       );
@@ -214,7 +224,6 @@ describe('AuthController', () => {
     });
 
     it('should return 500 if user is not created', async () => {
-      const { InternalServerErrorException } = require('@nestjs/common');
       authService.register.mockRejectedValue(
         new InternalServerErrorException('failed to create new user'),
       );
@@ -229,7 +238,7 @@ describe('AuthController', () => {
     it('should clear cookies and return success message', async () => {
       // Mock le service
       authService.destroyRefreshToken = jest.fn().mockResolvedValue(true);
-      authService.generateCookiesConfig = jest.fn().mockReturnValue({
+      cookieService.generateCookiesConfig = jest.fn().mockReturnValue({
         jwtCookieConfig: { httpOnly: true, secure: false },
         refreshCookieConfig: { httpOnly: true, secure: false },
       });
@@ -251,7 +260,7 @@ describe('AuthController', () => {
     it('should warn if refresh token not found but still clear cookies', async () => {
       const spy = jest.spyOn(console, 'warn').mockImplementation();
       authService.destroyRefreshToken = jest.fn().mockResolvedValue(false);
-      authService.generateCookiesConfig = jest.fn().mockReturnValue({
+      cookieService.generateCookiesConfig = jest.fn().mockReturnValue({
         jwtCookieConfig: { httpOnly: true, secure: false },
         refreshCookieConfig: { httpOnly: true, secure: false },
       });

@@ -23,12 +23,16 @@ import { LoginRequestDto } from './dto/login-request.dto';
 import { LoginResponseDto } from './dto/login-response.dto';
 import { plainToInstance } from 'class-transformer';
 import { AuthGuard } from './auth.guard';
+import { CookieService } from '../security/cookie/cookie.service';
 
 @ApiTags('auth') // annotation swagger => permet de grouper la classe sous l'étiquette auth dans la documentation
 @UseInterceptors(ClassSerializerInterceptor) // permet de gérer l'exclude du DTO response => retirer les field avec @Exclude dans le dto de reponse
 @Controller('auth') // permet de définir le endpoint pour la classe à /auth
 export class AuthController {
-  constructor(private readonly authService: AuthService) {} // injection des dépendances. Permet d'utiliser les méthodes du service
+  constructor(
+    private readonly authService: AuthService,
+    private readonly cookieService: CookieService,
+  ) {} // injection des dépendances. Permet d'utiliser les méthodes du service
 
   @Post('/register') // l'endpoint complet est auth/register
   // décorateur Swagger => permet de documenter l'api
@@ -70,7 +74,8 @@ export class AuthController {
     const refreshToken = await this.authService.generateRefreshToken(user.id);
 
     // config and add cookie to response
-    const cookieConfig = this.authService.generateCookiesConfig();
+    const cookieConfig = this.cookieService.generateCookiesConfig();
+
     response.cookie('jwt_cookie', jwtToken, cookieConfig.jwtCookieConfig);
     response.cookie(
       'refresh_cookie',
@@ -103,7 +108,7 @@ export class AuthController {
     }
 
     // generate config config for clear to the front
-    const cookieConfig = this.authService.generateCookiesConfig();
+    const cookieConfig = this.cookieService.generateCookiesConfig();
     // destroy jwt and refresh cookie
     response.clearCookie('jwt_cookie', cookieConfig.jwtCookieConfig);
     response.clearCookie('refresh_cookie', cookieConfig.refreshCookieConfig);

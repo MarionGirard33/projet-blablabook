@@ -4,6 +4,7 @@ import { AuthController } from './auth.controller';
 import { UserModule } from 'src/user/user.module';
 import { JwtModule } from '@nestjs/jwt';
 import { PasswordService } from '../security/password/password.service';
+import { CookieService } from 'src/security/cookie/cookie.service';
 
 @Module({
   // controllers => définis le fichier qui gère les requêtes
@@ -19,7 +20,7 @@ import { PasswordService } from '../security/password/password.service';
     }),
   ],
   // définis la classe contenant les méthode de service => use pour importer les différents service
-  providers: [AuthService, PasswordService],
+  providers: [AuthService, PasswordService, CookieService],
   // rend l'auth disponible pour d'autre module qui l'importe
   exports: [AuthService],
 })

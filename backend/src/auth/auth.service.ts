@@ -7,14 +7,12 @@ import {
 import { plainToInstance } from 'class-transformer';
 import { RegisterRequestDto } from './dto/register-request.dto';
 import { UserService } from '../user/user.service';
-import argon2 from 'argon2';
 import { UserInsert } from 'src/user/types/user';
 import { RegisterResponseDto } from './dto/register-response.dto';
 import { LoginRequestDto } from './dto/login-request.dto';
 import { JwtService } from '@nestjs/jwt';
 import { createHash, randomBytes } from 'crypto';
 import {
-  CookiesConfig,
   JwtPayload,
   RotateTokensData,
   TokenInsert,
@@ -23,7 +21,6 @@ import {
 } from './types/token.type';
 import { db } from '../db/index';
 import { refreshToken, user } from '../db/schema';
-import { CookieOptions } from 'express';
 import { eq } from 'drizzle-orm';
 import { PasswordService } from '../security/password/password.service';
 
@@ -96,33 +93,6 @@ export class AuthService {
     return plainToInstance(RegisterResponseDto, userEntity, {
       excludeExtraneousValues: true,
     });
-  }
-
-  // COOKIE ===========================================================
-  generateCookiesConfig(): CookiesConfig {
-    // if we set TRUE, we need to be on HTTPS, so for the dev we use false for save the cookie
-    const secureProps = process.env.NODE_ENV === 'prod';
-
-    const jwtCookieConfig: CookieOptions = {
-      httpOnly: true,
-      secure: secureProps,
-      sameSite: 'strict',
-      path: '/',
-      maxAge: 15 * 60 * 1000, // 15min
-    };
-
-    const refreshCookieConfig: CookieOptions = {
-      httpOnly: true,
-      secure: secureProps,
-      sameSite: 'strict',
-      path: '/',
-      maxAge: 30 * 24 * 60 * 60 * 1000, // 30 day
-    };
-
-    return {
-      refreshCookieConfig,
-      jwtCookieConfig,
-    };
   }
 
   // JWT token ===========================================================
@@ -208,12 +178,16 @@ export class AuthService {
     const newJwtToken = await this.generateJWTToken(user.sub, user.userRole);
     const newRefreshToken = await this.generateRefreshToken(user.sub);
 
-    if(!newJwtToken){
-      throw new InternalServerErrorException("failed to generate new JWT token");
+    if (!newJwtToken) {
+      throw new InternalServerErrorException(
+        'failed to generate new JWT token',
+      );
     }
 
-    if(!newRefreshToken){
-      throw new InternalServerErrorException("failed to generate new refresh token");
+    if (!newRefreshToken) {
+      throw new InternalServerErrorException(
+        'failed to generate new refresh token',
+      );
     }
 
     // delete old refresh token
