@@ -4,26 +4,18 @@ import SearchBar from "@/components/SearchBar";
 import { useEffect, useState } from "react";
 import { useExternalBooks } from "@/hooks/useExternalBooks";
 import { getBooks } from "@/api/books";
-import type { Book } from "@/@types/books";
-import type { ExternalBook } from "@/@types/externalBooks";
+import type { BookRow } from "@/@types/books";
+import {
+  mapBookRowToDisplay,
+  mapExternalBookToDisplay,
+} from "@/lib/bookDisplayMapper";
 
 export default function HomePage() {
   const [search, setSearch] = useState("");
-  const [internalBooks, setInternalBooks] = useState<Book[]>();
-
-  function mapBookToExternalBook(book: Book): ExternalBook {
-    return {
-      key: book.id.toString(),
-      title: book.name,
-      author: book.author,
-      cover: book.coverId ?? "",
-      isbn: book.isbn,
-      categories: book.categories,
-    };
-  }
+  const [internalBooks, setInternalBooks] = useState<BookRow[]>();
 
   useEffect(() => {
-    getBooks().then((books: Book[]) => {
+    getBooks().then((books: BookRow[]) => {
       setInternalBooks(books);
     });
   }, []);
@@ -56,7 +48,7 @@ export default function HomePage() {
     content = (
       <CarouselDisplay
         title={`Résultats pour "${search}"`}
-        books={searchResults}
+        books={searchResults.map(mapExternalBookToDisplay)}
         isLoading={isSearchLoading}
         seeAllButton={false}
       />
@@ -68,8 +60,8 @@ export default function HomePage() {
           title={"Suggestions Aléatoire"}
           books={
             isRandomLoading
-              ? (internalBooks || []).map(mapBookToExternalBook)
-              : randomResults
+              ? (internalBooks || []).map(mapBookRowToDisplay)
+              : randomResults.map(mapExternalBookToDisplay)
           }
           mode={"random"}
           isLoading={!internalBooks}
@@ -81,8 +73,8 @@ export default function HomePage() {
             isBestSellerLoading || bestSellerResults.length === 0
               ? (internalBooks || [])
                   .filter((book) => book.categories?.includes("bestsellers"))
-                  .map(mapBookToExternalBook)
-              : bestSellerResults
+                  .map(mapBookRowToDisplay)
+              : bestSellerResults.map(mapExternalBookToDisplay)
           }
           mode={"category"}
           categoryName={"bestsellers"}
@@ -95,8 +87,8 @@ export default function HomePage() {
             isHorrorLoading || horrorResults.length === 0
               ? (internalBooks || [])
                   .filter((book) => book.categories?.includes("horror"))
-                  .map(mapBookToExternalBook)
-              : horrorResults
+                  .map(mapBookRowToDisplay)
+              : horrorResults.map(mapExternalBookToDisplay)
           }
           mode={"category"}
           categoryName={"horror"}
