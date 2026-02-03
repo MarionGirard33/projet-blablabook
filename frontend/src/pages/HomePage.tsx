@@ -34,8 +34,16 @@ export default function HomePage() {
   let content;
   if (isSearchLoading) {
     content = (
-      <div className="flex justify-center items-center h-64">
-        <Loader2 className="h-12 w-12 animate-spin text-primary" />
+      <div
+        className="flex justify-center items-center h-64"
+        role="status"
+        aria-live="polite"
+      >
+        <Loader2
+          className="h-12 w-12 animate-spin text-primary"
+          aria-hidden="true"
+        />
+        <span className="sr-only">Chargement des résultats...</span>
       </div>
     );
   } else if (searchResults.length > 0) {

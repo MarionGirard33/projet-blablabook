@@ -114,14 +114,16 @@ export function AddBookModal({ isOpen, onClose, userId }: AddBookModalProps) {
               setQuery(e.target.value);
               if (hasSearched) setHasSearched(false);
             }}
-            className="flex-1 bg-white border-bookbeige rounded-full shadow-sm focus:ring-2 focus:ring-bookochre/30"
+            aria-label="Rechercher un livre à ajouter"
+            className="flex-1 bg-white border-bookbeige rounded-full shadow-sm focus:ring-2 focus:ring-bookochre/30 focus-visible:ring-2 focus-visible:ring-bookochre/30"
           />
 
           <Button
-            onClick={handleSearch}
-            className="flex items-center gap-2 bg-bookterracotta hover:bg-bookochre rounded-full shadow"
+            type="submit"
+            className="flex items-center gap-2 bg-bookterracotta hover:bg-bookochre rounded-full shadow focus-visible:ring-2 focus-visible:ring-offset-2"
+            aria-label="Lancer la recherche de livres"
           >
-            <Search size={18} />
+            <Search size={18} aria-hidden="true" />
             Rechercher
           </Button>
         </div>
@@ -155,6 +157,7 @@ export function AddBookModal({ isOpen, onClose, userId }: AddBookModalProps) {
                 className={`
           relative w-full bg-white/80 flex items-center gap-4
           mb-4 p-3 border border-bookbeige rounded-xl shadow-sm text-left
+          focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-bookochre
           ${alreadyInLibrary ? "opacity-50 cursor-default" : "hover:bg-white cursor-pointer"}
         `}
               >
@@ -191,7 +194,7 @@ export function AddBookModal({ isOpen, onClose, userId }: AddBookModalProps) {
                 {book.cover ? (
                   <img
                     src={book.cover}
-                    alt={book.title}
+                    alt={`Couverture de ${book.title}`}
                     className="w-20 h-32 object-cover rounded flex-shrink-0"
                   />
                 ) : (

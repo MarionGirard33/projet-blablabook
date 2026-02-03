@@ -84,8 +84,12 @@ const BookDetails = () => {
   // --- LOADING & ERROR STATES ---
   if (isLoading) {
     return (
-      <div className="flex h-[50vh] w-full items-center justify-center">
-        <Loader2 className="h-10 w-10 animate-spin text-primary" />
+      <div
+        className="flex h-[50vh] w-full items-center justify-center"
+        role="status"
+        aria-live="polite"
+      >
+        <Loader2 className="h-10 w-10 animate-spin text-primary" aria-hidden="true" />
         <span className="ml-3 text-muted-foreground">Fetching book details...</span>
       </div>
     );
@@ -94,7 +98,7 @@ const BookDetails = () => {
   if (isError || !book) {
     return (
       <div className="flex flex-col items-center justify-center h-[50vh] space-y-4">
-        <p className="text-destructive font-semibold text-lg">
+        <p className="text-destructive font-semibold text-lg" role="alert">
           Oups ! {(error as Error)?.message || "Impossible de charger ce livre."}
         </p>
         <Button variant="outline" onClick={() => globalThis.history.back()}>
@@ -114,7 +118,7 @@ const BookDetails = () => {
           to="/library"
           className="inline-flex items-center text-sm font-medium text-muted-foreground hover:text-primary transition-colors"
         >
-          <ArrowLeft className="mr-2 h-4 w-4" />
+          <ArrowLeft className="mr-2 h-4 w-4" aria-hidden="true" />
           Retour
         </Link>
       </div>

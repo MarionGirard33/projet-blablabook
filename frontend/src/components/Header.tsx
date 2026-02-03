@@ -26,13 +26,19 @@ export default function Header() {
   return (
     <header className=" px-4 py-4 bg-white shadow relative">
       <div className="flex items-center justify-between sm:px-10">
-        <Link to="/" className="flex items-center gap-2">
-          <Book className="h-8 w-8" />
+        <Link
+          to="/"
+          className="flex items-center gap-2 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-bookochre rounded"
+        >
+          <Book className="h-8 w-8" aria-hidden="true" />
           <span className="font-bold text-xl">Blablabook</span>
         </Link>
 
         {/* Desktop nav */}
-        <nav className="hidden md:flex items-center gap-4">
+        <nav
+          className="hidden md:flex items-center gap-4"
+          aria-label="Navigation principale"
+        >
           <Link to="/" className={isActive("/")}>
             Accueil
           </Link>
@@ -84,7 +90,12 @@ export default function Header() {
 
         {/* Avatar mobile or burger menu */}
         <div className="flex items-center md:hidden">
-          <button onClick={() => setOpen(true)}>
+          <button
+            type="button"
+            onClick={() => setOpen(true)}
+            className="focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-bookochre rounded"
+            aria-label="Ouvrir le menu"
+          >
             {user ? (
               <Avatar className="w-10 h-10 cursor-pointer border border-bookbeige">
                 <AvatarImage
@@ -102,14 +113,24 @@ export default function Header() {
         </div>
         {/* Mobile menu overlay */}
         {open && (
-          <div className="fixed inset-0 z-50 bg-black bg-opacity-50 flex flex-col p-4">
+          <div
+            className="fixed inset-0 z-50 bg-black bg-opacity-50 flex flex-col p-4"
+            role="dialog"
+            aria-modal="true"
+            aria-label="Menu de navigation mobile"
+          >
             <button
-              className="self-end text-white text-2xl cursor-pointer"
+              type="button"
+              className="self-end text-white text-2xl cursor-pointer focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-white rounded"
               onClick={() => setOpen(false)}
+              aria-label="Fermer le menu"
             >
-              <X size={28} />
+              <X size={28} aria-hidden="true" />
             </button>
-            <nav className="flex flex-col items-center gap-6 mt-20">
+            <nav
+              className="flex flex-col items-center gap-6 mt-20"
+              aria-label="Navigation"
+            >
               <Link
                 to="/"
                 className="text-white text-xl"
