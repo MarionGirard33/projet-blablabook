@@ -9,7 +9,6 @@ interface BookAddActionProps {
 
 export const BookAddAction: React.FC<BookAddActionProps> = ({ onAdd, isAdding }) => {
   return (
-    /* Removed potential fixed widths, using w-full and flex-1 */
     <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm flex flex-col items-center text-center gap-4 w-full">
       <div className="text-center space-y-1">
         <h3 className="font-semibold text-lg text-gray-900">
@@ -20,7 +19,6 @@ export const BookAddAction: React.FC<BookAddActionProps> = ({ onAdd, isAdding })
       <Button
         onClick={onAdd}
         disabled={isAdding}
-        /* Ensure w-full for responsive consistency */
         className="w-full h-12 text-md shadow-md hover:shadow-lg transition-all active:scale-95 group bg-rose-600 hover:bg-rose-700 text-white"
       >
         {isAdding ? (
