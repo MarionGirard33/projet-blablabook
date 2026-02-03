@@ -21,7 +21,7 @@ async function seed() {
     })
     .returning();
 
-  if (!userTable) throw new Error("User insert failed");
+  if (!userTable) throw new Error('User insert failed');
 
   // 3️⃣ Create the user list
   const [userList] = await db
@@ -32,7 +32,7 @@ async function seed() {
     })
     .returning();
 
-  if (!userList) throw new Error("User list insert failed");
+  if (!userList) throw new Error('User list insert failed');
 
   // 4️⃣ Create books
   // 4️⃣ Books from OpenLibrary (REAL ISBN)
@@ -176,8 +176,8 @@ async function seed() {
 
   const insertedBooks = await db.insert(book).values(booksToInsert).returning();
 
-  if (!insertedBooks || insertedBooks.length !== booksToInsert.length) 
-  throw new Error("Books insert failed");
+  if (!insertedBooks || insertedBooks.length !== booksToInsert.length)
+    throw new Error('Books insert failed');
 
   // 5️⃣ Add each book with different reading status
   // 5️⃣ Add each book to the user’s list
