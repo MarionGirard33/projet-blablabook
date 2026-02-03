@@ -64,7 +64,7 @@ services:
     seed:
       build:
         context: ./backend
-        dockerfile: Dockerfile.dev
+        dockerfile: Dockerfile
       depends_on:
         postgres:
           condition: service_healthy
