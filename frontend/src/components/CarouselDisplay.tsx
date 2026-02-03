@@ -5,7 +5,7 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
-import type { ExternalBookCarouselProps } from "../@types/externalBooks";
+import type { CarouselProps } from "../@types/carouselProps";
 import { Button } from "./ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import BookCardCarousel from "./BookCardCarousel";
@@ -36,7 +36,7 @@ export default function CarouselDisplay({
   categoryName,
   isLoading,
   seeAllButton,
-}: Readonly<ExternalBookCarouselProps>) {
+}: Readonly<CarouselProps>) {
   return (
     <section className="my-8">
       <div className="flex mb-4 items-center justify-between">

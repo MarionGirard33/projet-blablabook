@@ -1,3 +1,4 @@
+import type { BookDisplay } from "@/@types/books";
 import {
   Card,
   CardHeader,
@@ -6,15 +7,11 @@ import {
   CardContent,
 } from "@/components/ui/card";
 import { useRouter } from "@tanstack/react-router";
-import type { ExternalBook } from "../@types/externalBooks";
-import type { Book } from "@/@types/books";
-
-type BookOrExternal = Book | ExternalBook;
 
 export default function BookCardCarousel({
   book,
 }: {
-  readonly book: BookOrExternal;
+  readonly book: BookDisplay;
 }) {
   const router = useRouter();
 
@@ -22,6 +19,7 @@ export default function BookCardCarousel({
     <Card
       className="flex flex-col items-center rounded-xl gap-0 overflow-hidden shadow w-full h-full p-0 min-h-96 cursor-pointer focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-bookochre"
       onClick={() =>
+        book.isbn &&
         router.navigate({
           to: "/books/$isbn",
           params: { isbn: book.isbn },

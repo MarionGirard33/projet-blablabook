@@ -1,10 +1,11 @@
-import type { Book } from "@/@types/books";
-import type { SearchParamsSeeAllPage } from "@/@types/externalBooks";
+import type { SearchParamsSeeAllPage } from "@/@types/seeAllPageProps";
 import BookCardCarousel from "@/components/BookCardCarousel";
 import SearchBar from "@/components/SearchBar";
 import { useExternalBooks } from "@/hooks/useExternalBooks";
 import { seeAllRoute } from "@/routes/routes";
 import { useMemo, useState } from "react";
+import type { BookDisplay } from "@/@types/books";
+import { mapExternalBookToDisplay } from "@/lib/bookDisplayMapper";
 
 export default function SeeAllPage() {
   const searchParams = seeAllRoute.useSearch() as SearchParamsSeeAllPage;
@@ -14,36 +15,44 @@ export default function SeeAllPage() {
   const param = mode === "category" ? categoryName : undefined;
 
   const [query, setQuery] = useState("");
-  const internalBooks = (searchParams.books ?? []) as Book[];
 
+  // Récupère les livres internes bruts
+  const internalBooks = searchParams.books ?? [];
+
+  const internalBooksDisplay: BookDisplay[] = internalBooks.filter(
+    (book) => book && book.key,
+  );
   const { data: books = [], isLoading: isBooksLoading } = useExternalBooks({
     mode,
     param,
   });
+  const externalBooksDisplay: BookDisplay[] = books.map(
+    mapExternalBookToDisplay,
+  );
 
-  const filteredBooks = useMemo(() => {
-    if (!query.trim()) return books;
+  const filteredBooksDisplay = useMemo(() => {
+    if (!query.trim()) return externalBooksDisplay;
     const lowerQuery = query.toLowerCase();
-    return books.filter(
+    return externalBooksDisplay.filter(
       (book) =>
         book.title?.toLowerCase().includes(lowerQuery) ||
         book.author?.toLowerCase().includes(lowerQuery),
     );
-  }, [books, query]);
+  }, [externalBooksDisplay, query]);
 
   let content;
   if (isBooksLoading) {
     content = (
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-        {internalBooks?.map((book) => (
-          <BookCardCarousel key={book.id} book={book} />
+        {internalBooksDisplay.map((book) => (
+          <BookCardCarousel key={book.key} book={book} />
         ))}
       </div>
     );
-  } else if (filteredBooks.length > 0) {
+  } else if (filteredBooksDisplay.length > 0) {
     content = (
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-        {filteredBooks.map((book) => (
+        {filteredBooksDisplay.map((book) => (
           <BookCardCarousel key={book.key} book={book} />
         ))}
       </div>
