@@ -3,7 +3,6 @@ import { InternalServerErrorException } from '@nestjs/common';
 import * as argon2 from 'argon2';
 import { PasswordService } from 'src/security/password/password.service';
 
-// Mock manuel du module argon2 avant tout
 jest.mock('argon2', () => ({
   hash: jest.fn(),
   verify: jest.fn(),
@@ -11,6 +10,8 @@ jest.mock('argon2', () => ({
 
 describe('PasswordService', () => {
   let service: PasswordService;
+
+  const mockedArgon2 = argon2 as jest.Mocked<typeof argon2>;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -25,8 +26,7 @@ describe('PasswordService', () => {
 
   describe('checkPassword', () => {
     it('should return true if argon2.verify returns true', async () => {
-      // On caste en jest.Mock pour avoir accès aux méthodes de mock
-      (argon2.verify as jest.Mock).mockResolvedValue(true);
+      mockedArgon2.verify.mockResolvedValue(true);
 
       const result = await service.checkPassword('hash', 'password');
 
@@ -35,7 +35,7 @@ describe('PasswordService', () => {
     });
 
     it('should return false if argon2.verify returns false', async () => {
-      (argon2.verify as jest.Mock).mockResolvedValue(false);
+      mockedArgon2.verify.mockResolvedValue(false);
 
       const result = await service.checkPassword('hash', 'wrong_password');
 
@@ -43,10 +43,8 @@ describe('PasswordService', () => {
     });
 
     it('should return false and log error if argon2.verify throws', async () => {
+      mockedArgon2.verify.mockRejectedValue(new Error('Argon2 failure'));
       const consoleSpy = jest.spyOn(console, 'error').mockImplementation();
-      (argon2.verify as jest.Mock).mockRejectedValue(
-        new Error('Argon2 failure'),
-      );
 
       const result = await service.checkPassword('bad_hash', 'password');
 
@@ -59,7 +57,7 @@ describe('PasswordService', () => {
   describe('hashPassword', () => {
     it('should return a hashed password on success', async () => {
       const mockHash = '$argon2id$v=19$m=65536...';
-      (argon2.hash as jest.Mock).mockResolvedValue(mockHash);
+      mockedArgon2.hash.mockResolvedValue(mockHash);
 
       const result = await service.hashPassword('mypassword');
 
@@ -68,7 +66,7 @@ describe('PasswordService', () => {
     });
 
     it('should throw InternalServerErrorException if hashing fails', async () => {
-      (argon2.hash as jest.Mock).mockRejectedValue(new Error('CPU failure'));
+      mockedArgon2.hash.mockRejectedValue(new Error('CPU failure'));
       const consoleSpy = jest.spyOn(console, 'error').mockImplementation();
 
       await expect(service.hashPassword('pwd')).rejects.toThrow(
