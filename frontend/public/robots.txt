@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://blablabook.com/sitemap.xml
+Sitemap: https://pooka-blablabook.surge.sh/sitemap.xml
