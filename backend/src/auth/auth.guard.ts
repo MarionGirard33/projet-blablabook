@@ -6,7 +6,6 @@ import {
 } from '@nestjs/common';
 import { JwtService, TokenExpiredError } from '@nestjs/jwt';
 import { Request, Response } from 'express';
-import { AuthService } from './auth.service';
 import { TokenService } from '../security/token/token.service';
 import { TokenExtractorData } from './types';
 import { JwtPayload, RotateTokensData } from 'src/security/token/types';
@@ -16,7 +15,6 @@ import { CookieService } from '../security/cookie/cookie.service';
 export class AuthGuard implements CanActivate {
   constructor(
     private jwtService: JwtService,
-    private authService: AuthService,
     private tokenService: TokenService,
     private cookieService: CookieService,
   ) {}
@@ -99,7 +97,9 @@ export class AuthGuard implements CanActivate {
     }
   }
 
-  private extractTokenFromCookie(request: Request): TokenExtractorData {
+  private extractTokenFromCookie(request: {
+    cookies?: Record<string, any>;
+  }): TokenExtractorData {
     const jwtCookie =
       (request.cookies?.['jwt_cookie'] as string | undefined) ?? null;
     const refreshTokenCookie =
