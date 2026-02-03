@@ -19,7 +19,13 @@ export default function UpdateUserForm({ userId, onClose, onUpdate }: UpdateUser
   const updateUserMutation = useUpdateUser(userId);
 
   const { data: currentUser } = useCurrentUser();
-  if (!currentUser) return <div>Loading...</div>;
+  if (!currentUser) {
+    return (
+      <div role="status" aria-live="polite">
+        Loading...
+      </div>
+    );
+  }
 
   const form = useForm({
     defaultValues: {
@@ -108,6 +114,7 @@ export default function UpdateUserForm({ userId, onClose, onUpdate }: UpdateUser
               value={field.state.value}
               onChange={(e) => field.handleChange(e.target.value)}
               placeholder="Entrez votre nom d'utilisateur"
+              autoComplete="username"
               className="w-full border rounded px-3 py-2 text-sm placeholder-gray-400"
             />
           </div>
@@ -126,6 +133,7 @@ export default function UpdateUserForm({ userId, onClose, onUpdate }: UpdateUser
               value={field.state.value}
               onChange={(e) => field.handleChange(e.target.value)}
               placeholder="Entrez votre email"
+              autoComplete="email"
               className="w-full border rounded px-3 py-2 text-sm placeholder-gray-400"
             />
           </div>
@@ -144,6 +152,7 @@ export default function UpdateUserForm({ userId, onClose, onUpdate }: UpdateUser
               value={field.state.value}
               onChange={(e) => field.handleChange(e.target.value)}
               placeholder="Nouveau mot de passe"
+              autoComplete="new-password"
               className="w-full border rounded px-3 py-2 text-sm placeholder-gray-400"
             />
           </div>
@@ -162,6 +171,7 @@ export default function UpdateUserForm({ userId, onClose, onUpdate }: UpdateUser
               value={field.state.value}
               onChange={(e) => field.handleChange(e.target.value)}
               placeholder="Confirmez"
+              autoComplete="new-password"
               className="w-full border rounded px-3 py-2 text-sm placeholder-gray-400"
             />
           </div>
