@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { Test, TestingModule } from '@nestjs/testing';
 import { BooksService } from './books.service';
 import { CategoryService } from '../category/category.service';
@@ -15,7 +14,6 @@ type UserBookRow = BookRow & {
   addedAt: Date;
 };
 type UserBook = BookRow & { status: string; categories: string[] };
-type DrizzleResult = BookRow[] | CategoryRow[] | ListRow[] | ListBookRow[];
 
 /**
  * INTERFACE DE MOCK POUR DRIZZLE
@@ -24,20 +22,20 @@ type DrizzleResult = BookRow[] | CategoryRow[] | ListRow[] | ListBookRow[];
  * pour que la chaîne ne soit pas brisée.
  */
 interface DrizzleMock {
-  select: jest.Mock<DrizzleMock>;
-  from: jest.Mock<DrizzleMock>;
-  where: jest.Mock<DrizzleMock>;
-  orderBy: jest.Mock<DrizzleMock>;
-  innerJoin: jest.Mock<DrizzleMock>;
-  insert: jest.Mock<DrizzleMock>;
-  values: jest.Mock<DrizzleMock>;
-  returning: jest.Mock<Promise<DrizzleResult>>;
-  delete: jest.Mock<DrizzleMock>;
-  update: jest.Mock<DrizzleMock>;
-  set: jest.Mock<DrizzleMock>;
-  onConflictDoNothing: jest.Mock<DrizzleMock>;
+  select: jest.Mock;
+  from: jest.Mock;
+  where: jest.Mock;
+  orderBy: jest.Mock;
+  innerJoin: jest.Mock;
+  insert: jest.Mock;
+  values: jest.Mock;
+  returning: jest.Mock;
+  delete: jest.Mock;
+  update: jest.Mock;
+  set: jest.Mock;
+  onConflictDoNothing: jest.Mock;
   // execute et returning sont les "terminaisons" qui renvoient la promesse de données
-  execute: jest.Mock<Promise<DrizzleResult>>;
+  execute: jest.Mock;
 }
 
 interface CategoryServiceMock {
@@ -102,17 +100,20 @@ describe('BooksService', () => {
       innerJoin: jest.fn().mockReturnThis(),
       insert: jest.fn().mockReturnThis(),
       values: jest.fn().mockReturnThis(),
-      returning: jest.fn() as jest.Mock<Promise<DrizzleResult>>,
+      returning: jest.fn().mockResolvedValue([]),
       delete: jest.fn().mockReturnThis(),
       update: jest.fn().mockReturnThis(),
       set: jest.fn().mockReturnThis(),
       onConflictDoNothing: jest.fn().mockReturnThis(),
-      execute: jest.fn() as jest.Mock<Promise<DrizzleResult>>,
-    } as DrizzleMock;
+      execute: jest.fn().mockResolvedValue([]),
+    };
 
     // Mock category service
     mockCategoryService = {
-      findOrCreateByName: jest.fn(),
+      findOrCreateByName: jest.fn<
+        Promise<Pick<CategoryRow, 'id' | 'name'>>,
+        [string]
+      >(),
     };
 
     const module: TestingModule = await Test.createTestingModule({
@@ -159,7 +160,7 @@ describe('BooksService', () => {
 
       mockDb.select = jest.fn().mockReturnValue({
         from: jest.fn().mockResolvedValue(mockBooks),
-      } as DrizzleMock);
+      });
 
       const result = await service.findAllBooks();
 
