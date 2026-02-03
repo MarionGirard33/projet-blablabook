@@ -1,6 +1,6 @@
 import type { BookDisplay } from "./books";
 
-export type SearchParamsSeeAllPage = {
+export type SeeAllPageProps = {
   title: string;
   books: BookDisplay[];
 };

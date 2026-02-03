@@ -1,4 +1,4 @@
-import type { SearchParamsSeeAllPage } from "@/@types/seeAllPageProps";
+import type { SeeAllPageProps } from "@/@types/seeAllPageProps";
 import BookCardCarousel from "@/components/BookCardCarousel";
 import SearchBar from "@/components/SearchBar";
 import { seeAllRoute } from "@/routes/routes";
@@ -6,7 +6,7 @@ import { useMemo, useState } from "react";
 import type { BookDisplay } from "@/@types/books";
 
 export default function SeeAllPage() {
-  const searchParams = seeAllRoute.useSearch() as SearchParamsSeeAllPage;
+  const searchParams = seeAllRoute.useSearch() as SeeAllPageProps;
   const title = searchParams.title;
 
   const [query, setQuery] = useState("");
