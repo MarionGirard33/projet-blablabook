@@ -1,4 +1,4 @@
-import { Link } from "@tanstack/react-router";
+import { Link, useRouter } from "@tanstack/react-router";
 import { ArrowLeft, Loader2 } from "lucide-react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { addBookToUserList } from "../../api/books";
@@ -18,6 +18,7 @@ import type { BookStatus } from "@/@types/books";
 
 // --- MAIN COMPONENT ---
 const BookDetails = () => {
+  const router = useRouter();
   const { isbn } = bookDetailsRoute.useParams();
   const { data: currentUser } = useCurrentUser();
 
@@ -72,6 +73,13 @@ const BookDetails = () => {
   });
 
   const handleAddToLibrary = () => {
+    if (!currentUser) {
+      router.navigate({
+        to: '/login',
+        search: { redirect: globalThis.location.pathname }
+      });
+      return;
+    }
     if (book) addBookMutation.mutate(book);
   };
 
@@ -97,7 +105,9 @@ const BookDetails = () => {
         <p className="text-destructive font-semibold text-lg">
           Oups ! {(error as Error)?.message || "Impossible de charger ce livre."}
         </p>
-        <Button variant="outline" onClick={() => globalThis.history.back()}>
+        <Button variant="outline" 
+        onClick={() => router.history.back()}
+        >
           Retour
         </Button>
       </div>
@@ -151,6 +161,7 @@ const BookDetails = () => {
               isAdding={addBookMutation.isPending}
               onChangeStatus={handleChangeStatus}
               isUpdatingStatus={isUpdatingStatus}
+              isConnected={!!currentUser?.id}
             />
           </div>
         </div>
