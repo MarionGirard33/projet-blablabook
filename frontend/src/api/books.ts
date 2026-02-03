@@ -78,10 +78,10 @@ export const updateBookStatus = async (
   let readEnd: string | null = null;
 
   // Helper function to safely convert potential date strings to ISO
-  const formatToISO = (date: any) => {
-    if (!date) return null;
-    return typeof date === "string" ? date : date.toISOString();
-  };
+  const formatToISO = (date: string | Date | null | undefined): string | null => {
+      if (!date) return null;
+      return typeof date === "string" ? date : date.toISOString();
+    };
 
   if (status === "À lire") {
     // Reset to "to read" state
