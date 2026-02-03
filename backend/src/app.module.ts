@@ -14,10 +14,10 @@ import { DrizzleModule } from './db/drizzle.module';
     // The DrizzleModule will handle validation during the application bootstrap.
       connectionString: process.env.DATABASE_URL as string,
     }),
-    AuthModule, 
-    BooksModule, 
-    UserModule, 
-    CategoryModule
+    AuthModule,
+    BooksModule,
+    UserModule,
+    CategoryModule,
   ],
   controllers: [AppController],
   providers: [AppService],

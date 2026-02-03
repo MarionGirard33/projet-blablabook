@@ -4,41 +4,52 @@ import { UserSelect } from 'src/user/types/user';
 import { LoginRequestDto } from './dto/login-request.dto';
 import { UserService } from '../user/user.service';
 import { JwtService } from '@nestjs/jwt';
-import argon2 from 'argon2';
 import { RegisterRequestDto } from './dto/register-request.dto';
+import { PasswordService } from '../security/password/password.service';
+import { TokenService } from '../security/token/token.service';
 
 describe('AuthService', () => {
   let authService: AuthService;
-  let verifyMock;
 
+  // mock dépendances
   const userServiceMock = {
     getUserByUsername: jest.fn(),
     checkUserExisting: jest.fn(),
     createUser: jest.fn(),
   };
 
+  const passwordServiceMock = {
+    checkPassword: jest.fn(),
+    hashPassword: jest.fn(),
+  };
+
+  const tokenServiceMock = {
+    destroyToken: jest.fn(),
+  };
+
   beforeEach(async () => {
     jest.clearAllMocks();
+    // skip les log d'erreur déclencher par le test
+    jest.spyOn(console, 'error').mockImplementation(() => {});
+
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         AuthService, // fournis le vrai service
         { provide: UserService, useValue: userServiceMock }, // mock du UserService
-        { provide: JwtService, useValue: { signAsync: jest.fn() } }, // mock du service jwt
+        { provide: JwtService, useValue: { signAsync: jest.fn() } },
+        { provide: PasswordService, useValue: passwordServiceMock },
+        { provide: TokenService, useValue: tokenServiceMock },
       ],
     }).compile();
 
     authService = module.get<AuthService>(AuthService);
-
-    // mock argon2
-    verifyMock = jest.spyOn(argon2, 'verify');
-    jest.spyOn(argon2, 'hash').mockResolvedValue('hashed-password');
   });
 
   it('should be defined', () => {
     expect(authService).toBeDefined();
   });
 
-  describe('sevice.login()', () => {
+  describe('AuthService.login()', () => {
     const id = 1;
     const email = 'giz@mail.com';
     const username = 'giz';
@@ -66,11 +77,15 @@ describe('AuthService', () => {
 
     it('should return user if login is valid', async () => {
       userServiceMock.getUserByUsername.mockResolvedValue(resolvedValue);
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
-      verifyMock.mockResolvedValueOnce(true);
+
+      passwordServiceMock.checkPassword.mockResolvedValue(true);
 
       const result = await authService.login(payload);
-      expect(verifyMock).toHaveBeenCalledWith(resolvedValue.password, password);
+
+      expect(passwordServiceMock.checkPassword).toHaveBeenCalledWith(
+        resolvedValue.password,
+        password,
+      );
       expect(result).toBe(resolvedValue);
     });
 
@@ -78,16 +93,16 @@ describe('AuthService', () => {
       userServiceMock.getUserByUsername.mockResolvedValue(null);
 
       await expect(
-        // eslint-disable-next-line prettier/prettier
-        authService.login({ username: 'unknow', password })
+        authService.login({ username: 'unknow', password }),
       ).rejects.toThrow('username or password is invalid');
-      expect(verifyMock).not.toHaveBeenCalled();
+
+      expect(passwordServiceMock.checkPassword).not.toHaveBeenCalled();
     });
 
     it('should throw error UnauthorizedError if password is not valid', async () => {
       userServiceMock.getUserByUsername.mockResolvedValue(resolvedValue);
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
-      verifyMock.mockResolvedValueOnce(false);
+
+      passwordServiceMock.checkPassword.mockResolvedValue(false);
 
       await expect(
         authService.login({ username, password: 'not_valid_password' }),
@@ -144,6 +159,12 @@ describe('AuthService', () => {
       userServiceMock.createUser.mockResolvedValue(mockNewUser);
 
       const result = await authService.register(payload);
+
+      // On vérifie que le hashage a bien été appelé avec le mot de passe clair
+      expect(passwordServiceMock.hashPassword).toHaveBeenCalledWith(
+        payload.password,
+      );
+
       expect(result).toEqual(resolvedValue);
     });
 
@@ -185,27 +206,6 @@ describe('AuthService', () => {
 
       await expect(authService.register(payload)).rejects.toThrow(
         'password is not confirmed',
-      );
-    });
-
-    it('should throw error if password is not hashed', async () => {
-      const username = 'gizmo';
-      const email = 'gizmo@mail.com';
-      const password = '12345678';
-      const confirmPassword = '12345678';
-
-      const payload: RegisterRequestDto = {
-        username,
-        email,
-        password,
-        confirmPassword,
-      };
-
-      userServiceMock.checkUserExisting.mockResolvedValue(null);
-      jest.spyOn(argon2, 'hash').mockRejectedValue(new Error('hash failed'));
-
-      await expect(authService.register(payload)).rejects.toThrow(
-        'failed to hash password',
       );
     });
 

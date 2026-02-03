@@ -26,35 +26,34 @@ import { LoginRequestDto } from './dto/login-request.dto';
 import { LoginResponseDto } from './dto/login-response.dto';
 import { plainToInstance } from 'class-transformer';
 import { AuthGuard } from './auth.guard';
+import { CookieService } from '../security/cookie/cookie.service';
+import { TokenService } from '../security/token/token.service';
 
-@ApiTags('auth') // annotation swagger => permet de grouper la classe sous l'étiquette auth dans la documentation
-@UseInterceptors(ClassSerializerInterceptor) // permet de gérer l'exclude du DTO response => retirer les field avec @Exclude dans le dto de reponse
-@Controller('auth') // permet de définir le endpoint pour la classe à /auth
+@ApiTags('auth')
+@UseInterceptors(ClassSerializerInterceptor)
+@Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {} // injection des dépendances. Permet d'utiliser les méthodes du service
+  constructor(
+    private readonly authService: AuthService,
+    private readonly cookieService: CookieService,
+    private readonly tokenService: TokenService,
+  ) {}
 
-  @Post('/register') // l'endpoint complet est auth/register
-  // décorateur Swagger => permet de documenter l'api
+  @Post('/register')
   @ApiCreatedResponse({
-    // définis le code réponse (201)
-    description: 'User is created with password hashed.', // message afficher dans la doc ?
-    type: RegisterResponseDto, // permet de fournir le schema des données dans la doc
+    description: 'User is created with password hashed.',
+    type: RegisterResponseDto,
   })
-  // why
   @ApiUnprocessableEntityResponse({
     description: 'email or username is alrady in use',
   })
-  // body() permet de transmettre les données issue du body de la requête au service
   async register(
     @Body() payload: RegisterRequestDto,
   ): Promise<RegisterResponseDto> {
-    // on retourne directement l'objt retourner par la méthode register du service
     return this.authService.register(payload);
   }
 
   @Post('/login')
-  // par défaut Nest utilise 201 par défaut sur les post
-  // HttpCode permet de définir son propre code statut
   @HttpCode(HttpStatus.OK)
   @ApiOkResponse({
     description: 'User is logged.',
@@ -68,21 +67,16 @@ export class AuthController {
   })
   async login(
     @Body() payload: LoginRequestDto,
-    // passthrough allow use cookie and return it
     @Res({ passthrough: true }) response: Response,
   ): Promise<LoginResponseDto> {
-    // get user if credentials is valid
     const user = await this.authService.login(payload);
-
-    // generate jwt token and refresh token
-    const jwtToken = await this.authService.generateJWTToken(
+    const jwtToken = await this.tokenService.generateJWTToken(
       user.id,
       user.role,
     );
-    const refreshToken = await this.authService.generateRefreshToken(user.id);
+    const refreshToken = await this.tokenService.generateRefreshToken(user.id);
+    const cookieConfig = this.cookieService.generateCookiesConfig();
 
-    // config and add cookie to response
-    const cookieConfig = this.authService.generateCookiesConfig();
     response.cookie('jwt_cookie', jwtToken, cookieConfig.jwtCookieConfig);
     response.cookie(
       'refresh_cookie',
@@ -90,7 +84,6 @@ export class AuthController {
       cookieConfig.refreshCookieConfig,
     );
 
-    // return response with user data
     return plainToInstance(LoginResponseDto, user, {
       excludeExtraneousValues: true,
     });
@@ -103,22 +96,13 @@ export class AuthController {
     description: 'User is logout and token is destroyed',
   })
   async logout(
-    @Req() request: Request, // allow to use request objet
+    @Req() request: Request,
     @Res({ passthrough: true }) response: Response,
   ) {
-    // get refresh token from request with guard
     const refreshToken = request['refresh_token'] as string;
-    // delete refresh token
-    const isDestoyToken =
-      await this.authService.destroyRefreshToken(refreshToken);
+    await this.authService.logout(refreshToken); // destroy token
 
-    if (!isDestoyToken) {
-      console.warn('refresh token not found in the db');
-    }
-
-    // generate config config for clear to the front
-    const cookieConfig = this.authService.generateCookiesConfig();
-    // destroy jwt and refresh cookie
+    const cookieConfig = this.cookieService.generateCookiesConfig();
     response.clearCookie('jwt_cookie', cookieConfig.jwtCookieConfig);
     response.clearCookie('refresh_cookie', cookieConfig.refreshCookieConfig);
 

@@ -1,6 +1,6 @@
 import { Injectable, Inject, NotFoundException, Logger } from '@nestjs/common';
 import * as schema from 'src/db/schema';
-import { eq , and} from 'drizzle-orm';
+import { eq, and } from 'drizzle-orm';
 import { NodePgDatabase } from 'drizzle-orm/node-postgres';
 import { CategoryResponseDto } from './dto/category-response.dto';
 
@@ -8,7 +8,9 @@ import { CategoryResponseDto } from './dto/category-response.dto';
 export class CategoryService {
   private readonly logger = new Logger(CategoryService.name);
 
-  constructor(@Inject('DRIZZLE') private readonly db: NodePgDatabase<typeof schema>) {}
+  constructor(
+    @Inject('DRIZZLE') private readonly db: NodePgDatabase<typeof schema>,
+  ) {}
 
   /**
    * Find all categories
@@ -20,7 +22,7 @@ export class CategoryService {
       .where(eq(schema.category.isActive, true))
       .execute();
 
-    return categories.map(c => ({
+    return categories.map((c) => ({
       id: c.id,
       name: c.name,
     }));
@@ -34,10 +36,7 @@ export class CategoryService {
       .select()
       .from(schema.category)
       .where(
-        and(
-          eq(schema.category.id, id),
-          eq(schema.category.isActive, true)
-        ),
+        and(eq(schema.category.id, id), eq(schema.category.isActive, true)),
       )
       .execute();
 
