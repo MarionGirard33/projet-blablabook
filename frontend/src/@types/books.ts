@@ -1,4 +1,5 @@
 export type BookStatus = "Lu" | "En cours" | "À lire";
+
 export interface CreateBookDto {
   name: string;
   coverId: string;
@@ -10,7 +11,11 @@ export interface CreateBookDto {
   categories: string[];
 }
 
-export interface Book {
+/**
+ * Drizzle-generated type matching backend BookSelect.
+ * This ensures frontend mocks and data align exactly with backend schema.
+ */
+export interface BookRow {
   id: number;
   name: string;
   coverId: string;
@@ -18,10 +23,17 @@ export interface Book {
   description: string;
   isbn: string;
   publishingHouse: string;
-  publishedAt: string;
-  listName?: string;
+  publishedAt: string; // date format from Drizzle
+  readStart?: Date | null;
+  readEnd?: Date | null;
+  addedAt?: Date;
   status?: BookStatus;
-  readStart?: string;
-  readEnd?: string;
-  categories: string[];
+  categories?: string[];
 }
+
+// /**
+//  * @deprecated Use BookRow instead for strict typing with Drizzle-generated types.
+//  */
+// export interface Book extends BookRow {
+//   listName?: string;
+// }

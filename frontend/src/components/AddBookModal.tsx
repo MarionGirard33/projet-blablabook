@@ -161,6 +161,7 @@ export function AddBookModal({ isOpen, onClose, userId }: AddBookModalProps) {
                 {/* ✔️ Already in library */}
                 {alreadyInLibrary && (
                   <Check
+                    data-testid="check-icon"
                     className="absolute top-2 right-2 text-green-600"
                     size={22}
                   />
