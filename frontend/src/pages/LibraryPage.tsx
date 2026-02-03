@@ -4,7 +4,7 @@
 import { useEffect, useState } from "react";
 import { BookCard } from "@/components/BookCard";
 import { Plus, Search } from "lucide-react";
-import type { Book } from "../@types/books";
+import type { BookRow } from "../@types/books";
 import { AddBookModal } from "@/components/AddBookModal";
 import { useAuthStore } from "@/stores/authStore";
 import { useUserBooks } from "@/hooks/useUserBooks";
@@ -25,18 +25,19 @@ export default function LibraryPage() {
   }, [userId, refetch]);
 
   // Client-side filtering by title
-  const filteredBooks: Book[] =
-    books?.filter((b: Book) => {
+  const filteredBooks: BookRow[] =
+    books?.filter((b: BookRow) => {
       const searchLower = search.toLowerCase();
       return b.name.toLowerCase().includes(searchLower);
     }) || [];
 
   // Reading status counters for quick stats
-  const readCount = books?.filter((b: Book) => b.status === "Lu").length || 0;
+  const readCount =
+    books?.filter((b: BookRow) => b.status === "Lu").length || 0;
   const readingCount =
-    books?.filter((b: Book) => b.status === "En cours").length || 0;
+    books?.filter((b: BookRow) => b.status === "En cours").length || 0;
   const toReadCount =
-    books?.filter((b: Book) => b.status === "À lire").length || 0;
+    books?.filter((b: BookRow) => b.status === "À lire").length || 0;
 
   return (
     <div className="container mx-auto p-6 max-w-6xl">
