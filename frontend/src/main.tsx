@@ -14,7 +14,6 @@ declare module "@tanstack/react-router" {
 
 // Extend the globalThis type to include __TANSTACK_QUERY_CLIENT__
 declare global {
-  // eslint-disable-next-line no-var
   var __TANSTACK_QUERY_CLIENT__: QueryClient | undefined;
 }
 
