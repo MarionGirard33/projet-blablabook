@@ -74,8 +74,14 @@ export const updateBookStatus = async (
 ): Promise<BookRow> => {
   const now = new Date().toISOString();
 
-  let readStart: string | null;
-  let readEnd: string | null;
+  let readStart: string | null = null;
+  let readEnd: string | null = null;
+
+  // Helper function to safely convert potential date strings to ISO
+  const formatToISO = (date: any) => {
+    if (!date) return null;
+    return typeof date === "string" ? date : date.toISOString();
+  };
 
   if (status === "À lire") {
     // Reset to "to read" state
@@ -83,16 +89,12 @@ export const updateBookStatus = async (
     readEnd = null;
   } else if (status === "En cours") {
     // Start reading: set start date if not already set, clear end date
-    readStart = currentBook.readStart
-      ? currentBook.readStart.toISOString()
-      : now;
+    readStart = currentBook.readStart ? formatToISO(currentBook.readStart) : now;
     readEnd = null;
-  } else {
+  } else if (status === "Lu") {
     // "Lu": Mark as finished
     // Keep existing readStart or set to now if never started
-    readStart = currentBook.readStart
-      ? currentBook.readStart.toISOString()
-      : now;
+    readStart = currentBook.readStart ? formatToISO(currentBook.readStart) : now;
     readEnd = now;
   }
 
