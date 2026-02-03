@@ -25,16 +25,7 @@ export class AuthGuard implements CanActivate {
 
     const tokens: TokenExtractorData = this.extractTokenFromCookie(request); // get cookie from request
 
-    // check if cookie is on the request
-    if (!tokens.jwtCookie || !tokens.refreshTokenCookie) {
-      if (!tokens.jwtCookie) {
-        console.error('jwt cookie is missing on the request');
-      }
-      if (!tokens.refreshTokenCookie) {
-        console.error('refresh cookie is missing on the request');
-      }
-      throw new UnauthorizedException('no tokens found');
-    }
+    this.checkCookie(tokens);
 
     try {
       // check jwt token success
@@ -109,5 +100,18 @@ export class AuthGuard implements CanActivate {
       jwtCookie,
       refreshTokenCookie,
     };
+  }
+
+  private checkCookie(tokens: TokenExtractorData): boolean {
+    if (!tokens.jwtCookie || !tokens.refreshTokenCookie) {
+      if (process.env.NODE_ENV === 'dev') {
+        if (!tokens.jwtCookie)
+          console.error('jwt cookie is missing on the request');
+        if (!tokens.refreshTokenCookie)
+          console.error('refresh cookie is missing on the request');
+      }
+      throw new UnauthorizedException('no tokens found');
+    }
+    return true;
   }
 }

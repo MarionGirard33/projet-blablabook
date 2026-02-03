@@ -3,6 +3,7 @@ import { AuthGuard } from './auth.guard';
 import { JwtService } from '@nestjs/jwt'; // Importe bien la classe !
 import { TokenService } from '../security/token/token.service';
 import { CookieService } from '../security/cookie/cookie.service';
+import { UnauthorizedException } from '@nestjs/common/exceptions/unauthorized.exception';
 
 describe('AuthGuard', () => {
   let authGuard: AuthGuard;
@@ -78,6 +79,30 @@ describe('AuthGuard', () => {
         jwtCookie: null,
         refreshTokenCookie: null,
       });
+    });
+  });
+
+  describe('authGuard.checkCookie', () => {
+    it('should return true when both tokens are present', () => {
+      const tokens = {
+        jwtCookie: 'jwt',
+        refreshTokenCookie: 'tokens',
+      };
+
+      const result = authGuard['checkCookie'](tokens);
+
+      expect(result).toBe(true);
+    });
+
+    it('should throw UnauthorizedException when token is missing', () => {
+      const token = {
+        jwtCookie: null,
+        refreshTokenCookie: null,
+      };
+
+      expect(() => authGuard['checkCookie'](token)).toThrow(
+        UnauthorizedException,
+      );
     });
   });
 });
