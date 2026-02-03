@@ -31,16 +31,24 @@ export default function SearchBar({ onSearch }: SearchBarProps) {
         e.preventDefault();
         onSearch(query);
       }}
+      role="search"
     >
       <Input
         type="text"
         placeholder="Rechercher un livre, un auteur..."
         value={query}
         onChange={handleChange}
-        className="flex-1 border-none focus:ring-0"
+        aria-label="Rechercher un livre ou un auteur"
+        className="flex-1 border-none focus:ring-0 focus-visible:ring-2 focus-visible:ring-offset-2"
       />
-      <Button type="submit" variant="ghost" size="icon">
-        <Search className="h-5 w-5 text-gray-500" />
+      <Button
+        type="submit"
+        variant="ghost"
+        size="icon"
+        aria-label="Lancer la recherche"
+        className="focus-visible:ring-2 focus-visible:ring-offset-2"
+      >
+        <Search className="h-5 w-5 text-gray-500" aria-hidden="true" />
       </Button>
     </form>
   );

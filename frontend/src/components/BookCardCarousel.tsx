@@ -17,19 +17,22 @@ export default function BookCardCarousel({
 
   return (
     <Card
-      className="flex flex-col items-center rounded-xl gap-0 overflow-hidden shadow w-full h-full p-0 min-h-96 cursor-pointer"
+      className="flex flex-col items-center rounded-xl gap-0 overflow-hidden shadow w-full h-full p-0 min-h-96 cursor-pointer focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-bookochre"
       onClick={() =>
         router.navigate({
           to: "/books/$isbn",
           params: { isbn: book.isbn },
         })
       }
+      role="article"
     >
       <CardHeader className="w-full flex flex-col items-center p-4">
         {book.cover ? (
           <img
             src={book.cover}
-            alt={book.title}
+            alt={`Couverture de ${book.title}`}
+            width="128"
+            height="192"
             className="h-48 w-32 object-cover mb-2 rounded shadow"
             style={{ maxHeight: "12rem", minHeight: "12rem" }}
           />

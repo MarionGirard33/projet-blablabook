@@ -27,9 +27,11 @@
           {/* Crayon */}
           <div className="flex justify-end mb-2">
             <button
+              type="button"
               onClick={() => setIsModalOpen(true)}
               className="w-10 h-10 flex items-center justify-center rounded-full border border-bookbeige cursor-pointer transition"
               title="Modifier profil"
+              aria-label="Modifier le profil"
             >
               <Pencil size={20} color="black" />
             </button>

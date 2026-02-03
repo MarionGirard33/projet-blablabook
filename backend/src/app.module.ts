@@ -7,22 +7,18 @@ import { UserModule } from './user/user.module';
 import { CategoryModule } from './category/category.module';
 import { DrizzleModule } from './db/drizzle.module';
 
-const connectionString = process.env.DATABASE_URL;
-if (!connectionString) {
-  throw new Error('DATABASE_URL environment variable is required');
-}
-
 @Module({
   imports: [
     DrizzleModule.forRoot({
-      connectionString,
+    // Inject the connection string from environment variables.
+    // The DrizzleModule will handle validation during the application bootstrap.
+      connectionString: process.env.DATABASE_URL as string,
     }),
     AuthModule, 
     BooksModule, 
     UserModule, 
     CategoryModule
   ],
-
   controllers: [AppController],
   providers: [AppService],
 })
