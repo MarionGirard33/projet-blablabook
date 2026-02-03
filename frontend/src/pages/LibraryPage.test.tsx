@@ -16,26 +16,26 @@ vi.mock("@/stores/authStore", () => ({
   useAuthStore: () => ({ user: { id: 1 } }),
 }));
 
-// Factory function to create BookRow test data
-const createBookRow = (overrides?: Partial<BookRow>): BookRow => ({
-  id: 1,
-  name: "Test Book",
-  coverId: "cover.jpg",
-  author: "Test Author",
-  description: "Test description",
-  isbn: "123",
-  publishingHouse: "Test Publisher",
-  publishedAt: "2023-01-01",
-  categories: [],
-  readStart: null,
-  readEnd: null,
-  addedAt: new Date(),
-  status: "À lire",
-  ...overrides,
-});
-
 // Static test data
 const { useUserBooksMock } = vi.hoisted(() => {
+  // Factory function to create BookRow test data
+  const createBookRow = (overrides?: Partial<BookRow>): BookRow => ({
+    id: 1,
+    name: "Test Book",
+    coverId: "cover.jpg",
+    author: "Test Author",
+    description: "Test description",
+    isbn: "123",
+    publishingHouse: "Test Publisher",
+    publishedAt: "2023-01-01",
+    categories: [],
+    readStart: null,
+    readEnd: null,
+    addedAt: new Date(),
+    status: "À lire",
+    ...overrides,
+  });
+
   const booksFixture: BookRow[] = [
     createBookRow({
       id: 1,
