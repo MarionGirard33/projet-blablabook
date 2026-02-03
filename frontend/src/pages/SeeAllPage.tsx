@@ -26,15 +26,23 @@ export default function SeeAllPage() {
     return books.filter(
       (book) =>
         book.title?.toLowerCase().includes(lowerQuery) ||
-        book.author?.toLowerCase().includes(lowerQuery)
+        book.author?.toLowerCase().includes(lowerQuery),
     );
   }, [books, query]);
 
   let content;
   if (isBooksLoading) {
     content = (
-      <div className="flex items-start justify-center py-12">
-        <Loader2 className="h-12 w-12 animate-spin text-primary" />
+      <div
+        className="flex items-start justify-center py-12"
+        role="status"
+        aria-live="polite"
+      >
+        <Loader2
+          className="h-12 w-12 animate-spin text-primary"
+          aria-hidden="true"
+        />
+        <span className="sr-only">Chargement des résultats...</span>
       </div>
     );
   } else if (filteredBooks.length > 0) {

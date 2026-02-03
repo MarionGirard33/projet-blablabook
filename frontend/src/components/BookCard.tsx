@@ -43,11 +43,13 @@ export function BookCard({ book, onRemove, onStatusChange }: Props) {
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <button
+              type="button"
               onClick={(e) => e.stopPropagation()}
-              className="absolute top-3 left-3 px-3 py-1 text-xs font-semibold rounded-full shadow bg-bookcream text-bookdark hover:bg-bookcream/90 transition-colors flex items-center gap-1"
+              className="absolute top-3 left-3 px-3 py-1 text-xs font-semibold rounded-full shadow bg-bookcream text-bookdark hover:bg-bookcream/90 transition-colors flex items-center gap-1 focus-visible:ring-2 focus-visible:ring-offset-2"
+              aria-label={`Statut de lecture: ${book.status}. Cliquer pour changer`}
             >
               {book.status}
-              <ChevronDown size={12} />
+              <ChevronDown size={12} aria-hidden="true" />
             </button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="start">
@@ -78,8 +80,9 @@ export function BookCard({ book, onRemove, onStatusChange }: Props) {
 
   return (
     <div
-      className="w-full max-w-md transform hover:scale-101 transition-transform duration-500 cursor-pointer"
+      className="w-full max-w-md transform hover:scale-101 transition-transform duration-500 cursor-pointer focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-bookochre rounded-xl"
       onClick={() => goToBookDetails()}
+      role="article"
     >
       <Card className="w-full shadow-lg relative rounded-xl overflow-hidden p-0 gap-2 flex flex-col h-full">
         {/* Book cover (fallback placeholder when no cover) */}
@@ -88,7 +91,9 @@ export function BookCard({ book, onRemove, onStatusChange }: Props) {
             <img
               //src={`https://covers.openlibrary.org/b/id/${book.coverId}-M.jpg`}
               src={book.coverId} // dev
-              alt={book.name}
+              alt={`Couverture de ${book.name}`}
+              width="320"
+              height="192"
               className="w-full h-48 object-cover"
             />
           ) : (
@@ -106,13 +111,15 @@ export function BookCard({ book, onRemove, onStatusChange }: Props) {
 
           {/* Delete button: removes the book from the user's list */}
           <button
+            type="button"
             onClick={(e) => {
               e.stopPropagation();
               onRemove();
             }}
-            className="absolute top-3 right-3 p-1 bg-white/80 rounded-full shadow hover:bg-white transition"
+            className="absolute top-3 right-3 p-1 bg-white/80 rounded-full shadow hover:bg-white transition focus-visible:ring-2 focus-visible:ring-offset-2"
+            aria-label={`Supprimer ${book.name} de la bibliothèque`}
           >
-            <Trash2 size={16} className="text-red-600" />
+            <Trash2 size={16} className="text-red-600" aria-hidden="true" />
           </button>
         </div>
 

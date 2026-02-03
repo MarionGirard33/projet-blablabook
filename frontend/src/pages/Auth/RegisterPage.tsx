@@ -109,7 +109,11 @@ export default function RegisterPage() {
     >
       <FormTitle title="Inscription" />
 
-      {globalError && <FormGlobalError message={globalError} />}
+      {globalError && (
+        <div role="alert" aria-live="assertive">
+          <FormGlobalError message={globalError} />
+        </div>
+      )}
 
       <form.Field name="email">
         {(field) => {

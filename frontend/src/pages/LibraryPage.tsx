@@ -82,13 +82,18 @@ export default function LibraryPage() {
         <input
           type="text"
           placeholder="Rechercher un livre..."
+          aria-label="Rechercher un livre"
           className="flex-1 px-4 py-2.5 border border-bookbeige rounded-full text-sm bg-white text-bookdark shadow-sm focus:outline-none focus:ring-2 focus:ring-bookochre/30"
           value={search}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
             setSearch(e.target.value)
           }
         />
-        <button className="p-2.5 bg-bookochre rounded-full text-white shadow hover:opacity-90 transition-opacity">
+        <button
+          type="button"
+          aria-label="Lancer la recherche"
+          className="p-2.5 bg-bookochre rounded-full text-white shadow hover:opacity-90 transition-opacity"
+        >
           <Search size={18} />
         </button>
       </div>
@@ -96,7 +101,11 @@ export default function LibraryPage() {
       {/* Books list: show empty state when no results */}
       <div className="mt-8 grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
         {filteredBooks.length === 0 ? (
-          <p className="text-gray-500 text-center col-span-full">
+          <p
+            className="text-gray-500 text-center col-span-full"
+            role="status"
+            aria-live="polite"
+          >
             Aucun livre trouvé.
           </p>
         ) : (

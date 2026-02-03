@@ -87,7 +87,11 @@ export default function LoginPage() {
     >
       <FormTitle title="Connexion" />
 
-      {globalError && <FormGlobalError message={globalError} />}
+      {globalError && (
+        <div role="alert" aria-live="assertive">
+          <FormGlobalError message={globalError} />
+        </div>
+      )}
 
       <form.Field name="username">
         {(field) => {
