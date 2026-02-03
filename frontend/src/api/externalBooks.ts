@@ -21,10 +21,17 @@ const DEFAULT_COVER = "/default-book-cover.png";
 // HELPERS
 // -----------------------------
 
-const parseDescription = (desc: any): string => {
+const parseDescription = (desc: unknown): string => {
   if (!desc) return "";
   if (typeof desc === "string") return desc;
-  if (typeof desc === "object" && desc.value) return desc.value;
+  
+  if (typeof desc === "object" && desc !== null && "value" in desc) {
+    const obj = desc as { value: unknown };
+    if (typeof obj.value === "string") {
+      return obj.value;
+    }
+  }
+  
   return "";
 };
 
