@@ -279,10 +279,10 @@ async function seed() {
     },
     {
       name: 'The Haunting of Hill House',
-      coverId: 'https://covers.openlibrary.org/b/isbn/9780141191442-L.jpg',
+      coverId: 'https://covers.openlibrary.org/b/isbn/9780140071078-L.jpg',
       author: 'Shirley Jackson',
       description: 'A cursed mansion.',
-      isbn: '9780141191442',
+      isbn: '9780140071078',
       publishingHouse: 'Penguin',
       publishedAt: '1959-10-16',
     },
