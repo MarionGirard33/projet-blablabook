@@ -1,4 +1,4 @@
-import { Link, useRouter } from "@tanstack/react-router";
+import { useRouter } from "@tanstack/react-router";
 import { ArrowLeft, Loader2 } from "lucide-react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { addBookToUserList } from "../../api/books";
@@ -122,7 +122,6 @@ const BookDetails = () => {
 
   // --- FRONTEND RENDER ---
 return (
-  /* 1. Added min-h-[80vh] to prevent layout shift during loading/rendering */
   <div className="container mx-auto p-6 max-w-5xl min-h-[80vh] animate-in fade-in zoom-in-95 duration-500">
     
     {/* BACK NAVIGATION */}
@@ -143,7 +142,6 @@ return (
           <BookCover
             src={book.cover}
             alt={book.title}
-            /* Fixed maxWidth to maintain layout stability */
             className="w-full w-[220px] md:w-[260px] aspect-[2/3] object-cover rounded-lg transform group-hover:scale-105 transition-transform duration-500"
           />
         </div>
@@ -152,8 +150,8 @@ return (
 
       {/* DETAILS AND STATUS GRID */}
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 w-full items-start">        
-        {/* 1. Sidebar container (Status/Add Button) */}
         <div className="order-first xl:order-last xl:col-span-1 w-full xl:sticky xl:top-6 flex flex-col">
+          {/* STATUS ACTION */}
           <BookStatusAction
             status={userBooks.find((b) => b.isbn === book.isbn)?.status}
             onAddToLibrary={handleAddToLibrary}
@@ -164,7 +162,7 @@ return (
           />
         </div>
 
-        {/* 2. Main Data Grid */}
+        {/* DETAILS */}
         <div className="xl:col-span-2 w-full">
           <BookDataGrid
             publisher={book.publisher}
