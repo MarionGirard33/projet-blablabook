@@ -64,7 +64,6 @@ const BookDetails = () => {
       return addBookToUserList(currentUser.id, payload);
     },
     onSuccess: () => {
-      alert("Success: Book added to your library!");
       refetch();
     },
     onError: (err: AxiosError<{ message: string }>) => {
