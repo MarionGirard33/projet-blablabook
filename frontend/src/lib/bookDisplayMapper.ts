@@ -2,7 +2,7 @@ import type { BookRow } from "@/@types/books";
 import type { ExternalBook } from "@/@types/externalBooks";
 import type { BookDisplay } from "@/@types/books";
 
-// Mappe un BookRow (interne) vers BookDisplay
+// Maps a BookRow (internal) to a BookDisplay
 export function mapBookRowToDisplay(book: BookRow): BookDisplay {
   return {
     key: book.id.toString(),
@@ -14,7 +14,7 @@ export function mapBookRowToDisplay(book: BookRow): BookDisplay {
   };
 }
 
-// Mappe un ExternalBook (externe) vers BookDisplay
+// Maps an ExternalBook (external) to a BookDisplay
 export function mapExternalBookToDisplay(book: ExternalBook): BookDisplay {
   return {
     key: book.key,
