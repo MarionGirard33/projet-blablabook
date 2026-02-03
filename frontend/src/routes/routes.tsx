@@ -1,11 +1,5 @@
 import RootLayout from "@/layouts/RootLayout";
-import LoginPage from "@/pages/Auth/LoginPage/LoginPage";
-import RegisterPage from "@/pages/Auth/RegisterPage/RegisterPage";
-import HomePage from "@/pages/HomePage";
-import NotFound from "@/pages/NotFound";
-import LibraryPage from "@/pages/LibraryPage";
-import ProfilePage from "@/pages/ProfilePage/ProfilePage";
-import BookDetails from "@/pages/Book/BookDetails";
+import { lazy } from "react";
 import {
   createRouter,
   createRootRoute,
@@ -14,16 +8,23 @@ import {
 } from "@tanstack/react-router";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { useAuthStore } from "@/stores/authStore";
-import SeeAllPage from "@/pages/SeeAllPage";
+
+// Lazy-loaded pages for code splitting - each route downloads only when visited
+const LoginPage = lazy(() => import("@/pages/Auth/LoginPage/LoginPage"));
+const RegisterPage = lazy(() => import("@/pages/Auth/RegisterPage/RegisterPage"));
+const HomePage = lazy(() => import("@/pages/HomePage"));
+const NotFound = lazy(() => import("@/pages/NotFound"));
+const LibraryPage = lazy(() => import("@/pages/LibraryPage"));
+const ProfilePage = lazy(() => import("@/pages/ProfilePage/ProfilePage"));
+const BookDetails = lazy(() => import("@/pages/Book/BookDetails"));
+const SeeAllPage = lazy(() => import("@/pages/SeeAllPage"));
 
 const rootRoute = createRootRoute({
   component: () => <RootLayout />,
   notFoundComponent: () => <NotFound />,
 });
 
-// PROTECTED ROUTE
-// This parent route protects all its child routes by checking if the user is authenticated.
-// If not authenticated, it redirects to the login page.
+// Protected route - checks authentication before allowing access to child routes
 const protectedRoute = createRoute({
   getParentRoute: () => rootRoute,
   id: "protected",
@@ -35,42 +36,38 @@ const protectedRoute = createRoute({
   },
 });
 
-// HOME ROUTE
 const homeRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/",
   component: () => <HomePage />,
 });
 
-// SEE ALL ROUTE
 export const seeAllRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/see-all",
   component: () => <SeeAllPage />,
 });
 
-// AUTH ROUTE
 const registerPage = createRoute({
   getParentRoute: () => rootRoute,
   path: "/register",
   component: () => <RegisterPage />,
 });
 
-// LOGIN ROUTE
 const loginPage = createRoute({
   getParentRoute: () => rootRoute,
   path: "/login",
   component: () => <LoginPage />,
 });
 
-// LIBRARY ROUTE (protected)
+// Protected route - user must be authenticated
 const libraryRoute = createRoute({
   getParentRoute: () => protectedRoute,
   path: "/library",
   component: () => <LibraryPage />,
 });
 
-// PROFILE ROUTE (protected)
+// Protected route - user must be authenticated
 const profilePage = createRoute({
   getParentRoute: () => protectedRoute,
   path: "/profile",
@@ -84,7 +81,7 @@ const profilePage = createRoute({
   },
 });
 
-// DETAILS BOOK ROUTE
+// Dynamic route with ISBN parameter: /books/:isbn
 export const bookDetailsRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/books/$isbn",
@@ -100,6 +97,7 @@ const routeTree = rootRoute.addChildren([
   protectedRoute.addChildren([libraryRoute, profilePage]),
 ]);
 
+// defaultPreload: "intent" - preloads code chunks on hover for instant navigation
 export const router = createRouter({
   routeTree,
   defaultPreload: "intent",

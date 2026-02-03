@@ -155,12 +155,14 @@ export function AddBookModal({ isOpen, onClose, userId }: AddBookModalProps) {
                 className={`
           relative w-full bg-white/80 flex items-center gap-4
           mb-4 p-3 border border-bookbeige rounded-xl shadow-sm text-left
+          focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-bookochre
           ${alreadyInLibrary ? "opacity-50 cursor-default" : "hover:bg-white cursor-pointer"}
         `}
               >
                 {/* ✔️ Already in library */}
                 {alreadyInLibrary && (
                   <Check
+                    data-testid="check-icon"
                     className="absolute top-2 right-2 text-green-600"
                     size={22}
                   />
@@ -190,7 +192,7 @@ export function AddBookModal({ isOpen, onClose, userId }: AddBookModalProps) {
                 {book.cover ? (
                   <img
                     src={book.cover}
-                    alt={book.title}
+                    alt={`Couverture de ${book.title}`}
                     className="w-20 h-32 object-cover rounded flex-shrink-0"
                   />
                 ) : (

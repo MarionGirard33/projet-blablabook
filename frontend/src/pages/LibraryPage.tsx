@@ -4,7 +4,7 @@
 import { useEffect, useState } from "react";
 import { BookCard } from "@/components/BookCard";
 import { Plus, Search } from "lucide-react";
-import type { Book } from "../@types/books";
+import type { BookRow } from "../@types/books";
 import { AddBookModal } from "@/components/AddBookModal";
 import { useAuthStore } from "@/stores/authStore";
 import { useUserBooks } from "@/hooks/useUserBooks";
@@ -25,18 +25,19 @@ export default function LibraryPage() {
   }, [userId, refetch]);
 
   // Client-side filtering by title
-  const filteredBooks: Book[] =
-    books?.filter((b: Book) => {
+  const filteredBooks: BookRow[] =
+    books?.filter((b: BookRow) => {
       const searchLower = search.toLowerCase();
       return b.name.toLowerCase().includes(searchLower);
     }) || [];
 
   // Reading status counters for quick stats
-  const readCount = books?.filter((b: Book) => b.status === "Lu").length || 0;
+  const readCount =
+    books?.filter((b: BookRow) => b.status === "Lu").length || 0;
   const readingCount =
-    books?.filter((b: Book) => b.status === "En cours").length || 0;
+    books?.filter((b: BookRow) => b.status === "En cours").length || 0;
   const toReadCount =
-    books?.filter((b: Book) => b.status === "À lire").length || 0;
+    books?.filter((b: BookRow) => b.status === "À lire").length || 0;
 
   return (
     <div className="container mx-auto p-6 max-w-6xl">
@@ -81,13 +82,18 @@ export default function LibraryPage() {
         <input
           type="text"
           placeholder="Rechercher un livre..."
+          aria-label="Rechercher un livre"
           className="flex-1 px-4 py-2.5 border border-bookbeige rounded-full text-sm bg-white text-bookdark shadow-sm focus:outline-none focus:ring-2 focus:ring-bookochre/30"
           value={search}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
             setSearch(e.target.value)
           }
         />
-        <button className="p-2.5 bg-bookochre rounded-full text-white shadow hover:opacity-90 transition-opacity">
+        <button
+          type="button"
+          aria-label="Lancer la recherche"
+          className="p-2.5 bg-bookochre rounded-full text-white shadow hover:opacity-90 transition-opacity"
+        >
           <Search size={18} />
         </button>
       </div>
@@ -95,7 +101,11 @@ export default function LibraryPage() {
       {/* Books list: show empty state when no results */}
       <div className="mt-8 grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
         {filteredBooks.length === 0 ? (
-          <p className="text-gray-500 text-center col-span-full">
+          <p
+            className="text-gray-500 text-center col-span-full"
+            role="status"
+            aria-live="polite"
+          >
             Aucun livre trouvé.
           </p>
         ) : (
