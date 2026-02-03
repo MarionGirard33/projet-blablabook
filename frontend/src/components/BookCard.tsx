@@ -92,6 +92,8 @@ export function BookCard({ book, onRemove, onStatusChange }: Props) {
               //src={`https://covers.openlibrary.org/b/id/${book.coverId}-M.jpg`}
               src={book.coverId} // dev
               alt={`Couverture de ${book.name}`}
+              width="320"
+              height="192"
               className="w-full h-48 object-cover"
             />
           ) : (

@@ -31,6 +31,8 @@ export default function BookCardCarousel({
           <img
             src={book.cover}
             alt={`Couverture de ${book.title}`}
+            width="128"
+            height="192"
             className="h-48 w-32 object-cover mb-2 rounded shadow"
             style={{ maxHeight: "12rem", minHeight: "12rem" }}
           />

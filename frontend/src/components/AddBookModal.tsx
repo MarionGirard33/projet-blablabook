@@ -114,16 +114,14 @@ export function AddBookModal({ isOpen, onClose, userId }: AddBookModalProps) {
               setQuery(e.target.value);
               if (hasSearched) setHasSearched(false);
             }}
-            aria-label="Rechercher un livre à ajouter"
-            className="flex-1 bg-white border-bookbeige rounded-full shadow-sm focus:ring-2 focus:ring-bookochre/30 focus-visible:ring-2 focus-visible:ring-bookochre/30"
+            className="flex-1 bg-white border-bookbeige rounded-full shadow-sm focus:ring-2 focus:ring-bookochre/30"
           />
 
           <Button
-            type="submit"
-            className="flex items-center gap-2 bg-bookterracotta hover:bg-bookochre rounded-full shadow focus-visible:ring-2 focus-visible:ring-offset-2"
-            aria-label="Lancer la recherche de livres"
+            onClick={handleSearch}
+            className="flex items-center gap-2 bg-bookterracotta hover:bg-bookochre rounded-full shadow"
           >
-            <Search size={18} aria-hidden="true" />
+            <Search size={18} />
             Rechercher
           </Button>
         </div>
