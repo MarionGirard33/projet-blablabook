@@ -37,3 +37,14 @@ export interface BookRow {
 // export interface Book extends BookRow {
 //   listName?: string;
 // }
+
+// BookDisplay: unified display type for the front end
+// Allows all components to use the same type, regardless of the source (internal or external)
+export interface BookDisplay {
+  key: string;
+  title: string;
+  author: string;
+  cover: string;
+  isbn?: string;
+  categories?: string[];
+}
