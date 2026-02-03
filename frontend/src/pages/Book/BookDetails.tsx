@@ -16,6 +16,7 @@ import { BookStatusAction } from "../../components/Book/BookStatusAction";
 import { Button } from "../../components/ui/button";
 import type { BookStatus } from "@/@types/books";
 import { BookSummary } from "@/components/Book/BookSummary";
+import type { AxiosError } from "axios";
 
 // --- MAIN COMPONENT ---
 const BookDetails = () => {
@@ -66,7 +67,7 @@ const BookDetails = () => {
       alert("Success: Book added to your library!");
       refetch();
     },
-    onError: (err: any) => {
+    onError: (err: AxiosError<{ message: string }>) => {
       console.error("Backend error:", err);
       const message = err.response?.data?.message || err.message || "Failed to add book.";
       alert(`Error: ${message}`);
