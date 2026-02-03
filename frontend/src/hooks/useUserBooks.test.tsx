@@ -1,7 +1,15 @@
 import React from "react";
 import { renderHook, waitFor, act } from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { describe, expect, it, vi, afterEach, type Mock } from "vitest";
+import {
+  describe,
+  expect,
+  it,
+  vi,
+  afterEach,
+  beforeEach,
+  type Mock,
+} from "vitest";
 import type { BookRow } from "@/@types/books";
 import { useUserBooks } from "./useUserBooks";
 
@@ -56,6 +64,10 @@ const createBookRow = (overrides?: Partial<BookRow>): BookRow => ({
 });
 
 describe("useUserBooks", () => {
+  beforeEach(() => {
+    (getUserBooks as Mock).mockResolvedValue([]);
+  });
+
   it("fetches books when userId is provided", async () => {
     const books: BookRow[] = [createBookRow()];
 
