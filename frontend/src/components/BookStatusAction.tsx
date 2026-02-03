@@ -1,5 +1,5 @@
 import React from "react";
-import { Heart, CheckCircle, BookOpen, Clock, Loader2 } from "lucide-react";
+import { Heart, CheckCircle, BookOpen, Clock, Loader2, LogIn } from "lucide-react";
 import { Button } from "./ui/button"; 
 import { Badge } from "./ui/badge";
 import {
@@ -22,6 +22,7 @@ interface BookStatusActionProps {
   isAdding?: boolean;
   onChangeStatus?: (status: BookStatus) => void;
   isUpdatingStatus?: boolean; 
+  isConnected?: boolean; //if the user is connected
 }
 
 // Component to display the book status and allow adding/updating
@@ -31,6 +32,7 @@ export const BookStatusAction: React.FC<BookStatusActionProps> = ({
   isAdding = false, 
   onChangeStatus,
   isUpdatingStatus = false,
+  isConnected,
 }) => {
 
   // Map each status to a label, icon, and styling
@@ -45,6 +47,21 @@ export const BookStatusAction: React.FC<BookStatusActionProps> = ({
       icon: Clock,
     },
   };
+
+  // Determine button label based on state
+  const getButtonLabel = () => {
+    if (isAdding) return "Ajout...";
+    if (isConnected) return "Ajouter à ma bibliothèque";
+    return "Connectez-vous pour l'ajouter";
+  };
+  // Determine button icon based on state
+  const ButtonIcon = () => {
+    if (isAdding) return <Loader2 className="mr-2 h-5 w-5 animate-spin" />;
+    if (isConnected) return <Heart className="mr-2 h-5 w-5 fill-transparent group-hover:fill-white transition-colors duration-300" />;
+    return <LogIn className="mr-2 h-5 w-5" />;
+  };
+  // Get the button label
+  const buttonLabel = getButtonLabel();
 
   // If the book has a status, display it with a dropdown for updating
   if (status && statusConfig[status]) {
@@ -93,20 +110,22 @@ export const BookStatusAction: React.FC<BookStatusActionProps> = ({
   return (
     <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm flex flex-col items-center text-center gap-4">
       <div className="text-center space-y-1">
-        <h3 className="font-semibold text-lg text-gray-900">Intéressé par ce livre?</h3>
+        <h3 className="font-semibold text-lg text-gray-900">
+          { "Intéressé par ce livre ?" }
+        </h3>
       </div>
 
       <Button 
         onClick={onAddToLibrary} 
         disabled={isAdding}
-        className="w-full h-12 text-md bg-rose-600 hover:bg-rose-700 text-white shadow-md hover:shadow-lg transition-all active:scale-95 group"
+        className={`w-full h-12 text-md shadow-md hover:shadow-lg transition-all active:scale-95 group ${
+          isConnected 
+            ? "bg-rose-600 hover:bg-rose-700 text-white" 
+            : "bg-primary hover:bg-primary/90 text-white"
+        }`}
       >
-        {isAdding ? (
-          <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-        ) : (
-          <Heart className="mr-2 h-5 w-5 fill-transparent group-hover:fill-white transition-colors duration-300" />
-        )}
-        {isAdding ? "Adding..." : "Ajouter à ma bibliothèque"}
+        <ButtonIcon />
+                {buttonLabel}
       </Button>
     </div>
   );
