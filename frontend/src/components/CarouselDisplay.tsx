@@ -32,8 +32,6 @@ function BookCardSkeleton() {
 export default function CarouselDisplay({
   title,
   books,
-  mode,
-  categoryName,
   isLoading,
   seeAllButton,
 }: Readonly<CarouselProps>) {
@@ -51,11 +49,7 @@ export default function CarouselDisplay({
             <Link
               to="/see-all"
               className={`${isLoading ? "opacity-40 pointer-events-none" : ""} transition-opacity duration-200 flex items-center gap-2`}
-              search={
-                isLoading && mode === "category"
-                  ? { mode, categoryName: categoryName, title }
-                  : { mode, title, books }
-              }
+              search={{ title, books }}
             >
               Voir tout
               <ArrowRight />

@@ -14,6 +14,7 @@ export type ExternalBook = {
 export type UseExternalBooksOptions = {
   mode: "search" | "random" | "category";
   param?: string;
+  enabled?: boolean;
 };
 
 export interface EditionData {

@@ -60,10 +60,11 @@ export default function HomePage() {
           title={"Suggestions Aléatoire"}
           books={
             isRandomLoading
-              ? (internalBooks || []).map(mapBookRowToDisplay)
+              ? (internalBooks || [])
+                  .filter((book) => book.categories?.includes("random"))
+                  .map(mapBookRowToDisplay)
               : randomResults.map(mapExternalBookToDisplay)
           }
-          mode={"random"}
           isLoading={!internalBooks}
           seeAllButton={true}
         />
@@ -76,7 +77,6 @@ export default function HomePage() {
                   .map(mapBookRowToDisplay)
               : bestSellerResults.map(mapExternalBookToDisplay)
           }
-          mode={"category"}
           categoryName={"bestsellers"}
           isLoading={!internalBooks}
           seeAllButton={true}
@@ -90,7 +90,6 @@ export default function HomePage() {
                   .map(mapBookRowToDisplay)
               : horrorResults.map(mapExternalBookToDisplay)
           }
-          mode={"category"}
           categoryName={"horror"}
           isLoading={!internalBooks}
           seeAllButton={true}
