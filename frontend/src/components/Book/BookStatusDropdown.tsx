@@ -40,7 +40,7 @@ export const BookStatusDropdown: React.FC<BookStatusDropdownProps> = ({
       <DropdownMenuTrigger asChild>
         <Badge
           variant={badgeVariantMap[status]}
-          className="cursor-pointer flex items-center gap-2 px-3 py-2 text-base"
+          className="cursor-pointer flex items-center gap-2 px-3 py-2 text-foreground font-sans"
         >
           <Icon size={18} strokeWidth={2.2} />
           {isUpdatingStatus && (
