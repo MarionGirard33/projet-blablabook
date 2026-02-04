@@ -3,12 +3,13 @@
 // Data is fetched via TanStack Query and updates automatically after mutations.
 import { useEffect, useState } from "react";
 import { BookCard } from "@/components/BookCard";
-import { Plus, Search } from "lucide-react";
+import { Plus } from "lucide-react";
 import { Button } from "../components/ui/button";
 import type { BookRow } from "../@types/books";
 import { AddBookModal } from "@/components/AddBookModal";
 import { useAuthStore } from "@/stores/authStore";
 import { useUserBooks } from "@/hooks/useUserBooks";
+import SearchBar from "@/components/SearchBar";
 
 export default function LibraryPage() {
   const { user } = useAuthStore();
@@ -25,11 +26,14 @@ export default function LibraryPage() {
     if (userId) refetch();
   }, [userId, refetch]);
 
-  // Client-side filtering by title
+  // Client-side filtering by title or author
   const filteredBooks: BookRow[] =
     books?.filter((b: BookRow) => {
       const searchLower = search.toLowerCase();
-      return b.name.toLowerCase().includes(searchLower);
+      return (
+        b.name.toLowerCase().includes(searchLower) ||
+        (b.author ?? "").toLowerCase().includes(searchLower)
+      );
     }) || [];
 
   // Reading status counters for quick stats
@@ -78,26 +82,12 @@ export default function LibraryPage() {
         </span>
       </div>
 
-      {/* Search input (client-side filtering only) */}
-      <div className="flex items-center gap-2">
-        <input
-          type="text"
-          placeholder="Rechercher un livre..."
-          aria-label="Rechercher un livre"
-          className="flex-1 px-4 py-2.5 border border-input rounded-full text-sm bg-background text-foreground shadow-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring/30"
-          value={search}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-            setSearch(e.target.value)
-          }
-        />
-        <button
-          type="button"
-          aria-label="Lancer la recherche"
-          className="p-2.5 bg-primary rounded-full text-primary-foreground shadow hover:bg-primary/90 transition-colors"
-        >
-          <Search size={18} />
-        </button>
-      </div>
+      {/* SearchBar (client-side filtering only) */}
+      <SearchBar
+        onSearch={setSearch}
+        spacingClassName="mt-2 mb-2"
+        placeholder="Rechercher dans ma bibliothèque..."
+      />
 
       {/* Books list: show empty state when no results */}
       <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
