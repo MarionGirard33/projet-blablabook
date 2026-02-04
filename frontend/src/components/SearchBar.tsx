@@ -6,9 +6,15 @@ import { Search } from "lucide-react";
 
 type SearchBarProps = {
   readonly onSearch: (query: string) => void;
+  readonly spacingClassName?: string;
+  readonly placeholder?: string;
 };
 
-export default function SearchBar({ onSearch }: SearchBarProps) {
+export default function SearchBar({
+  onSearch,
+  spacingClassName,
+  placeholder,
+}: SearchBarProps) {
   const [query, setQuery] = useState("");
   const [debouncedQuery] = useDebounce(query, 400);
 
@@ -26,7 +32,9 @@ export default function SearchBar({ onSearch }: SearchBarProps) {
 
   return (
     <form
-      className="w-full max-w-md mx-auto flex items-center gap-2 bg-chart-2 rounded-lg shadow px-3 py-2 mt-10 mb-10 sm:max-w-lg md:max-w-2xl"
+      className={`w-full max-w-md mx-auto flex items-center gap-2 bg-chart-2 rounded-lg shadow px-3 py-2 sm:max-w-lg md:max-w-2xl ${
+        spacingClassName ?? "mt-10 mb-10"
+      }`}
       onSubmit={(e) => {
         e.preventDefault();
         onSearch(query);
@@ -35,7 +43,7 @@ export default function SearchBar({ onSearch }: SearchBarProps) {
     >
       <Input
         type="text"
-        placeholder="Rechercher un livre, un auteur..."
+        placeholder={placeholder ?? "Rechercher un livre, un auteur..."}
         value={query}
         onChange={handleChange}
         aria-label="Rechercher un livre ou un auteur"
@@ -46,7 +54,7 @@ export default function SearchBar({ onSearch }: SearchBarProps) {
         variant="ghost"
         size="icon"
         aria-label="Lancer la recherche"
-        className="focus-visible:ring-2 focus-visible:ring-offset-2"
+        className="focus-visible:ring-2 focus-visible:ring-offset-2 hover:bg-primary/20 transition-colors"
       >
         <Search className="h-5 w-5 text-primary" aria-hidden="true" />
       </Button>
