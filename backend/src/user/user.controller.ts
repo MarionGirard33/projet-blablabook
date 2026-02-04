@@ -1,4 +1,11 @@
-import { Controller, Get, Patch, Body, Param, ParseIntPipe } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Patch,
+  Body,
+  Param,
+  ParseIntPipe,
+} from '@nestjs/common';
 import { ApiTags, ApiResponse } from '@nestjs/swagger';
 import { UserService } from './user.service';
 import { UpdateUserResponseDto } from './dto/update-user.response.dto';
@@ -30,10 +37,14 @@ export class UserController {
       user: updatedUser,
     };
   }
-  
+
   // soft delete
   @Patch(':id/soft-delete')
-  @ApiResponse({ status: 200, description: 'User soft deleted successfully', type: UpdateUserResponseDto })
+  @ApiResponse({
+    status: 200,
+    description: 'User soft deleted successfully',
+    type: UpdateUserResponseDto,
+  })
   @ApiResponse({ status: 404, description: 'User not found' })
   async softDelete(@Param('id', ParseIntPipe) id: number) {
     const deletedUser = await this.userService.softDelete(id);

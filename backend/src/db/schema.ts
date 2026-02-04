@@ -31,9 +31,8 @@ export const list = pgTable('list', {
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
   userId: integer('user_id')
-  .references(() => user.id, { onDelete: 'cascade' })
-  .notNull()
-
+    .references(() => user.id, { onDelete: 'cascade' })
+    .notNull(),
 });
 
 export const book = pgTable('book', {
@@ -77,7 +76,7 @@ export const userCategory = pgTable(
       .notNull(),
     userId: integer('user_id')
       .references(() => user.id, { onDelete: 'cascade' })
-      .notNull()
+      .notNull(),
   },
   // prevent duplicate category for user
   (t) => [unique('unique_category_user').on(t.userId, t.categoryId)],
@@ -115,8 +114,9 @@ export const review = pgTable('review', {
   bookId: integer('book_id')
     .references(() => book.id)
     .notNull(),
-  userId: integer('user_id')
-    .references(() => user.id, { onDelete: 'set null' }) 
+  userId: integer('user_id').references(() => user.id, {
+    onDelete: 'set null',
+  }),
 });
 
 export const refreshToken = pgTable('refresh_token', {
@@ -124,6 +124,6 @@ export const refreshToken = pgTable('refresh_token', {
   token: varchar().notNull(),
   createdAt: timestamp().defaultNow().notNull(),
   userId: integer('user_id')
-  .references(() => user.id, { onDelete: 'cascade' })
-  .notNull()
+    .references(() => user.id, { onDelete: 'cascade' })
+    .notNull(),
 });

@@ -34,7 +34,7 @@ export default function Hero() {
             size="lg"
             className="w-[80%] sm:w-auto whitespace-normal text-center mt-2"
           >
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 font-bold">
               {actionButton}
               <MoveRight />
             </div>

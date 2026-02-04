@@ -9,15 +9,25 @@ export class CategoryController {
   constructor(private readonly categoryService: CategoryService) {}
 
   @Get()
-  @ApiResponse({ status: 200, description: 'Categories retrieved successfully', type: [CategoryResponseDto] })
+  @ApiResponse({
+    status: 200,
+    description: 'Categories retrieved successfully',
+    type: [CategoryResponseDto],
+  })
   async findAll(): Promise<CategoryResponseDto[]> {
     return this.categoryService.findAll();
   }
 
   @Get(':id')
-  @ApiResponse({ status: 200, description: 'Category retrieved successfully', type: CategoryResponseDto })
+  @ApiResponse({
+    status: 200,
+    description: 'Category retrieved successfully',
+    type: CategoryResponseDto,
+  })
   @ApiResponse({ status: 404, description: 'Category not found' })
-  async findOne(@Param('id', ParseIntPipe) id: number): Promise<CategoryResponseDto> {
+  async findOne(
+    @Param('id', ParseIntPipe) id: number,
+  ): Promise<CategoryResponseDto> {
     return this.categoryService.findOne(id);
   }
 }

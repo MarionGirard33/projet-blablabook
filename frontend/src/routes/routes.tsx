@@ -9,8 +9,8 @@ import {
 import { useAuthStore } from "@/stores/authStore";
 
 // Lazy-loaded pages for code splitting - each route downloads only when visited
-const LoginPage = lazy(() => import("@/pages/Auth/LoginPage"));
-const RegisterPage = lazy(() => import("@/pages/Auth/RegisterPage"));
+const LoginPage = lazy(() => import("@/pages/Auth/LoginPage/LoginPage"));
+const RegisterPage = lazy(() => import("@/pages/Auth/RegisterPage/RegisterPage"));
 const HomePage = lazy(() => import("@/pages/HomePage"));
 const NotFound = lazy(() => import("@/pages/NotFound"));
 const LibraryPage = lazy(() => import("@/pages/LibraryPage"));
