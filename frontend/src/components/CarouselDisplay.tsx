@@ -64,7 +64,7 @@ export default function CarouselDisplay({
           align: "start",
           loop: true,
         }}
-        className="w-full max-w-4xl mx-auto"
+        className="w-full max-w-4xl mx-auto animate-in fade-in duration-500"
       >
         <CarouselContent>
           {isLoading

@@ -7,6 +7,7 @@ import {
   Param,
   Body,
   ParseIntPipe,
+  Query,
 } from '@nestjs/common';
 import { BooksService } from './books.service';
 import { CreateBookDto } from './dto/create-book.dto';
@@ -31,6 +32,15 @@ export class BooksController {
   @ApiResponse({ status: 200, description: 'Books retrieved successfully' })
   async getAllBooks() {
     return this.booksService.findAllBooks();
+  }
+
+  /**
+   * GET /books/random
+   * Returns randoms books persisted in the `book` table (not user-specific).
+   */
+  @Get('random')
+  async getRandomBooks(@Query('limit') limit: string = '10') {
+    return this.booksService.getRandomBooks(parseInt(limit));
   }
 
   /**
