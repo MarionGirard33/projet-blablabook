@@ -1,18 +1,21 @@
-import { Book, Mail, Lock, FileText } from "lucide-react";
+import { Mail, Lock, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import logo from "@/assets/Blablabook-svg.svg";
 
 export default function Footer() {
   return (
-    <footer className="w-full bg-gray-100 py-6 mt-auto border-t">
+    <footer className="w-full py-6 mt-auto border-t bg-primary text-white">
       <div className="container mx-auto flex flex-wrap flex-col md:flex-row items-center justify-between gap-6 px-4">
         <div className="flex items-center gap-2 mb-2 md:mb-0">
-          <Book className="h-6 w-6" />
-          <span className="font-bold text-lg">Blablabook</span>
+          <div className="rounded-2xl flex items-center gap-2">
+            <img src={logo} className="w-20" alt="" />
+            <span className="text-xl text-secondary">Blablabook</span>
+          </div>
         </div>
         <nav className="flex flex-wrap items-center gap-2 md:gap-4 justify-center md:justify-start mb-2 md:mb-0">
           <Tooltip>
@@ -21,7 +24,7 @@ export default function Footer() {
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="flex items-center gap-1"
+                  className="flex items-center text-md gap-1 hover:bg-chart-2"
                 >
                   <Mail className="h-5 w-5" />
                   Contact
@@ -36,7 +39,7 @@ export default function Footer() {
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="flex items-center gap-1"
+                  className="flex items-center text-md gap-1 hover:bg-chart-2"
                 >
                   <FileText className="h-5 w-5" />
                   CGU
@@ -51,7 +54,7 @@ export default function Footer() {
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="flex items-center gap-1"
+                  className="flex items-center text-md gap-1 hover:bg-chart-2"
                 >
                   <Lock className="h-5 w-5" />
                   Confidentialité
@@ -61,7 +64,7 @@ export default function Footer() {
             <TooltipContent>Politique de confidentialité</TooltipContent>
           </Tooltip>
         </nav>
-        <div className="w-full md:w-auto text-xs text-gray-500 text-center md:text-right mt-2 md:mt-0">
+        <div className="w-full md:w-auto text-md text-center md:text-right mt-2 md:mt-0">
           © {new Date().getFullYear()} Blablabook. Tous droits réservés.
         </div>
       </div>

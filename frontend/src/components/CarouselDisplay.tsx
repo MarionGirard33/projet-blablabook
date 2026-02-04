@@ -38,7 +38,7 @@ export default function CarouselDisplay({
   return (
     <section className="my-8">
       <div className="flex mb-4 items-center justify-between">
-        <h2 className="text-lg font-bold">{title}</h2>
+        <h2 className="text-lg foreground-secondary">{title}</h2>
         {seeAllButton && (
           <Button
             disabled={!!isLoading}
@@ -48,11 +48,13 @@ export default function CarouselDisplay({
           >
             <Link
               to="/see-all"
-              className={`${isLoading ? "opacity-40 pointer-events-none" : ""} transition-opacity duration-200 flex items-center gap-2`}
+              className={`${isLoading ? "opacity-40 pointer-events-none" : ""} transition-opacity underline-none duration-200 flex items-center gap-2`}
               search={{ title, books }}
             >
-              Voir tout
-              <ArrowRight />
+              <div className="flex items-center gap-2 text-black">
+                <p className="text-foreground">Voir tout</p>
+                <ArrowRight />
+              </div>
             </Link>
           </Button>
         )}
@@ -83,8 +85,8 @@ export default function CarouselDisplay({
                 </CarouselItem>
               ))}
         </CarouselContent>
-        <CarouselPrevious className="sm:flex w-8 h-8" />
-        <CarouselNext className="sm:flex w-8 h-8" />
+        <CarouselPrevious className="sm:flex w-8 h-8 hover:bg-primary hover:text-secondary" />
+        <CarouselNext className="sm:flex w-8 h-8 hover:bg-primary hover:text-secondary" />
       </Carousel>
     </section>
   );

@@ -100,7 +100,7 @@ export default function HomePage() {
 
   return (
     <div className="flex-col w-full">
-      <div className="sticky top-0 z-20 bg-white pb-2">
+      <div className="sticky top-0 z-20 bg-background pb-2">
         <Hero />
         <SearchBar onSearch={setSearch} />
       </div>

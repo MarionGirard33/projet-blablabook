@@ -17,7 +17,7 @@ export default function BookCardCarousel({
 
   return (
     <Card
-      className="flex flex-col items-center rounded-xl gap-0 overflow-hidden shadow w-full h-full p-0 min-h-96 cursor-pointer focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-bookochre"
+      className="flex flex-col bg-chart-2 items-center rounded-xl gap-0 overflow-hidden shadow w-full h-full p-0 min-h-96 cursor-pointer focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-bookochre"
       onClick={() =>
         book.isbn &&
         router.navigate({
