@@ -11,24 +11,10 @@ export type ExternalBook = {
   categories: string[];
 };
 
-export type SearchParamsSeeAllPage = {
-  title: string;
-  mode: "random" | "category";
-  categoryName?: string;
-};
-
 export type UseExternalBooksOptions = {
   mode: "search" | "random" | "category";
   param?: string;
-};
-
-export type ExternalBookCarouselProps = {
-  title: string;
-  books: Array<ExternalBook>;
-  isLoading: boolean;
-  seeAllButton?: boolean;
-  mode?: "random" | "category";
-  categoryName?: string;
+  enabled?: boolean;
 };
 
 export interface EditionData {

@@ -1,12 +1,24 @@
 import CarouselDisplay from "@/components/CarouselDisplay";
 import Hero from "@/components/Hero";
 import SearchBar from "@/components/SearchBar";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useExternalBooks } from "@/hooks/useExternalBooks";
-import { Loader2 } from "lucide-react";
+import { getBooks } from "@/api/books";
+import type { BookRow } from "@/@types/books";
+import {
+  mapBookRowToDisplay,
+  mapExternalBookToDisplay,
+} from "@/lib/bookDisplayMapper";
 
 export default function HomePage() {
   const [search, setSearch] = useState("");
+  const [internalBooks, setInternalBooks] = useState<BookRow[]>();
+
+  useEffect(() => {
+    getBooks().then((books: BookRow[]) => {
+      setInternalBooks(books);
+    });
+  }, []);
 
   const { data: searchResults = [], isLoading: isSearchLoading } =
     useExternalBooks({
@@ -32,25 +44,11 @@ export default function HomePage() {
     });
 
   let content;
-  if (isSearchLoading) {
-    content = (
-      <div
-        className="flex justify-center items-center h-64"
-        role="status"
-        aria-live="polite"
-      >
-        <Loader2
-          className="h-12 w-12 animate-spin text-primary"
-          aria-hidden="true"
-        />
-        <span className="sr-only">Chargement des résultats...</span>
-      </div>
-    );
-  } else if (searchResults.length > 0) {
+  if (isSearchLoading || searchResults.length > 0) {
     content = (
       <CarouselDisplay
         title={`Résultats pour "${search}"`}
-        books={searchResults}
+        books={searchResults.map(mapExternalBookToDisplay)}
         isLoading={isSearchLoading}
         seeAllButton={false}
       />
@@ -60,25 +58,40 @@ export default function HomePage() {
       <>
         <CarouselDisplay
           title={"Suggestions Aléatoire"}
-          books={randomResults}
-          mode={"random"}
-          isLoading={isRandomLoading}
+          books={
+            isRandomLoading
+              ? (internalBooks || [])
+                  .filter((book) => book.categories?.includes("random"))
+                  .map(mapBookRowToDisplay)
+              : randomResults.map(mapExternalBookToDisplay)
+          }
+          isLoading={!internalBooks}
           seeAllButton={true}
         />
         <CarouselDisplay
           title={"Tendances du moment"}
-          books={bestSellerResults}
-          mode={"category"}
+          books={
+            isBestSellerLoading || bestSellerResults.length === 0
+              ? (internalBooks || [])
+                  .filter((book) => book.categories?.includes("bestsellers"))
+                  .map(mapBookRowToDisplay)
+              : bestSellerResults.map(mapExternalBookToDisplay)
+          }
           categoryName={"bestsellers"}
-          isLoading={isBestSellerLoading}
+          isLoading={!internalBooks}
           seeAllButton={true}
         />
         <CarouselDisplay
           title={"Frissons et Horreur"}
-          books={horrorResults}
-          mode={"category"}
+          books={
+            isHorrorLoading || horrorResults.length === 0
+              ? (internalBooks || [])
+                  .filter((book) => book.categories?.includes("horror"))
+                  .map(mapBookRowToDisplay)
+              : horrorResults.map(mapExternalBookToDisplay)
+          }
           categoryName={"horror"}
-          isLoading={isHorrorLoading}
+          isLoading={!internalBooks}
           seeAllButton={true}
         />
       </>
@@ -87,11 +100,11 @@ export default function HomePage() {
 
   return (
     <div className="flex-col w-full">
-      <div className="sticky top-0 z-20 bg-white pb-2">
+      <div className="sticky top-0 z-20 bg-background pb-2">
         <Hero />
         <SearchBar onSearch={setSearch} />
       </div>
-      <div className="min-h-[500px]">{content}</div>
+      <div className="min-h-125">{content}</div>
     </div>
   );
 }

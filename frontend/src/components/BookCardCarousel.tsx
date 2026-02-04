@@ -1,3 +1,4 @@
+import type { BookDisplay } from "@/@types/books";
 import {
   Card,
   CardHeader,
@@ -6,19 +7,19 @@ import {
   CardContent,
 } from "@/components/ui/card";
 import { useRouter } from "@tanstack/react-router";
-import type { ExternalBook } from "../@types/externalBooks";
 
 export default function BookCardCarousel({
   book,
 }: {
-  readonly book: ExternalBook;
+  readonly book: BookDisplay;
 }) {
   const router = useRouter();
 
   return (
     <Card
-      className="flex flex-col items-center rounded-xl gap-0 overflow-hidden shadow w-full h-full p-0 min-h-96 cursor-pointer focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-bookochre"
+      className="flex flex-col bg-chart-2 items-center rounded-xl gap-0 overflow-hidden shadow w-full h-full p-0 min-h-96 cursor-pointer focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-bookochre"
       onClick={() =>
+        book.isbn &&
         router.navigate({
           to: "/books/$isbn",
           params: { isbn: book.isbn },
@@ -27,7 +28,7 @@ export default function BookCardCarousel({
       role="article"
     >
       <CardHeader className="w-full flex flex-col items-center p-4">
-        {book.cover ? (
+        {"cover" in book && book.cover ? (
           <img
             src={book.cover}
             alt={`Couverture de ${book.title}`}
@@ -42,7 +43,7 @@ export default function BookCardCarousel({
           </div>
         )}
         <CardTitle className="font-bold text-base mb-1 text-center line-clamp-2">
-          {book.title}
+          {"title" in book ? book.title : ""}
         </CardTitle>
         <CardDescription className="text-sm text-gray-700 text-center line-clamp-1">
           {book.author ? book.author : "Auteur inconnu"}
@@ -50,7 +51,9 @@ export default function BookCardCarousel({
       </CardHeader>
       <CardContent className="w-full flex flex-col items-center px-4 pb-0">
         <p className="text-xs text-gray-500 mb-1 text-center">
-          {book.publishDate ? `Première publication : ${book.publishDate}` : ""}
+          {"publishDate" in book && book.publishDate
+            ? `Première publication : ${book.publishDate}`
+            : ""}
         </p>
       </CardContent>
     </Card>

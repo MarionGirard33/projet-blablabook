@@ -22,11 +22,11 @@ export default function Hero() {
 
   return (
     <section className="w-full mt-2 px-2">
-      <div className="w-full py-8 rounded-xl shadow-xl bg-white flex flex-col items-center">
-        <h1 className="text-xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-center mb-4 sm:mb-6">
+      <div className="w-full py-8 rounded-xl shadow-xl bg-card flex flex-col items-center bg-chart-2">
+        <h1 className="text-xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-center mb-4 sm:mb-6 text-foreground">
           {title}
         </h1>
-        <p className="text-center text-gray-700 mb-6 sm:mb-8 max-w-xs sm:max-w-md md:max-w-xl lg:text-2xl text-base sm:text-lg md:text-xl">
+        <p className="text-center mb-6 sm:mb-8 max-w-xs sm:max-w-md md:max-w-xl lg:text-2xl text-base sm:text-lg md:text-xl text-muted-foreground">
           {paragraph}
         </p>
         <Link to={link} className="w-full flex justify-center">

@@ -1,54 +1,33 @@
-import type { SearchParamsSeeAllPage } from "@/@types/externalBooks";
+import type { SeeAllPageProps } from "@/@types/seeAllPageProps";
 import BookCardCarousel from "@/components/BookCardCarousel";
 import SearchBar from "@/components/SearchBar";
-import { useExternalBooks } from "@/hooks/useExternalBooks";
 import { seeAllRoute } from "@/routes/routes";
 import { useMemo, useState } from "react";
-import { Loader2 } from "lucide-react";
+import type { BookDisplay } from "@/@types/books";
 
 export default function SeeAllPage() {
-  const searchParams = seeAllRoute.useSearch() as SearchParamsSeeAllPage;
-  const mode = searchParams.mode;
+  const searchParams = seeAllRoute.useSearch() as SeeAllPageProps;
   const title = searchParams.title;
-  const categoryName = searchParams.categoryName;
-  const param = mode === "category" ? categoryName : undefined;
 
   const [query, setQuery] = useState("");
 
-  const { data: books = [], isLoading: isBooksLoading } = useExternalBooks({
-    mode,
-    param,
-  });
+  const booksDisplay: BookDisplay[] = searchParams.books ?? [];
 
-  const filteredBooks = useMemo(() => {
-    if (!query.trim()) return books;
+  const filteredBooksDisplay = useMemo(() => {
+    if (!query.trim()) return booksDisplay;
     const lowerQuery = query.toLowerCase();
-    return books.filter(
+    return booksDisplay.filter(
       (book) =>
         book.title?.toLowerCase().includes(lowerQuery) ||
         book.author?.toLowerCase().includes(lowerQuery),
     );
-  }, [books, query]);
+  }, [booksDisplay, query]);
 
   let content;
-  if (isBooksLoading) {
-    content = (
-      <div
-        className="flex items-start justify-center py-12"
-        role="status"
-        aria-live="polite"
-      >
-        <Loader2
-          className="h-12 w-12 animate-spin text-primary"
-          aria-hidden="true"
-        />
-        <span className="sr-only">Chargement des résultats...</span>
-      </div>
-    );
-  } else if (filteredBooks.length > 0) {
+  if (filteredBooksDisplay.length > 0) {
     content = (
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-        {filteredBooks.map((book) => (
+        {filteredBooksDisplay.map((book) => (
           <BookCardCarousel key={book.key} book={book} />
         ))}
       </div>

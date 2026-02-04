@@ -48,7 +48,7 @@ const createExternalBook = (
   isbn: string,
   coverUrl: string,
   description: string,
-  categories?: string[]
+  categories?: string[],
 ): ExternalBook => {
   return {
     key: edition.key,
@@ -68,7 +68,7 @@ const createExternalBook = (
 // Filter work results early to avoid unnecessary API calls
 const filterSearchResults = (
   works: WorkSearchDoc[],
-  searchText: string
+  searchText: string,
 ): WorkSearchDoc[] => {
   const searchLower = searchText.toLowerCase();
   return works.filter((work) => {
@@ -83,7 +83,7 @@ const filterSearchResults = (
 // -----------------------------
 
 export const searchExternalBooks = async (
-  params: GetExternalBooksParams
+  params: GetExternalBooksParams,
 ): Promise<ExternalBook[]> => {
   let q = "";
 
@@ -122,7 +122,7 @@ export const searchExternalBooks = async (
     const editionKey = work.edition_key[0];
     try {
       const editionResponse = await externalApi.get<EditionData>(
-        `/books/${editionKey}.json`
+        `/books/${editionKey}.json`,
       );
       const edition = editionResponse.data;
 
@@ -132,7 +132,9 @@ export const searchExternalBooks = async (
       const coverUrl = buildCoverUrl(edition);
       const categories = work.subject || [];
 
-      books.push(createExternalBook(edition, work, isbn, coverUrl, "", categories));
+      books.push(
+        createExternalBook(edition, work, isbn, coverUrl, "", categories),
+      );
     } catch (err) {
       console.warn(`Failed to fetch edition ${editionKey}:`, err);
     }
@@ -146,30 +148,30 @@ export const searchExternalBooks = async (
 
 // GET Book ISBN Data
 export const getOpenLibIsbnData = async (
-  isbn: string
+  isbn: string,
 ): Promise<ExternalApiIsbnResponse> => {
   const response = await externalApi.get<ExternalApiIsbnResponse>(
-    `/isbn/${isbn}.json`
+    `/isbn/${isbn}.json`,
   );
   return response.data;
 };
 
 // GET Book Work Data
 export const getOpenLibWorkData = async (
-  workKey: string
+  workKey: string,
 ): Promise<ExternalApiWorkResponse> => {
   const response = await externalApi.get<ExternalApiWorkResponse>(
-    `${workKey}.json`
+    `${workKey}.json`,
   );
   return response.data;
 };
 
 // GET Book Author Data
 export const getOpenLibAuthorData = async (
-  authorKey: string
+  authorKey: string,
 ): Promise<ExternalApiAuthorResponse> => {
   const response = await externalApi.get<ExternalApiAuthorResponse>(
-    `${authorKey}.json`
+    `${authorKey}.json`,
   );
   return response.data;
 };
@@ -179,7 +181,7 @@ export const getOpenLibAuthorData = async (
 // -----------------------------
 
 export const getFullExternalBook = async (
-  isbn: string
+  isbn: string,
 ): Promise<ExternalBookDisplayData> => {
   // MAPPING DATA FROM MULTIPLE CALLS
   const dataIsbn = await getOpenLibIsbnData(isbn);

@@ -5,16 +5,19 @@ import type {
 } from "@/@types/externalBooks";
 import { searchExternalBooks } from "@/api/externalBooks";
 
-export const useExternalBooks = ({ mode, param }: UseExternalBooksOptions) => {
-  let queryKey: (string | undefined)[] = [];
+export const useExternalBooks = (options: UseExternalBooksOptions) => {
+  const { mode, param, enabled: enabledOption, ...queryOptions } = options;
+  let queryKey: any[] = [];
   let queryFn: () => Promise<ExternalBook[]>;
-  let enabled = true;
+  let enabled = enabledOption !== undefined ? enabledOption : true;
 
   if (mode === "search") {
     queryKey = ["externalBooks", mode, param];
     queryFn = () =>
       searchExternalBooks({ type: "searchText", searchText: param! });
-    enabled = !!param && param.length > 0;
+    if (enabledOption === undefined) {
+      enabled = !!param && param.length > 0;
+    }
   } else if (mode === "random") {
     queryKey = ["random-external-books", mode];
     queryFn = () => searchExternalBooks({ type: "random" });
@@ -32,5 +35,6 @@ export const useExternalBooks = ({ mode, param }: UseExternalBooksOptions) => {
     queryFn,
     staleTime: 1000 * 60 * 5,
     enabled,
+    ...queryOptions,
   });
 };

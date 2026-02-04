@@ -26,7 +26,7 @@ export default function SearchBar({ onSearch }: SearchBarProps) {
 
   return (
     <form
-      className="w-full max-w-md mx-auto flex items-center gap-2 bg-white rounded-lg shadow px-3 py-2 mt-10 mb-10 sm:max-w-lg md:max-w-2xl"
+      className="w-full max-w-md mx-auto flex items-center gap-2 bg-chart-2 rounded-lg shadow px-3 py-2 mt-10 mb-10 sm:max-w-lg md:max-w-2xl"
       onSubmit={(e) => {
         e.preventDefault();
         onSearch(query);
@@ -39,7 +39,7 @@ export default function SearchBar({ onSearch }: SearchBarProps) {
         value={query}
         onChange={handleChange}
         aria-label="Rechercher un livre ou un auteur"
-        className="flex-1 border-none focus:ring-0 focus-visible:ring-2 focus-visible:ring-offset-2"
+        className="flex-1 border-none bg-white focus:ring-0 focus-visible:ring-2 focus-visible:ring-offset-2"
       />
       <Button
         type="submit"
@@ -48,7 +48,7 @@ export default function SearchBar({ onSearch }: SearchBarProps) {
         aria-label="Lancer la recherche"
         className="focus-visible:ring-2 focus-visible:ring-offset-2"
       >
-        <Search className="h-5 w-5 text-gray-500" aria-hidden="true" />
+        <Search className="h-5 w-5 text-primary" aria-hidden="true" />
       </Button>
     </form>
   );

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
-import { Menu, X, Book } from "lucide-react";
+import { Menu, X } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -10,6 +10,7 @@ import {
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
 import { useAuthStore } from "@/stores/authStore";
+import logo from "@/assets/Blablabook-svg.svg";
 
 export default function Header() {
   const user = useAuthStore((state) => state.user);
@@ -21,17 +22,19 @@ export default function Header() {
   const navigate = useNavigate();
 
   const isActive = (path: string) =>
-    location.pathname === path ? "font-bold border-primary" : "";
+    location.pathname === path ? "font-bold text-secondary" : "";
 
   return (
-    <header className=" px-4 py-4 bg-white shadow relative">
+    <header className=" px-4 py-6 text-white bg-primary shadow relative text-xl">
       <div className="flex items-center justify-between sm:px-10">
         <Link
           to="/"
           className="flex items-center gap-2 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-bookochre rounded"
         >
-          <Book className="h-8 w-8" aria-hidden="true" />
-          <span className="font-bold text-xl">Blablabook</span>
+          <div className="rounded-2xl flex items-center gap-2">
+            <img src={logo} className="w-20" alt="" />
+            <span className="text-xl text-secondary">Blablabook</span>
+          </div>
         </Link>
 
         {/* Desktop nav */}
@@ -83,7 +86,7 @@ export default function Header() {
             </>
           ) : (
             <Link to="/login">
-              <Button>Se connecter</Button>
+              <Button className="text-xl">Se connecter</Button>
             </Link>
           )}
         </nav>

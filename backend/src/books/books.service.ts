@@ -40,7 +40,18 @@ export class BooksService {
    * @returns Array of persisted book records
    */
   async findAllBooks(): Promise<BookSelect[]> {
-    return this.db.select().from(book);
+    const books = await this.db.select().from(book);
+
+    const booksWithCategories = await Promise.all(
+      books.map(async (b) => {
+        const categories = await this.getCategoriesForBook(b.id);
+        return {
+          ...b,
+          categories: categories.map((c) => c.name),
+        };
+      }),
+    );
+    return booksWithCategories as BookSelect[];
   }
   /**
    * Get all books belonging to a specific user's list, enriched with a computed
