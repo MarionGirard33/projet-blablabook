@@ -99,7 +99,7 @@ const BookDetails = () => {
           aria-live="polite"
         >
           <Loader2 className="h-10 w-10 animate-spin text-primary" aria-hidden="true" />
-          <span className="ml-3 text-muted-foreground">Fetching book details...</span>
+          <span className="ml-3 text-muted-foreground">Chargement...</span>
         </output>
       </div>
     );
