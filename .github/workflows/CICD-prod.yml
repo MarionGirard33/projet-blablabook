@@ -5,7 +5,6 @@ on:
   push:
     branches:
       - main
-      - refacto/frontend-book-details
   pull_request:
     branches:
       - main
@@ -118,7 +117,7 @@ jobs:
       - name: Start docker compose
         # injecte les env GitHub directement dans le shell
         # le | c'est pour un script multi lignes
-        run: docker compose -f docker-compose.prod.yml up -d --build
+        run: docker compose -f docker-compose.yml up -d --build
 
       # vérifie si on accède à Postgres via le container postgres
       - name: Wait for Postgres
