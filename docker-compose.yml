@@ -24,7 +24,7 @@ services:
       timeout: 5s
       retries: 5
 
-  # Backend service (NestJS + Prisma)
+  # Backend service (NestJS + Drizzle ORM)
   backend:
     container_name: backend
     build:
