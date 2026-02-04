@@ -6,16 +6,15 @@ import {
   createRoute,
   redirect,
 } from "@tanstack/react-router";
-import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { useAuthStore } from "@/stores/authStore";
 
 // Lazy-loaded pages for code splitting - each route downloads only when visited
-const LoginPage = lazy(() => import("@/pages/Auth/LoginPage"));
-const RegisterPage = lazy(() => import("@/pages/Auth/RegisterPage"));
+const LoginPage = lazy(() => import("@/pages/Auth/LoginPage/LoginPage"));
+const RegisterPage = lazy(() => import("@/pages/Auth/RegisterPage/RegisterPage"));
 const HomePage = lazy(() => import("@/pages/HomePage"));
 const NotFound = lazy(() => import("@/pages/NotFound"));
 const LibraryPage = lazy(() => import("@/pages/LibraryPage"));
-const ProfilePage = lazy(() => import("@/pages/ProfilePage/ProfilePage"));
+const ProfileRoute = lazy(() => import("@/pages/ProfilePage/ProfileRoute"));
 const BookDetails = lazy(() => import("@/pages/Book/BookDetails"));
 const SeeAllPage = lazy(() => import("@/pages/SeeAllPage"));
 
@@ -71,14 +70,7 @@ const libraryRoute = createRoute({
 const profilePage = createRoute({
   getParentRoute: () => protectedRoute,
   path: "/profile",
-  component: () => {
-    const { data: currentUser, isLoading, isError } = useCurrentUser();
-
-    if (isLoading) return <div>Chargement...</div>;
-    if (isError) return <div>Impossible de charger le profil</div>;
-
-    return <ProfilePage currentUser={currentUser!} />;
-  },
+  component: ProfileRoute,
 });
 
 // Dynamic route with ISBN parameter: /books/:isbn

@@ -10,7 +10,7 @@ import {
   removeBookFromUserList,
   updateBookStatus,
 } from "@/api/books";
-import type { BookRow } from "@/@types/books";
+import type { BookRow, BookStatus } from "@/@types/books";
 
 export const useUserBooks = (userId?: number) => {
   const queryClient = useQueryClient();
@@ -40,7 +40,7 @@ export const useUserBooks = (userId?: number) => {
       currentBook,
     }: {
       bookId: number;
-      status: "Lu" | "En cours" | "À lire";
+      status: BookStatus;
       currentBook: BookRow;
     }) => {
       if (!userId) throw new Error("UserId is required");
