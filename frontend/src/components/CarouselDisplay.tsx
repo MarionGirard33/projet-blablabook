@@ -71,15 +71,17 @@ export default function CarouselDisplay({
             ? Array.from({ length: 4 }).map((_, i) => (
                 <CarouselItem
                   key={i}
-                  className="basis-full md:basis-1/3 lg:basis-1/4"
+                  className="basis-full md:basis-1/3 lg:basis-1/4 animate-in fade-in slide-in-from-bottom-4 duration-800"
+                  style={{ animationDelay: `${i * 100}ms` }}
                 >
                   <BookCardSkeleton />
                 </CarouselItem>
               ))
-            : books.map((book) => (
+            : books.map((book, i) => (
                 <CarouselItem
                   key={book.key}
-                  className="basis-full md:basis-1/3 lg:basis-1/4"
+                  className="basis-full md:basis-1/3 lg:basis-1/4 animate-in fade-in slide-in-from-bottom-4 zoom-in-95 duration-800"
+                  style={{ animationDelay: `${i * 100}ms` }}
                 >
                   <BookCardCarousel book={book} />
                 </CarouselItem>
