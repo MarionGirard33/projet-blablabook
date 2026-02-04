@@ -98,8 +98,8 @@ const BookDetails = () => {
           className="flex items-center" 
           aria-live="polite"
         >
-          <Loader2 className="h-10 w-10 animate-spin text-primary" aria-hidden="true" />
-          <span className="ml-3 text-muted-foreground">Chargement...</span>
+          <Loader2 className="h-10 w-10 animate-spin text-foreground font-sans" aria-hidden="true" />
+          <span className="ml-3 text-foreground">Chargement...</span>
         </output>
       </div>
     );
@@ -108,7 +108,7 @@ const BookDetails = () => {
   if (isError || !book) {
     return (
       <div className="flex flex-col items-center justify-center h-[50vh] space-y-4">
-        <p className="text-destructive font-semibold text-lg" role="alert">
+        <p className="text-destructive font-sans text-lg" role="alert">
           Oups ! {(error as Error)?.message || "Impossible de charger ce livre."}
         </p>
         <Button variant="outline" 
@@ -128,7 +128,7 @@ return (
     <div className="mb-6">
       <button
           onClick={() => router.history.back()}
-          className="inline-flex items-center text-sm font-medium text-muted-foreground hover:text-primary transition-colors cursor-pointer"
+          className="inline-flex items-center text-sm font-sans text-foreground hover:text-primary transition-colors cursor-pointer"
         >
           <ArrowLeft className="mr-2 h-4 w-4" aria-hidden="true" />
           Retour
