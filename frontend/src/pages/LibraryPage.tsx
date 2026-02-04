@@ -3,11 +3,13 @@
 // Data is fetched via TanStack Query and updates automatically after mutations.
 import { useEffect, useState } from "react";
 import { BookCard } from "@/components/BookCard";
-import { Plus, Search } from "lucide-react";
+import { Plus } from "lucide-react";
+import { Button } from "../components/ui/button";
 import type { BookRow } from "../@types/books";
 import { AddBookModal } from "@/components/AddBookModal";
 import { useAuthStore } from "@/stores/authStore";
 import { useUserBooks } from "@/hooks/useUserBooks";
+import SearchBar from "@/components/SearchBar";
 
 export default function LibraryPage() {
   const { user } = useAuthStore();
@@ -24,11 +26,14 @@ export default function LibraryPage() {
     if (userId) refetch();
   }, [userId, refetch]);
 
-  // Client-side filtering by title
+  // Client-side filtering by title or author
   const filteredBooks: BookRow[] =
     books?.filter((b: BookRow) => {
       const searchLower = search.toLowerCase();
-      return b.name.toLowerCase().includes(searchLower);
+      return (
+        b.name.toLowerCase().includes(searchLower) ||
+        (b.author ?? "").toLowerCase().includes(searchLower)
+      );
     }) || [];
 
   // Reading status counters for quick stats
@@ -40,20 +45,20 @@ export default function LibraryPage() {
     books?.filter((b: BookRow) => b.status === "À lire").length || 0;
 
   return (
-    <div className="container mx-auto p-6 max-w-6xl">
+    <div className="flex w-full flex-col gap-6 px-4 pb-10 md:px-6">
       {/* Banner: page title + open AddBook modal */}
-      <div className="bg-bookcream/70 border border-bookbeige rounded-2xl p-6 shadow-md flex flex-col items-center gap-3">
-        <h1 className="text-2xl md:text-3xl font-bold text-bookdark">
+      <div className="w-full py-8 rounded-xl shadow-xl bg-card flex flex-col items-center bg-chart-2">
+        <h1 className="text-xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-center mb-4 sm:mb-6 text-foreground">
           Ma Bibliothèque
         </h1>
-        <button
+        <Button
           onClick={() => setOpen(true)}
-          className="px-5 py-2.5 bg-bookterracotta text-white rounded-full flex items-center gap-2 text-sm shadow hover:bg-bookochre transition-colors"
-          aria-label="Ajouter un livre"
+          size="lg"
+          className="w-[80%] sm:w-auto whitespace-normal text-center mt-2"
         >
           <Plus size={16} />
-          Ajouter
-        </button>
+          Ajouter un livre
+        </Button>
         {/* AddBook modal controlled by `open` state */}
         <AddBookModal
           isOpen={open}
@@ -63,46 +68,32 @@ export default function LibraryPage() {
       </div>
 
       {/* Status: counters by reading status */}
-      <div className="flex flex-wrap justify-center gap-3 mt-6 text-sm text-bookdark">
-        <span className="px-3 py-1.5 bg-bookbeige/70 rounded-full shadow-sm">
+      <div className="flex flex-wrap justify-center gap-3 text-sm text-muted-foreground">
+        <span className="px-3 py-1.5 bg-muted/60 border border-border rounded-md shadow-sm text-foreground bg-primary text-primary-foreground">
           Lus : <strong>{readCount}</strong>
         </span>
 
-        <span className="px-3 py-1.5 bg-bookbeige/70 rounded-full shadow-sm">
+        <span className="px-3 py-1.5 bg-muted/60 border border-border rounded-md shadow-sm text-foreground bg-primary text-primary-foreground">
           En cours : <strong>{readingCount}</strong>
         </span>
 
-        <span className="px-3 py-1.5 bg-bookbeige/70 rounded-full shadow-sm">
+        <span className="px-3 py-1.5 bg-muted/60 border border-border rounded-md shadow-sm text-foreground bg-primary text-primary-foreground">
           À lire : <strong>{toReadCount}</strong>
         </span>
       </div>
 
-      {/* Search input (client-side filtering only) */}
-      <div className="mt-6 flex items-center gap-2">
-        <input
-          type="text"
-          placeholder="Rechercher un livre..."
-          aria-label="Rechercher un livre"
-          className="flex-1 px-4 py-2.5 border border-bookbeige rounded-full text-sm bg-white text-bookdark shadow-sm focus:outline-none focus:ring-2 focus:ring-bookochre/30"
-          value={search}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-            setSearch(e.target.value)
-          }
-        />
-        <button
-          type="button"
-          aria-label="Lancer la recherche"
-          className="p-2.5 bg-bookochre rounded-full text-white shadow hover:opacity-90 transition-opacity"
-        >
-          <Search size={18} />
-        </button>
-      </div>
+      {/* SearchBar (client-side filtering only) */}
+      <SearchBar
+        onSearch={setSearch}
+        spacingClassName="mt-2 mb-2"
+        placeholder="Rechercher dans ma bibliothèque..."
+      />
 
       {/* Books list: show empty state when no results */}
-      <div className="mt-8 grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
         {filteredBooks.length === 0 ? (
           <p
-            className="text-gray-500 text-center col-span-full"
+            className="text-muted-foreground text-center col-span-full"
             role="status"
             aria-live="polite"
           >

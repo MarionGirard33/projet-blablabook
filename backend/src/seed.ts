@@ -6,8 +6,8 @@ async function seed() {
 
   const categoriesToInsert = [
     { name: 'random' },
-    { name: 'bestsellers' },
     { name: 'horror' },
+    { name: 'love' },
   ];
 
   const booksData = [

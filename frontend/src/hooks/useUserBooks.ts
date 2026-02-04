@@ -52,7 +52,7 @@ export const useUserBooks = (userId?: number) => {
 
   return {
     // Query
-    books: booksQuery.data ?? [],
+    books: Array.isArray(booksQuery.data) ? booksQuery.data : [],
     isLoading: booksQuery.isLoading,
     isError: booksQuery.isError,
     refetch: booksQuery.refetch,

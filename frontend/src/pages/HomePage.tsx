@@ -3,19 +3,44 @@ import Hero from "@/components/Hero";
 import SearchBar from "@/components/SearchBar";
 import { useEffect, useState } from "react";
 import { useExternalBooks } from "@/hooks/useExternalBooks";
-import { getBooks } from "@/api/books";
+import { getBooks, getRandomBooks } from "@/api/books";
 import type { BookRow } from "@/@types/books";
 import {
   mapBookRowToDisplay,
   mapExternalBookToDisplay,
 } from "@/lib/bookDisplayMapper";
+import { horrorKeywords, loveKeywords, fantasyKeywords } from "@/lib/utils";
 
 export default function HomePage() {
   const [search, setSearch] = useState("");
+
+  const [randomBooks, setRandomBooks] = useState<BookRow[]>();
   const [internalBooks, setInternalBooks] = useState<BookRow[]>();
 
+  const horrorBooks: BookRow[] = (internalBooks || []).filter((book) =>
+    book.categories?.some((cat) =>
+      horrorKeywords.some((keyword) => cat.toLowerCase().includes(keyword)),
+    ),
+  );
+
+  const loveBooks: BookRow[] = (internalBooks || []).filter((book) =>
+    book.categories?.some((cat) =>
+      loveKeywords.some((keyword) => cat.toLowerCase().includes(keyword)),
+    ),
+  );
+
+  const fantasyBooks: BookRow[] = (internalBooks || []).filter((book) =>
+    book.categories?.some((cat) =>
+      fantasyKeywords.some((keyword) => cat.toLowerCase().includes(keyword)),
+    ),
+  );
+
   useEffect(() => {
-    getBooks().then((books: BookRow[]) => {
+    getRandomBooks(20).then((books) => {
+      setRandomBooks(books);
+    });
+
+    getBooks().then((books) => {
       setInternalBooks(books);
     });
   }, []);
@@ -26,71 +51,62 @@ export default function HomePage() {
       param: search,
     });
 
-  const { data: randomResults = [], isLoading: isRandomLoading } =
-    useExternalBooks({
-      mode: "random",
-    });
-
-  const { data: bestSellerResults = [], isLoading: isBestSellerLoading } =
-    useExternalBooks({
-      mode: "category",
-      param: "bestsellers",
-    });
-
-  const { data: horrorResults = [], isLoading: isHorrorLoading } =
-    useExternalBooks({
-      mode: "category",
-      param: "horror",
-    });
-
   let content;
-  if (isSearchLoading || searchResults.length > 0) {
-    content = (
-      <CarouselDisplay
-        title={`Résultats pour "${search}"`}
-        books={searchResults.map(mapExternalBookToDisplay)}
-        isLoading={isSearchLoading}
-        seeAllButton={false}
-      />
-    );
+  if (search) {
+    if (isSearchLoading) {
+      content = (
+        <CarouselDisplay
+          title={`Recherche en cours...`}
+          books={[]}
+          isLoading={true}
+          seeAllButton={false}
+        />
+      );
+    } else if (searchResults.length === 0) {
+      content = (
+        <div className="text-center py-10">
+          <p className="text-lg text-muted-foreground">
+            Aucun résultat trouvé pour "{search}"
+          </p>
+          <p className="text-sm text-muted-foreground mt-2">
+            Essayez avec d'autres mots-clés
+          </p>
+        </div>
+      );
+    } else {
+      content = (
+        <CarouselDisplay
+          title={`Résultats pour "${search}"`}
+          books={searchResults.map(mapExternalBookToDisplay)}
+          isLoading={false}
+          seeAllButton={false}
+        />
+      );
+    }
   } else {
     content = (
       <>
         <CarouselDisplay
           title={"Suggestions Aléatoire"}
-          books={
-            isRandomLoading
-              ? (internalBooks || [])
-                  .filter((book) => book.categories?.includes("random"))
-                  .map(mapBookRowToDisplay)
-              : randomResults.map(mapExternalBookToDisplay)
-          }
+          books={(randomBooks || [])?.map(mapBookRowToDisplay)}
+          isLoading={!randomBooks}
+          seeAllButton={true}
+        />
+        <CarouselDisplay
+          title={"Fantasy et Magie"}
+          books={fantasyBooks?.map(mapBookRowToDisplay)}
           isLoading={!internalBooks}
           seeAllButton={true}
         />
         <CarouselDisplay
-          title={"Tendances du moment"}
-          books={
-            isBestSellerLoading || bestSellerResults.length === 0
-              ? (internalBooks || [])
-                  .filter((book) => book.categories?.includes("bestsellers"))
-                  .map(mapBookRowToDisplay)
-              : bestSellerResults.map(mapExternalBookToDisplay)
-          }
-          categoryName={"bestsellers"}
+          title={"Romance"}
+          books={loveBooks?.map(mapBookRowToDisplay)}
           isLoading={!internalBooks}
           seeAllButton={true}
         />
         <CarouselDisplay
           title={"Frissons et Horreur"}
-          books={
-            isHorrorLoading || horrorResults.length === 0
-              ? (internalBooks || [])
-                  .filter((book) => book.categories?.includes("horror"))
-                  .map(mapBookRowToDisplay)
-              : horrorResults.map(mapExternalBookToDisplay)
-          }
-          categoryName={"horror"}
+          books={horrorBooks?.map(mapBookRowToDisplay)}
           isLoading={!internalBooks}
           seeAllButton={true}
         />
