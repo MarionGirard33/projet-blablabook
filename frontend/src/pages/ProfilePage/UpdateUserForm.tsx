@@ -19,15 +19,7 @@ export default function UpdateUserForm({ userId, onClose, onUpdate }: UpdateUser
   const updateUserMutation = useUpdateUser(userId);
 
   const { data: currentUser } = useCurrentUser();
-  if (!currentUser) {
-    return (
-      <div role="status" aria-live="polite">
-        Loading...
-      </div>
-    );
-  }
-
-  const form = useForm({
+    const form = useForm({
     defaultValues: {
       username: currentUser?.username || "",
       email: currentUser?.email.toLowerCase() || "",
@@ -36,6 +28,7 @@ export default function UpdateUserForm({ userId, onClose, onUpdate }: UpdateUser
       image: currentUser?.image || undefined,
     },
     onSubmit: async ({ value }) => {
+      if (!currentUser) return;
       if (value.password && value.password !== value.confirmPassword) {
         alert("Les mots de passe ne correspondent pas !");
         return;
@@ -62,6 +55,14 @@ export default function UpdateUserForm({ userId, onClose, onUpdate }: UpdateUser
       });
     },
   });
+  
+  if (!currentUser) {
+    return (
+      <output aria-live="polite">
+        Loading...
+      </output>
+    );
+  }
 
   return (
     <form

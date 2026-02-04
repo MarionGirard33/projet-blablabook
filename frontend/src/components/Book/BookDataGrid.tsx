@@ -1,6 +1,6 @@
 import React from "react";
 import { Globe, Library, FileText, Barcode, Calendar, Star } from "lucide-react";
-import { BookDataItem } from "./ui/item";
+import { BookDataItem } from "../ui/item";
 
 interface BookDataGridProps {
   isbn: string;
@@ -13,8 +13,8 @@ interface BookDataGridProps {
 }
 
 export const BookDataGrid: React.FC<BookDataGridProps> = ({ isbn, publisher, language, pages, publishedAt, categories, rating }) => (
-  <div className="bg-card border border-border rounded-xl p-6 mt-6 shadow-sm">
-    {/* BookDataGrid displays book technical details using BookDataItem for each field */}
+    <div className="bg-card border border-border rounded-xl p-6 shadow-sm w-full">
+      {/* BookDataGrid displays book technical details using BookDataItem for each field */}
     <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
       {/* ISBN field */}
       <BookDataItem icon={<Barcode size={18} />} label="code ISBN" value={isbn} />

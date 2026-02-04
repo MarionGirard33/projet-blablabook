@@ -1,4 +1,4 @@
-import { Link } from "@tanstack/react-router";
+import { useRouter } from "@tanstack/react-router";
 import { ArrowLeft, Loader2 } from "lucide-react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { addBookToUserList } from "../../api/books";
@@ -9,15 +9,18 @@ import { getFullExternalBook } from "../../api/externalBooks";
 
 import type { ExternalBookDisplayData } from "../../@types/externalBooks";
 
-import { BookCover } from "../../components/BookCover";
-import { BookHeaderInfo } from "../../components/BookHeaderInfo";
-import { BookDataGrid } from "../../components/BookDataGrid";
-import { BookStatusAction } from "../../components/BookStatusAction";
+import { BookCover } from "../../components/Book/BookCover";
+import { BookHeaderInfo } from "../../components/Book/BookHeaderInfo";
+import { BookDataGrid } from "../../components/Book/BookDataGrid";
+import { BookStatusAction } from "../../components/Book/BookStatusAction";
 import { Button } from "../../components/ui/button";
 import type { BookStatus } from "@/@types/books";
+import { BookSummary } from "@/components/Book/BookSummary";
+import type { AxiosError } from "axios";
 
 // --- MAIN COMPONENT ---
 const BookDetails = () => {
+  const router = useRouter();
   const { isbn } = bookDetailsRoute.useParams();
   const { data: currentUser } = useCurrentUser();
 
@@ -61,10 +64,9 @@ const BookDetails = () => {
       return addBookToUserList(currentUser.id, payload);
     },
     onSuccess: () => {
-      alert("Success: Book added to your library!");
       refetch();
     },
-    onError: (err: any) => {
+    onError: (err: AxiosError<{ message: string }>) => {
       console.error("Backend error:", err);
       const message = err.response?.data?.message || err.message || "Failed to add book.";
       alert(`Error: ${message}`);
@@ -72,6 +74,13 @@ const BookDetails = () => {
   });
 
   const handleAddToLibrary = () => {
+    if (!currentUser) {
+      router.navigate({
+        to: '/login',
+        search: { redirect: globalThis.location.pathname }
+      });
+      return;
+    }
     if (book) addBookMutation.mutate(book);
   };
 
@@ -84,13 +93,14 @@ const BookDetails = () => {
   // --- LOADING & ERROR STATES ---
   if (isLoading) {
     return (
-      <div
-        className="flex h-[50vh] w-full items-center justify-center"
-        role="status"
-        aria-live="polite"
-      >
-        <Loader2 className="h-10 w-10 animate-spin text-primary" aria-hidden="true" />
-        <span className="ml-3 text-muted-foreground">Fetching book details...</span>
+      <div className="flex h-[50vh] w-full items-center justify-center">
+        <output 
+          className="flex items-center" 
+          aria-live="polite"
+        >
+          <Loader2 className="h-10 w-10 animate-spin text-primary" aria-hidden="true" />
+          <span className="ml-3 text-muted-foreground">Fetching book details...</span>
+        </output>
       </div>
     );
   }
@@ -101,7 +111,9 @@ const BookDetails = () => {
         <p className="text-destructive font-semibold text-lg" role="alert">
           Oups ! {(error as Error)?.message || "Impossible de charger ce livre."}
         </p>
-        <Button variant="outline" onClick={() => globalThis.history.back()}>
+        <Button variant="outline" 
+        onClick={() => router.history.back()}
+        >
           Retour
         </Button>
       </div>
@@ -109,66 +121,66 @@ const BookDetails = () => {
   }
 
   // --- FRONTEND RENDER ---
-  return (
-    <div className="container mx-auto p-6 max-w-5xl animate-in fade-in zoom-in-95 duration-500">
-      
-      {/* BACK NAVIGATION */}
-      <div className="mb-6">
-        <Link
-          to="/library"
-          className="inline-flex items-center text-sm font-medium text-muted-foreground hover:text-primary transition-colors"
+return (
+  <div className="container mx-auto p-6 max-w-5xl min-h-[80vh] animate-in fade-in zoom-in-95 duration-500">
+    
+    {/* BACK NAVIGATION */}
+    <div className="mb-6">
+      <button
+          onClick={() => router.history.back()}
+          className="inline-flex items-center text-sm font-medium text-muted-foreground hover:text-primary transition-colors cursor-pointer"
         >
           <ArrowLeft className="mr-2 h-4 w-4" aria-hidden="true" />
           Retour
-        </Link>
-      </div>
-
-      <div className="flex flex-col items-center space-y-10">
-      {/* COVER AND HEADER INFO */}
-        <div className="flex flex-col items-center text-center space-y-6 w-full max-w-2xl">
-          <div className="relative group shadow-2xl rounded-lg">
-            <BookCover
-              src={book.cover}
-              alt={book.title}
-              className="w-full max-w-[220px] md:max-w-[260px] rounded-lg transform group-hover:scale-105 transition-transform duration-500"
-            />
-          </div>
-          <BookHeaderInfo title={book.title} author={book.authors[0]} />
-        </div>
-
-        {/* DETAILS AND STATUS */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 w-full items-start">
-          <div className="lg:col-span-2 w-full">
-            <BookDataGrid
-              publisher={book.publisher}
-              publishedAt={book.publishedAt}
-              pages={book.pages}
-              isbn={book.isbn}
-              language={book.language}
-              categories={book.categories.slice(0, 5)} // TODO: show most used categories from API
-            />
-          </div>
-          <div className="lg:col-span-1 w-full lg:sticky lg:top-6">
-            <BookStatusAction
-              status={userBooks.find((b) => b.isbn === book.isbn)?.status}
-              onAddToLibrary={handleAddToLibrary}
-              isAdding={addBookMutation.isPending}
-              onChangeStatus={handleChangeStatus}
-              isUpdatingStatus={isUpdatingStatus}
-            />
-          </div>
-        </div>
-
-        {/* SUMMARY */}
-        <div className="w-full pt-6 border-t border-border">
-          <h3 className="text-xl font-semibold tracking-tight mb-4">Résumé</h3>
-          <div className="prose prose-lg dark:prose-invert max-w-none text-muted-foreground leading-relaxed whitespace-pre-line">
-            {book.description || <span className="italic opacity-70">Aucune description fournie par l'éditeur.</span>}
-          </div>
-        </div>
-      </div>
+      </button>
     </div>
-  );
+
+    <div className="flex flex-col items-center space-y-10">
+      {/* COVER AND HEADER INFO */}
+      <div className="flex flex-col items-center text-center space-y-6 w-full max-w-2xl">
+        <div className="relative group shadow-2xl rounded-lg">
+          <BookCover
+            src={book.cover}
+            alt={book.title}
+            className="w-full w-[220px] md:w-[260px] aspect-[2/3] object-cover rounded-lg transform group-hover:scale-105 transition-transform duration-500"
+          />
+        </div>
+        <BookHeaderInfo title={book.title} author={book.authors[0]} />
+      </div>
+
+      {/* DETAILS AND STATUS GRID */}
+      <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 w-full items-start">        
+        <div className="order-first xl:order-last xl:col-span-1 w-full xl:sticky xl:top-6 flex flex-col">
+          {/* STATUS ACTION */}
+          <BookStatusAction
+            status={userBooks.find((b) => b.isbn === book.isbn)?.status}
+            onAddToLibrary={handleAddToLibrary}
+            isAdding={addBookMutation.isPending}
+            onChangeStatus={handleChangeStatus}
+            isUpdatingStatus={isUpdatingStatus}
+            isConnected={!!currentUser?.id}
+          />
+        </div>
+
+        {/* DETAILS */}
+        <div className="xl:col-span-2 w-full">
+          <BookDataGrid
+            publisher={book.publisher}
+            publishedAt={book.publishedAt}
+            pages={book.pages}
+            isbn={book.isbn}
+            language={book.language}
+            categories={book.categories.slice(0, 5)}
+          />
+        </div>
+
+      </div>
+
+      {/* SUMMARY */}
+      <BookSummary description={book.description} />
+    </div>
+  </div>  
+);
 };
 
 export default BookDetails;

@@ -10,7 +10,6 @@ export const useUpdateUser = (userId: number, options?: { onSuccess?: () => void
     onSuccess: (_, updatedData) => {
       queryClient.setQueryData(["user", userId], updatedData);
       //TODO Modale génétique pour les alertes
-      alert("Profil mis à jour !");
       options?.onSuccess?.();
     },
     onError: (error) => {

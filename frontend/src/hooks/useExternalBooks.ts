@@ -6,7 +6,7 @@ import type {
 import { searchExternalBooks } from "@/api/externalBooks";
 
 export const useExternalBooks = ({ mode, param }: UseExternalBooksOptions) => {
-  let queryKey: any[] = [];
+  let queryKey: (string | undefined)[] = [];
   let queryFn: () => Promise<ExternalBook[]>;
   let enabled = true;
 
