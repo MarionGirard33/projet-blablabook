@@ -93,7 +93,7 @@ export default function HomePage() {
           seeAllButton={true}
         />
         <CarouselDisplay
-          title={"Fantasy & Magie"}
+          title={"Fantasy et Magie"}
           books={fantasyBooks?.map(mapBookRowToDisplay)}
           isLoading={!internalBooks}
           seeAllButton={true}
