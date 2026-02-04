@@ -29,7 +29,7 @@ export default function HomePage() {
     ),
   );
 
-  const trendingBooks: BookRow[] = (internalBooks || []).filter((book) =>
+  const fantasyBooks: BookRow[] = (internalBooks || []).filter((book) =>
     book.categories?.some((cat) =>
       fantasyKeywords.some((keyword) => cat.toLowerCase().includes(keyword)),
     ),
@@ -93,8 +93,8 @@ export default function HomePage() {
           seeAllButton={true}
         />
         <CarouselDisplay
-          title={"Tendances du moment"}
-          books={trendingBooks?.map(mapBookRowToDisplay)}
+          title={"Fantasy & Magie"}
+          books={fantasyBooks?.map(mapBookRowToDisplay)}
           isLoading={!internalBooks}
           seeAllButton={true}
         />
