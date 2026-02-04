@@ -83,44 +83,29 @@ export function AddBookModal({ isOpen, onClose, userId }: AddBookModalProps) {
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent
-        className="
-          w-full
-          max-w-4xl
-          lg:max-w-5xl
-          h-full
-          sm:h-auto
-          p-6
-          bg-bookcream text-bookdark border border-bookbeige
-          rounded-none sm:rounded-2xl
-          overflow-y-auto
-        "
-      >
+      <DialogContent className="max-w-2xl lg:max-w-3xl h-full sm:h-auto p-6 overflow-y-auto w-full py-8 rounded-xl bg-chart-2">
         <DialogDescription className="sr-only">
           Rechercher un livre.
         </DialogDescription>
 
         <DialogHeader>
-          <DialogTitle className="text-2xl md:text-3xl font-semibold text-bookdark">
+          <DialogTitle className="text-2xl md:text-3xl font-semibold">
             Rechercher un livre
           </DialogTitle>
         </DialogHeader>
 
         <div className="flex gap-2 mb-4 mt-2">
           <Input
-            placeholder="Rechercher un livre..."
+            placeholder="Nom du livre, auteur..."
             value={query}
             onChange={(e) => {
               setQuery(e.target.value);
               if (hasSearched) setHasSearched(false);
             }}
-            className="flex-1 bg-white border-bookbeige rounded-full shadow-sm focus:ring-2 focus:ring-bookochre/30"
+            className="flex-1 bg-white shadow-sm focus:ring-2 rounded-xl "
           />
 
-          <Button
-            onClick={handleSearch}
-            className="flex items-center gap-2 bg-bookterracotta hover:bg-bookochre rounded-full shadow"
-          >
+          <Button onClick={handleSearch} className="shadow">
             <Search size={18} />
             Rechercher
           </Button>
@@ -133,13 +118,13 @@ export function AddBookModal({ isOpen, onClose, userId }: AddBookModalProps) {
           <p className="mt-4 text-sm text-gray-600">Aucun livre trouvé.</p>
         )}
 
-        <div className="max-h-[500px] overflow-y-auto mt-4">
+        <div className="max-h-[500px] overflow-y-auto mt-4 pr-4">
           {results.map((book) => {
             const alreadyInLibrary = isInLibrary(book);
 
             // Keyboard support for the whole clickable row (Enter/Space)
             const handleKeyDown = (e: React.KeyboardEvent) => {
-              if ((e.key === "Enter" || e.key === " ") && !alreadyInLibrary) {
+              if (e.key === "Enter" || e.key === " ") {
                 handleCardClick(book);
               }
             };
@@ -149,14 +134,15 @@ export function AddBookModal({ isOpen, onClose, userId }: AddBookModalProps) {
               <div
                 key={book.key}
                 role="button"
-                tabIndex={alreadyInLibrary ? -1 : 0}
-                onClick={() => !alreadyInLibrary && handleCardClick(book)}
+                tabIndex={0}
+                onClick={() => handleCardClick(book)}
                 onKeyDown={handleKeyDown}
                 className={`
-          relative w-full bg-white/80 flex items-center gap-4
-          mb-4 p-3 border border-bookbeige rounded-xl shadow-sm text-left
-          focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-bookochre
-          ${alreadyInLibrary ? "opacity-50 cursor-default" : "hover:bg-white cursor-pointer"}
+          relative w-full bg-white flex items-center gap-4
+          mb-4 p-3 border rounded-xl shadow-sm text-left
+          focus-visible:ring-2 focus-visible:ring-offset-2
+          transition-transform hover:scale-101 cursor-pointer
+          ${alreadyInLibrary ? "opacity-60" : ""}
         `}
               >
                 {/* ✔️ Already in library */}
@@ -177,11 +163,10 @@ export function AddBookModal({ isOpen, onClose, userId }: AddBookModalProps) {
                       addBookMutation.mutate(book);
                     }}
                     className="
-              absolute top-2 right-2
-              w-8 h-8 flex items-center justify-center
+              absolute top-2 right-2 border
+              flex items-center justify-center
               rounded-full
-              bg-bookterracotta text-white text-lg font-semibold
-              hover:bg-bookochre
+              sm:flex w-8 h-8 hover:bg-primary hover:text-secondary
             "
                     aria-label="Ajouter à la librairie"
                   >
@@ -208,7 +193,7 @@ export function AddBookModal({ isOpen, onClose, userId }: AddBookModalProps) {
                     <p className="text-xs text-gray-500">{book.publishDate}</p>
                   )}
                   {book.categories && book.categories.length > 0 && (
-                    <span className="inline-block mt-2 px-3 py-1.5 text-xs font-semibold rounded-full bg-bookterracotta/20 text-bookterracotta border border-bookterracotta/30">
+                    <span className="inline-block mt-2 px-3 py-1.5 text-xs font-semibold rounded-full border">
                       {book.categories[0]}
                     </span>
                   )}
