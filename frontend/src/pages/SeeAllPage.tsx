@@ -41,7 +41,7 @@ export default function SeeAllPage() {
   }
 
   return (
-    <div className="min-h-screen text-center flex flex-col bg-white">
+    <div className="min-h-screen text-center flex flex-col rounded-4xl">
       <div className="sticky top-0">
         <div className="max-w-5xl mx-auto px-4 py-4">
           <h2 className="text-2xl font-bold mb-2">{title}</h2>

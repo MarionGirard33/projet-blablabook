@@ -10,16 +10,31 @@ import AvatarCarousel from "@/components/AvatarCarousel";
 type UpdateUserFormProps = {
   userId: number;
   onClose?: () => void;
-  onUpdate?: (updatedUser: { email: string; username: string; image?: string }) => void;
+  onUpdate?: (updatedUser: {
+    email: string;
+    username: string;
+    image?: string;
+  }) => void;
 };
 
-const availableImages = ["image1.jpg", "image2.jpg", "image3.jpg","image4.jpg", "image5.jpg", "image6.jpg"];
+const availableImages = [
+  "image1.jpg",
+  "image2.jpg",
+  "image3.jpg",
+  "image4.jpg",
+  "image5.jpg",
+  "image6.jpg",
+];
 
-export default function UpdateUserForm({ userId, onClose, onUpdate }: UpdateUserFormProps) {
+export default function UpdateUserForm({
+  userId,
+  onClose,
+  onUpdate,
+}: UpdateUserFormProps) {
   const updateUserMutation = useUpdateUser(userId);
 
   const { data: currentUser } = useCurrentUser();
-    const form = useForm({
+  const form = useForm({
     defaultValues: {
       username: currentUser?.username || "",
       email: currentUser?.email.toLowerCase() || "",
@@ -49,19 +64,20 @@ export default function UpdateUserForm({ userId, onClose, onUpdate }: UpdateUser
             email: value.email,
             image: value.image,
           });
-          if (onUpdate) onUpdate({ username: value.username, email: value.email, image: value.image });
+          if (onUpdate)
+            onUpdate({
+              username: value.username,
+              email: value.email,
+              image: value.image,
+            });
           if (onClose) onClose();
         },
       });
     },
   });
-  
+
   if (!currentUser) {
-    return (
-      <output aria-live="polite">
-        Loading...
-      </output>
-    );
+    return <output aria-live="polite">Loading...</output>;
   }
 
   return (
@@ -78,14 +94,18 @@ export default function UpdateUserForm({ userId, onClose, onUpdate }: UpdateUser
           <>
             <Avatar className="w-28 h-28 mx-auto mb-6 border border-bookbeige shadow">
               <AvatarImage
-                src={field.state.value ? `/images/${field.state.value}` : undefined}
+                src={
+                  field.state.value ? `/images/${field.state.value}` : undefined
+                }
                 alt={`Avatar de ${currentUser.username || "l'utilisateur"}`}
               />
               <AvatarFallback className="text-4xl bg-bookbeige/50 border-bookbeige font-bold">
-                {currentUser.username ? currentUser.username[0].toUpperCase() : "X"}
+                {currentUser.username
+                  ? currentUser.username[0].toUpperCase()
+                  : "X"}
               </AvatarFallback>
             </Avatar>
-            
+
             {/* Miniatures */}
             <div className="flex justify-center gap-3 mb-8">
               <form.Field name="image">
@@ -106,7 +126,10 @@ export default function UpdateUserForm({ userId, onClose, onUpdate }: UpdateUser
       <form.Field name="username">
         {(field) => (
           <div className="mb-4">
-            <label htmlFor="username" className="block text-gray-500 text-sm mb-1">
+            <label
+              htmlFor="username"
+              className="block text-gray-500 text-sm mb-1"
+            >
               Nom d'utilisateur
             </label>
             <input
@@ -144,7 +167,10 @@ export default function UpdateUserForm({ userId, onClose, onUpdate }: UpdateUser
       <form.Field name="password">
         {(field) => (
           <div className="mb-4">
-            <label htmlFor="password" className="block text-gray-500 text-sm mb-1">
+            <label
+              htmlFor="password"
+              className="block text-gray-500 text-sm mb-1"
+            >
               Mot de mot de passe
             </label>
             <input
@@ -163,7 +189,10 @@ export default function UpdateUserForm({ userId, onClose, onUpdate }: UpdateUser
       <form.Field name="confirmPassword">
         {(field) => (
           <div className="mb-4">
-            <label htmlFor="confirmPassword" className="block text-gray-500 text-sm mb-1">
+            <label
+              htmlFor="confirmPassword"
+              className="block text-gray-500 text-sm mb-1"
+            >
               Confirmer le mot de passe
             </label>
             <input
@@ -179,10 +208,12 @@ export default function UpdateUserForm({ userId, onClose, onUpdate }: UpdateUser
         )}
       </form.Field>
 
-      <Button type="submit" className="w-full mt-4 cursor-pointer bg-bookterracotta text-white">
+      <Button
+        type="submit"
+        className="w-full mt-4 cursor-pointer bg-bookterracotta bg-primary"
+      >
         {updateUserMutation.isPending ? "Mise à jour..." : "Enregistrer"}
       </Button>
     </form>
   );
 }
-  
