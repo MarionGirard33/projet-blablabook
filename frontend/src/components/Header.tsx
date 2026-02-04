@@ -29,7 +29,7 @@ export default function Header() {
       <div className="flex items-center justify-between sm:px-10">
         <Link
           to="/"
-          className="flex items-center gap-2 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-bookochre rounded"
+          className="flex items-center gap-2 focus-visible:ring-2 focus-visible:ring-offset-2 rounded"
         >
           <div className="rounded-2xl flex items-center gap-2">
             <img src={logo} className="w-20" alt="" />
@@ -53,13 +53,13 @@ export default function Header() {
               <div className="hidden md:flex items-center ">
                 <DropdownMenu>
                   <DropdownMenuTrigger className="cursor-pointer" asChild>
-                    <Avatar className="w-8 h-8 border border-bookbeige">
+                    <Avatar className="w-8 h-8 border">
                       <AvatarImage
                         key={user.image}
                         src={user.image ? `/images/${user.image}` : undefined}
                         alt={`Avatar de ${user.username || "X"}`}
                       />
-                      <AvatarFallback className="bg-bookbeige/50 border-bookbeige font-bold">
+                      <AvatarFallback className="bg-primary/50 border-primary font-bold">
                         {user.username ? user.username[0].toUpperCase() : "X"}
                       </AvatarFallback>
                     </Avatar>
@@ -96,16 +96,16 @@ export default function Header() {
           <button
             type="button"
             onClick={() => setOpen(true)}
-            className="focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-bookochre rounded"
+            className="focus-visible:ring-2 focus-visible:ring-offset-2 rounded"
             aria-label="Ouvrir le menu"
           >
             {user ? (
-              <Avatar className="w-10 h-10 cursor-pointer border border-bookbeige">
+              <Avatar className="w-10 h-10 cursor-pointer border">
                 <AvatarImage
                   src={user.image ? `/images/${user.image}` : undefined}
                   alt={`Avatar de ${user.username || "X"}`}
                 />
-                <AvatarFallback className="text-xl bg-bookbeige/50 border-bookbeige font-bold">
+                <AvatarFallback className="text-xl bg-primary/50 border-primary font-bold">
                   {user.username ? user.username[0].toUpperCase() : "X"}
                 </AvatarFallback>
               </Avatar>
