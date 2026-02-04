@@ -9,7 +9,7 @@ import { book, list, listBook, bookCategory, category } from '../db/schema';
 import * as schema from '../db/schema';
 import { NodePgDatabase } from 'drizzle-orm/node-postgres';
 import { CreateBookDto } from './dto/create-book.dto';
-import { eq, and, desc } from 'drizzle-orm';
+import { eq, and, desc, sql } from 'drizzle-orm';
 import { BookSelect, ListBookSelect } from './types/books';
 import { CategoryService } from '../category/category.service';
 /**
@@ -53,6 +53,19 @@ export class BooksService {
     );
     return booksWithCategories as BookSelect[];
   }
+
+  /**
+   * Get randoms Books from the `book` table with limit.
+   * @returns Array of persisted book records
+   */
+  async getRandomBooks(limit: number = 10) {
+    return await this.db
+      .select()
+      .from(book)
+      .orderBy(sql`RANDOM()`)
+      .limit(limit);
+  }
+
   /**
    * Get all books belonging to a specific user's list, enriched with a computed
    * `status` field based on `readStart`/`readEnd` dates and ordered by `addedAt`.

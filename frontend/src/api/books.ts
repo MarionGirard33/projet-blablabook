@@ -34,6 +34,16 @@ export const getUserBooks = async (userId: number): Promise<BookRow[]> => {
 };
 
 /**
+ * Fetch a random selection of books from the database.
+ * @param limit - Number of random books to retrieve (default: 10)
+ * @returns Promise resolving to an array of randomly selected books
+ */
+export const getRandomBooks = async (limit: number): Promise<BookRow[]> => {
+  const response = await api.get<BookRow[]>(`/books/random?limit=${limit}`);
+  return response.data;
+};
+
+/**
  * Add a book to a user's list. If the book doesn't exist yet, the backend
  * will create it first, then link it to the user's list.
  */
@@ -78,10 +88,12 @@ export const updateBookStatus = async (
   let readEnd: string | null = null;
 
   // Helper function to safely convert potential date strings to ISO
-  const formatToISO = (date: string | Date | null | undefined): string | null => {
-      if (!date) return null;
-      return typeof date === "string" ? date : date.toISOString();
-    };
+  const formatToISO = (
+    date: string | Date | null | undefined,
+  ): string | null => {
+    if (!date) return null;
+    return typeof date === "string" ? date : date.toISOString();
+  };
 
   if (status === "À lire") {
     // Reset to "to read" state
@@ -89,12 +101,16 @@ export const updateBookStatus = async (
     readEnd = null;
   } else if (status === "En cours") {
     // Start reading: set start date if not already set, clear end date
-    readStart = currentBook.readStart ? formatToISO(currentBook.readStart) : now;
+    readStart = currentBook.readStart
+      ? formatToISO(currentBook.readStart)
+      : now;
     readEnd = null;
   } else if (status === "Lu") {
     // "Lu": Mark as finished
     // Keep existing readStart or set to now if never started
-    readStart = currentBook.readStart ? formatToISO(currentBook.readStart) : now;
+    readStart = currentBook.readStart
+      ? formatToISO(currentBook.readStart)
+      : now;
     readEnd = now;
   }
 
