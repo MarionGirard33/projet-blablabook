@@ -92,7 +92,7 @@ This populates the `book` table and links them to the test user's list.
 
 ```bash
 cd backend
-npx ts-node src/seed.ts
+docker compose exec backend npx ts-node src/seed.ts
 ```
 
 ### 5️⃣ Access the services
@@ -161,6 +161,7 @@ Go to: [http://localhost:8080](http://localhost:8080)
 ├── docker-compose.prod.yml # Production configuration
 └── README.md
 ```
+
 ---
 
 ## 🧪 Test Plan
@@ -169,14 +170,14 @@ The project follows a testing strategy to ensure data integrity and API reliabil
 
 ### 🔹 Category Module Validation
 
-| Test Case | Expected Result | Status |
-| :--- | :--- | :--- |
-| **Get All Categories** | 200: Returns the list of active categories | 🟢 |
-| **Get Category by valid ID** | 200: Returns the specific category object | 🟢 |
-| **Get Category by non-existent ID** | 404: Error "Category with ID X not found" | 🔴 |
-| **Invalid ID format** (e.g., `/abc`) | 400: Validation error (ParseIntPipe) | 🔴 |
-| **Find or Create (Exists)** | Returns existing category without duplication | 🟢 |
-| **Find or Create (New)** | Persists new category in DB and returns it | 🟢 |
+| Test Case                            | Expected Result                               | Status |
+| :----------------------------------- | :-------------------------------------------- | :----- |
+| **Get All Categories**               | 200: Returns the list of active categories    | 🟢     |
+| **Get Category by valid ID**         | 200: Returns the specific category object     | 🟢     |
+| **Get Category by non-existent ID**  | 404: Error "Category with ID X not found"     | 🔴     |
+| **Invalid ID format** (e.g., `/abc`) | 400: Validation error (ParseIntPipe)          | 🔴     |
+| **Find or Create (Exists)**          | Returns existing category without duplication | 🟢     |
+| **Find or Create (New)**             | Persists new category in DB and returns it    | 🟢     |
 
 > **Note:** Backend tests are performed using **Jest** with a fully mocked Drizzle ORM to isolate business logic from the database layer.
 
