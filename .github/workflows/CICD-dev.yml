@@ -35,6 +35,10 @@ jobs:
       - name: Frontend CI
         run: npm ci
 
+      # lance les tests frontend en mode CI (sans watch)
+      - name: Run frontend tests
+        run: npm run test -- --run
+
       # génère le dossier dist du front
       - run: npm run build
 
@@ -145,13 +149,13 @@ jobs:
           done
           if [ $attempt -ge $max_attempts ]; then
             echo "Backend failed to start in time!"
-            docker compose logs backend
+          docker compose logs backend
             exit 1
           fi
 
-      # vérifie que le back fcontionne dans le container
-      #- name: Run backend tests
-      #  run: docker exec backend npm run test
+      # vérifie que le back fonctionne dans le container
+      - name: Run backend tests
+        run: docker exec backend npm run test
 
       # Vérifie que les containers tournent
       - name: Docker status
