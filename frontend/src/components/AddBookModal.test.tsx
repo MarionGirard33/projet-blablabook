@@ -86,7 +86,7 @@ describe("AddBookModal", () => {
     const user = userEvent.setup();
     render(<AddBookModal isOpen onClose={() => undefined} userId={1} />);
 
-    const input = screen.getByPlaceholderText("Rechercher un livre...");
+    const input = screen.getByPlaceholderText("Nom du livre, auteur...");
     await user.type(input, "Harry");
 
     const button = screen.getByRole("button", { name: /rechercher/i });
@@ -111,7 +111,7 @@ describe("AddBookModal", () => {
 
     render(<AddBookModal isOpen onClose={() => undefined} userId={1} />);
 
-    const input = screen.getByPlaceholderText("Rechercher un livre...");
+    const input = screen.getByPlaceholderText("Nom du livre, auteur...");
     await user.type(input, "Nope");
 
     const button = screen.getByRole("button", { name: /rechercher/i });

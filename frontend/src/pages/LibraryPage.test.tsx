@@ -1,5 +1,5 @@
 import { expect, it, describe, vi } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import type { BookRow } from "@/@types/books";
 import LibraryPage from "@/pages/LibraryPage";
@@ -99,11 +99,15 @@ describe("LibraryPage", () => {
     const user = userEvent.setup();
     render(<LibraryPage />);
 
-    const input = screen.getByPlaceholderText("Rechercher un livre...");
+    const input = screen.getByPlaceholderText(
+      "Rechercher dans ma bibliothèque...",
+    );
     await user.type(input, "Alpha");
 
-    expect(screen.getByText("Alpha")).toBeInTheDocument();
-    expect(screen.queryByText("Beta")).not.toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByText("Alpha")).toBeInTheDocument();
+      expect(screen.queryByText("Beta")).not.toBeInTheDocument();
+    });
   });
 
   it("renders all cards when search is empty", () => {
