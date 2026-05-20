@@ -15,6 +15,7 @@ import { AuthService } from './auth.service';
 import {
   ApiCreatedResponse,
   ApiInternalServerErrorResponse,
+  ApiOperation,
   ApiOkResponse,
   ApiTags,
   ApiUnauthorizedResponse,
@@ -40,6 +41,7 @@ export class AuthController {
   ) {}
 
   @Post('/register')
+  @ApiOperation({ summary: 'Register a new user' })
   @ApiCreatedResponse({
     description: 'User is created with password hashed.',
     type: RegisterResponseDto,
@@ -55,6 +57,7 @@ export class AuthController {
 
   @Post('/login')
   @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Login user' })
   @ApiOkResponse({
     description: 'User is logged.',
     type: LoginResponseDto,
@@ -90,6 +93,7 @@ export class AuthController {
   }
 
   @Post('/logout')
+  @ApiOperation({ summary: 'Logout user' })
   @UseGuards(AuthGuard) // add the guard for extract cookie
   @HttpCode(HttpStatus.OK) // code 200 for the logout if success
   @ApiOkResponse({

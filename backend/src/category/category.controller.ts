@@ -1,5 +1,5 @@
 import { Controller, Get, Param, ParseIntPipe } from '@nestjs/common';
-import { ApiTags, ApiResponse } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { CategoryService } from './category.service';
 import { CategoryResponseDto } from './dto/category-response.dto';
 
@@ -9,6 +9,7 @@ export class CategoryController {
   constructor(private readonly categoryService: CategoryService) {}
 
   @Get()
+  @ApiOperation({ summary: 'Get all categories' })
   @ApiResponse({
     status: 200,
     description: 'Categories retrieved successfully',
@@ -19,6 +20,7 @@ export class CategoryController {
   }
 
   @Get(':id')
+  @ApiOperation({ summary: 'Get category by ID' })
   @ApiResponse({
     status: 200,
     description: 'Category retrieved successfully',

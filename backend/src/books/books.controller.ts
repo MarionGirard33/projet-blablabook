@@ -39,8 +39,13 @@ export class BooksController {
    * Returns randoms books persisted in the `book` table (not user-specific).
    */
   @Get('random')
+  @ApiOperation({ summary: 'Get random books' })
+  @ApiResponse({
+    status: 200,
+    description: 'Random books retrieved successfully',
+  })
   async getRandomBooks(@Query('limit') limit: string = '10') {
-    return this.booksService.getRandomBooks(parseInt(limit));
+    return this.booksService.getRandomBooks(Number.parseInt(limit));
   }
 
   /**

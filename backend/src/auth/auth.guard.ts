@@ -14,9 +14,9 @@ import { CookieService } from '../security/cookie/cookie.service';
 @Injectable()
 export class AuthGuard implements CanActivate {
   constructor(
-    private jwtService: JwtService,
-    private tokenService: TokenService,
-    private cookieService: CookieService,
+    private readonly jwtService: JwtService,
+    private readonly tokenService: TokenService,
+    private readonly cookieService: CookieService,
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {

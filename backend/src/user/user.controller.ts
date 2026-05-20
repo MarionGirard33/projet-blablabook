@@ -6,7 +6,7 @@ import {
   Param,
   ParseIntPipe,
 } from '@nestjs/common';
-import { ApiTags, ApiResponse } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { UserService } from './user.service';
 import { UpdateUserResponseDto } from './dto/update-user.response.dto';
 import { UpdateUserRequestDto } from './dto/update-user.request.dto';
@@ -17,6 +17,7 @@ export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @Get(':id')
+  @ApiOperation({ summary: 'Get user by ID' })
   @ApiResponse({ status: 200, type: UpdateUserResponseDto })
   @ApiResponse({ status: 404, description: 'User not found' })
   async findById(@Param('id', ParseIntPipe) id: number) {
@@ -25,6 +26,7 @@ export class UserController {
 
   // mise à jour
   @Patch(':id')
+  @ApiOperation({ summary: 'Update user by ID' })
   @ApiResponse({ status: 200, type: UpdateUserResponseDto })
   @ApiResponse({ status: 404, description: 'User not found' })
   async update(
@@ -40,6 +42,7 @@ export class UserController {
 
   // soft delete
   @Patch(':id/soft-delete')
+  @ApiOperation({ summary: 'Soft delete user' })
   @ApiResponse({
     status: 200,
     description: 'User soft deleted successfully',

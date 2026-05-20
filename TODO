@@ -1,10 +1,9 @@
-
 Todo:
-  ☐ Test register controller 
-
-  ☐ Test register service 
-    ✔ Happy path : le nouvel utilisateur est créer (test fonction hash est bien appele + objet retour) @done(26-01-14 15:09)
-    ✔ Test si une erreur est thow si le password est pas confirmer @done(26-01-14 15:09)
-    ✔ test erreur si l'utilisateur ou l'username exste déjà @done(26-01-14 15:09)
-    ✔ test erreur throw si hash échoue @done(26-01-14 15:09)
-    ✔ test si erreur throw si creation a echouer @done(26-01-14 15:09)
+☐ RGPD
+☐ Artillery
+☐ Test Lighthouse
+☐ Certains endpoints backend génèrent des requêtes N+1 (ex : catégories par livre), ce qui pose une question de performance et d’optimisation.
+☐ Ajouter les guards sur les routes privées books/user/category 
+☐ Dériver l’identifiant utilisateur depuis request.user.sub plutôt que de le passer en paramètre (votre JWT c’est votre source vérité pour l’id du user : un user ne peut modifier que ces propres ressources de cette façon), et de proposer des routes de type /me/library ou /me/profile afin de garantir qu’un utilisateur ne manipule que ses propres données.
+☐ CICD Prod
+☐ CICD coverage test
