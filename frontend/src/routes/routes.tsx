@@ -20,6 +20,8 @@ const ProfileRoute = lazy(() => import("@/pages/ProfilePage/ProfileRoute"));
 const BookDetails = lazy(() => import("@/pages/Book/BookDetails"));
 const SeeAllPage = lazy(() => import("@/pages/SeeAllPage"));
 const PrivacyPage = lazy(() => import("@/pages/PrivacyPolicy"));
+const CGUPage = lazy(() => import("@/pages/CGU"));
+const LegalNoticePage = lazy(() => import("@/pages/MentionsLegales"));
 
 const rootRoute = createRootRoute({
   component: () => <RootLayout />,
@@ -89,12 +91,26 @@ const privacyRoute = createRoute({
   component: () => <PrivacyPage />,
 });
 
+const CGURoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/cgu",
+  component: () => <CGUPage />,
+});
+
+const legalNoticeRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/legal-notice",
+  component: () => <LegalNoticePage />,
+});
+
 const routeTree = rootRoute.addChildren([
   homeRoute,
   registerPage,
   loginPage,
   seeAllRoute,
   privacyRoute,
+  CGURoute,
+  legalNoticeRoute,
   bookDetailsRoute,
   protectedRoute.addChildren([libraryRoute, profilePage]),
 ]);

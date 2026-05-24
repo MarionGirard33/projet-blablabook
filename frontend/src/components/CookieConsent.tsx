@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { Link } from "@tanstack/react-router";
 
 const CONSENT_KEY = "cookie_consent";
 
@@ -47,11 +46,8 @@ export default function CookieConsent() {
       className="fixed bottom-4 left-4 right-4 md:left-auto md:right-6 z-50 max-w-3xl mx-auto md:mx-0 bg-white border shadow-lg rounded-lg p-4 flex items-start gap-4"
     >
       <div className="flex-1 text-sm text-gray-700">
-        This site uses cookies to improve your experience. Read our{" "}
-        <Link to="/privacy" className="underline text-bookterracotta">
-          privacy policy
-        </Link>
-        .
+        <span>This site uses cookies to improve your experience. Read our</span>
+        <a href="/privacy" className="underline text-bookterracotta ml-1">privacy policy</a>.
       </div>
 
       <div className="flex items-center gap-2">
