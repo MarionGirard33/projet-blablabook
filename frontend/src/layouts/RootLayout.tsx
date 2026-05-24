@@ -1,6 +1,7 @@
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
 import { Outlet } from "@tanstack/react-router";
+import CookieConsent from "@/components/CookieConsent";
 
 export default function RootLayout() {
   return (
@@ -12,6 +13,7 @@ export default function RootLayout() {
       </main>
 
       <Footer />
+      <CookieConsent />
     </div>
   );
 }

@@ -10,13 +10,18 @@ import { useAuthStore } from "@/stores/authStore";
 
 // Lazy-loaded pages for code splitting - each route downloads only when visited
 const LoginPage = lazy(() => import("@/pages/Auth/LoginPage/LoginPage"));
-const RegisterPage = lazy(() => import("@/pages/Auth/RegisterPage/RegisterPage"));
+const RegisterPage = lazy(
+  () => import("@/pages/Auth/RegisterPage/RegisterPage"),
+);
 const HomePage = lazy(() => import("@/pages/HomePage"));
 const NotFound = lazy(() => import("@/pages/NotFound"));
 const LibraryPage = lazy(() => import("@/pages/LibraryPage"));
 const ProfileRoute = lazy(() => import("@/pages/ProfilePage/ProfileRoute"));
 const BookDetails = lazy(() => import("@/pages/Book/BookDetails"));
 const SeeAllPage = lazy(() => import("@/pages/SeeAllPage"));
+const PrivacyPage = lazy(() => import("@/pages/PrivacyPolicy"));
+const CGUPage = lazy(() => import("@/pages/CGU"));
+const LegalNoticePage = lazy(() => import("@/pages/MentionsLegales"));
 
 const rootRoute = createRootRoute({
   component: () => <RootLayout />,
@@ -80,11 +85,32 @@ export const bookDetailsRoute = createRoute({
   component: () => <BookDetails />,
 });
 
+const privacyRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/privacy",
+  component: () => <PrivacyPage />,
+});
+
+const CGURoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/cgu",
+  component: () => <CGUPage />,
+});
+
+const legalNoticeRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/legal-notice",
+  component: () => <LegalNoticePage />,
+});
+
 const routeTree = rootRoute.addChildren([
   homeRoute,
   registerPage,
   loginPage,
   seeAllRoute,
+  privacyRoute,
+  CGURoute,
+  legalNoticeRoute,
   bookDetailsRoute,
   protectedRoute.addChildren([libraryRoute, profilePage]),
 ]);

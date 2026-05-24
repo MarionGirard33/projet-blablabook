@@ -1,4 +1,4 @@
-import { Mail, Lock, FileText } from "lucide-react";
+import { Mail, Lock, FileText, Scale } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Tooltip,
@@ -60,7 +60,22 @@ export default function Footer() {
             </Tooltip>
             <Tooltip>
               <TooltipTrigger asChild>
-                <a href="/confidentialite">
+                <a href="/legal-notice">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="flex items-center gap-2 hover:bg-secondary/20 hover:text-secondary transition-colors"
+                  >
+                    <Scale className="h-4 w-4" />
+                    <span className="text-sm">Mentions légales</span>
+                  </Button>
+                </a>
+              </TooltipTrigger>
+              <TooltipContent>Informations légales du site</TooltipContent>
+            </Tooltip>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <a href="/privacy">
                   <Button
                     variant="ghost"
                     size="sm"
