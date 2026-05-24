@@ -5,13 +5,16 @@ import {
   Body,
   Param,
   ParseIntPipe,
+  UseGuards,
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { UserService } from './user.service';
 import { UpdateUserResponseDto } from './dto/update-user.response.dto';
 import { UpdateUserRequestDto } from './dto/update-user.request.dto';
+import { AuthGuard } from '../auth/auth.guard';
 
 @ApiTags('user')
+@UseGuards(AuthGuard)
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}

@@ -1,9 +1,17 @@
-import { Controller, Get, Param, ParseIntPipe } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Param,
+  ParseIntPipe,
+  UseGuards,
+} from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { CategoryService } from './category.service';
 import { CategoryResponseDto } from './dto/category-response.dto';
+import { AuthGuard } from '../auth/auth.guard';
 
 @ApiTags('category')
+@UseGuards(AuthGuard)
 @Controller('category')
 export class CategoryController {
   constructor(private readonly categoryService: CategoryService) {}
