@@ -38,12 +38,24 @@ jobs:
       - name: Run frontend tests
         run: npm run test -- --run
 
+      # génère le coverage frontend
+      - name: Run frontend coverage
+        run: npm run coverage
+
       # build du front avec l'URL du back
-      #TODO : mettre l'url du backend de prod dans secrets
       - name: Build frontend with backend URL
         run: |
           export VITE_BACKEND_URL=${{ secrets.VITE_BACKEND_URL }}
           npm run build
+
+      # archive les rapports de coverage frontend
+      - name: Upload frontend coverage
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-coverage-${{ github.run_id }}
+          path: |
+            frontend/coverage
+            frontend/coverage.json
 
       # Sauvegarde le build pour le déploiement
       - name: Upload build artifacts
@@ -58,9 +70,8 @@ jobs:
     defaults:
       run:
         working-directory: backend
-    #TODO : mettre l'url de la database de prod dans secrets
     env:
-      DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      DATABASE_URL: ${{ secrets.SUPABASE_URL }}
       JWT_SECRET: ${{ secrets.JWT_SECRET }}
 
     steps:
@@ -76,16 +87,29 @@ jobs:
 
       # Install deps
       - name: Backend ci
-        run: npm ci
+        run: npm install
+
+      # vérifie le backend avec coverage
+      - name: Run backend coverage
+        run: npm run test:cov
 
       # Synch Drizzle Schema to Db supabase
       - name: Push Schema to Supabase
         run: npx drizzle-kit push
         env:
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          DATABASE_URL: ${{ secrets.SUPABASE_URL }}
 
       # Build backend
       - run: npm run build
+
+      # archive les rapports de coverage backend
+      - name: Upload backend coverage
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-coverage-${{ github.run_id }}
+          path: |
+            backend/coverage
+            backend/coverage/lcov.info
 
       # Build Docker image si besoin
       - run: docker build -t blablabook-back .
@@ -97,15 +121,13 @@ jobs:
     defaults:
       run:
         working-directory: .
-    # Bien mettre ces variables dans le secret de GitHub (settings > Secrets and variables > Secrets)
-    #TODO : mettre les variables de la database de prod dans secrets
     env:
       DB_NAME: ${{ secrets.DB_NAME }}
       DB_USER: ${{ secrets.DB_USER }}
-      DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
-      DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      DB_PASSWORD: ${{ secrets.SUPABASE_PASSWORD }}
+      DATABASE_URL: ${{ secrets.SUPABASE_URL }}
       JWT_SECRET: ${{ secrets.JWT_SECRET }}
-      FRONTEND_URL_CORS: "https://pooka-blablabook.surge.sh"
+      FRONTEND_URL_CORS: "https://MarionGirard33-blablabook.surge.sh"
       VITE_BACKEND_URL: ${{ secrets.VITE_BACKEND_URL }}
       NODE_ENV: "prod"
 
@@ -120,32 +142,33 @@ jobs:
       - name: Start docker compose
         # injecte les env GitHub directement dans le shell
         # le | c'est pour un script multi lignes
-        run: docker compose -f docker-compose.yml up -d --build
+        run: docker compose -f docker-compose.prod.yml up -d --build
 
       # vérifie si on accède à Postgres via le container postgres
       - name: Wait for Postgres
         run: |
-          max_attempts=10
+          max_attempts=15
           attempt=1
-          until docker exec postgres pg_isready -U blablabook || [ $attempt -ge $max_attempts ]; do
-            echo "Waiting for postgres..."
-            sleep 5
+          until docker compose exec -T postgres pg_isready -U "${DB_USER}" -d "${DB_NAME}" >/dev/null 2>&1 || [ $attempt -ge $max_attempts ]; do
+            echo "Waiting for Postgres..."
+            sleep 2
             attempt=$((attempt + 1))
           done
 
           if [ $attempt -ge $max_attempts ]; then
             echo "Postgres failed to start in time!"
+            docker compose logs postgres
             exit 1
           fi
 
       # vérifie si le container du back marche bien via http://localhost:3000/health
       - name: Wait for Backend
         run: |
-          max_attempts=10
+          max_attempts=20
           attempt=1
-          until docker exec backend curl -f http://localhost:3000/health || [ $attempt -ge $max_attempts ]; do
+          until curl -fsS http://localhost:3000/health >/dev/null 2>&1 || [ $attempt -ge $max_attempts ]; do
             echo "Waiting for backend..."
-            sleep 5
+            sleep 2
             attempt=$((attempt + 1))
           done
           if [ $attempt -ge $max_attempts ]; then
@@ -154,9 +177,9 @@ jobs:
             exit 1
           fi
 
-      # vérifie que le back fcontionne dans le container
+      # vérifie que le back fonctionne dans le container
       - name: Run backend tests
-        run: docker exec backend npm run test
+        run: docker compose exec -T backend npm run test
 
       # Vérifie que les containers tournent
       - name: Docker status
@@ -170,6 +193,9 @@ jobs:
   deploy-frontend:
     needs: ci-frontend
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
     steps:
       - uses: actions/checkout@v5
 
@@ -180,15 +206,16 @@ jobs:
           path: frontend/dist
 
       - name: Create 200.html for SPA routing
-        run: cp frontend/dist/index.html frontend/dist/200.html
+        run: cp dist/index.html dist/200.html
+
+      - name: Install Surge CLI
+        run: npm install -g surge
 
       - name: Deploy to Surge
-        # ne pas oublier de mettre SURGE_DOMAIN et SURGE_TOKEN dans le secret de GitHub
-        #TODO : mettre les variables de Surge dans secrets
-        run: |
-          npm install -g surge
-          surge frontend/dist ${{ secrets.SURGE_DOMAIN }} \
-            --token ${{ secrets.SURGE_TOKEN }}
+        run: surge --project ./dist --domain "${SURGE_DOMAIN}"
+        env:
+          SURGE_DOMAIN: ${{ secrets.SURGE_DOMAIN }}
+          SURGE_TOKEN: ${{ secrets.SURGE_TOKEN }}
 
   ### DEPLOY BACKEND TO RENDER ###
   deploy-backend:
@@ -196,7 +223,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Trigger Render deploy via API
-        #TODO : mettre les variables de Render dans secrets
         run: |
           curl -X POST \
             -H "Authorization: Bearer ${{ secrets.RENDER_API_KEY }}" \
