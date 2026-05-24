@@ -39,8 +39,21 @@ jobs:
       - name: Run frontend tests
         run: npm run test -- --run
 
+      # génère le coverage frontend après l'exécution des tests
+      - name: Run frontend coverage
+        run: npm run coverage
+
       # génère le dossier dist du front
       - run: npm run build
+
+      # archive les rapports de coverage frontend
+      - name: Upload frontend coverage
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-coverage-${{ github.run_id }}
+          path: |
+            frontend/coverage
+            frontend/coverage.json
 
   ### BACK CI ###
   ci-backend:
@@ -153,13 +166,22 @@ jobs:
             exit 1
           fi
 
-      # vérifie que le back fonctionne dans le container
-      - name: Run backend tests
-        run: docker exec backend npm run test
+      # vérifie que le back fonctionne dans le container avec coverage
+      - name: Run backend coverage
+        run: docker exec backend npm run test:cov
 
       # Vérifie que les containers tournent
       - name: Docker status
         run: docker compose ps
+
+      # archive les rapports de coverage backend
+      - name: Upload backend coverage
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-coverage-${{ github.run_id }}
+          path: |
+            backend/coverage
+            backend/coverage/lcov.info
 
       # Run Artillery smoke tests and archive reports
       - name: Setup Node.js for Artillery
