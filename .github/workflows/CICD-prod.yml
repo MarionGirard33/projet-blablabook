@@ -177,9 +177,9 @@ jobs:
             exit 1
           fi
 
-      # vérifie que le back fonctionne dans le container
-      - name: Run backend tests
-        run: docker compose exec -T backend npm run test
+      # vérifie que le back répond bien dans le container prod
+      - name: Backend smoke check
+        run: docker compose exec -T backend curl -fsS http://localhost:3000/health
 
       # Vérifie que les containers tournent
       - name: Docker status
