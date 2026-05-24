@@ -177,7 +177,7 @@ jobs:
             exit 1
           fi
 
-      # vérifie que le back fcontionne dans le container
+      # vérifie que le back fonctionne dans le container
       - name: Run backend tests
         run: docker compose exec -T backend npm run test
 
@@ -206,10 +206,10 @@ jobs:
         run: cp frontend/dist/index.html frontend/dist/200.html
 
       - name: Deploy to Surge
-        run: |
-          npm install -g surge
-          surge frontend/dist ${{ secrets.SURGE_DOMAIN }} \
-            --token ${{ secrets.SURGE_TOKEN }}
+        run: surge --project ./dist --domain MarionGirard33-blablabook.surge.sh
+        env:
+          SURGE_DOMAIN: ${{ secrets.SURGE_LOGIN }}
+          SURGE_TOKEN: ${{ secrets.SURGE_TOKEN }}
 
   ### DEPLOY BACKEND TO RENDER ###
   deploy-backend:
