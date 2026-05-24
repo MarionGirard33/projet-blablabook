@@ -193,6 +193,9 @@ jobs:
   deploy-frontend:
     needs: ci-frontend
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
     steps:
       - uses: actions/checkout@v5
 
@@ -203,12 +206,15 @@ jobs:
           path: frontend/dist
 
       - name: Create 200.html for SPA routing
-        run: cp frontend/dist/index.html frontend/dist/200.html
+        run: cp dist/index.html dist/200.html
+
+      - name: Install Surge CLI
+        run: npm install -g surge
 
       - name: Deploy to Surge
-        run: surge --project ./dist --domain MarionGirard33-blablabook.surge.sh
+        run: surge --project ./dist --domain "${SURGE_DOMAIN}"
         env:
-          SURGE_DOMAIN: ${{ secrets.SURGE_LOGIN }}
+          SURGE_DOMAIN: ${{ secrets.SURGE_DOMAIN }}
           SURGE_TOKEN: ${{ secrets.SURGE_TOKEN }}
 
   ### DEPLOY BACKEND TO RENDER ###
