@@ -2,8 +2,5 @@ Todo:
 ☐ RGPD
 ☐ Artillery
 ☐ Test Lighthouse
-☐ Certains endpoints backend génèrent des requêtes N+1 (ex : catégories par livre), ce qui pose une question de performance et d’optimisation.
-
-☐ Dériver l’identifiant utilisateur depuis request.user.sub plutôt que de le passer en paramètre (votre JWT c’est votre source vérité pour l’id du user : un user ne peut modifier que ces propres ressources de cette façon), et de proposer des routes de type /me/library ou /me/profile afin de garantir qu’un utilisateur ne manipule que ses propres données.
 ☐ CICD Prod
 ☐ CICD coverage test

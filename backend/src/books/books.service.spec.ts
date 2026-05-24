@@ -143,57 +143,44 @@ describe('BooksService', () => {
 
   describe('findAllBooks', () => {
     it('should return all books from the database', async () => {
-      const mockBooks: (BookRow & { categories: string[] })[] = [
-        {
-          ...makeBook({
-            id: 1,
-            name: 'Book 1',
-            author: 'Author 1',
-            isbn: '1234567890',
-          }),
-          categories: [],
-        },
-        {
-          ...makeBook({
-            id: 2,
-            name: 'Book 2',
-            author: 'Author 2',
-            isbn: '0987654321',
-          }),
-          categories: [],
-        },
+      const booksFromDb: BookRow[] = [
+        makeBook({
+          id: 1,
+          name: 'Book 1',
+          author: 'Author 1',
+          isbn: '1234567890',
+        }),
+        makeBook({
+          id: 2,
+          name: 'Book 2',
+          author: 'Author 2',
+          isbn: '0987654321',
+        }),
       ];
 
-      // Mock the full chain for getCategoriesForBook
-      mockDb.select = jest.fn().mockReturnValue({
-        from: jest.fn().mockReturnValue({
-          innerJoin: jest.fn().mockReturnValue({
-            where: jest.fn().mockReturnValue({
-              orderBy: jest.fn().mockReturnValue({
-                execute: jest.fn().mockResolvedValue([]),
-              }),
-            }),
-          }),
-        }),
-      });
-
-      // Also mock for the initial books fetch
-      const originalSelect = mockDb.select;
       mockDb.select = jest
         .fn()
         .mockReturnValueOnce({
-          from: jest.fn().mockResolvedValue(
-            mockBooks.map((b) => {
-              const { ...book } = b;
-              return book;
-            }),
-          ),
+          from: jest.fn().mockResolvedValue(booksFromDb),
         })
-        .mockReturnValue(originalSelect());
+        .mockReturnValueOnce({
+          from: jest.fn().mockReturnValue({
+            innerJoin: jest.fn().mockReturnValue({
+              where: jest.fn().mockReturnValue({
+                orderBy: jest.fn().mockReturnValue({
+                  execute: jest.fn().mockResolvedValue([]),
+                }),
+              }),
+            }),
+          }),
+        });
 
       const result = await service.findAllBooks();
 
-      expect(result).toEqual(mockBooks);
+      expect(result).toEqual([
+        { ...booksFromDb[0], categories: [] },
+        { ...booksFromDb[1], categories: [] },
+      ]);
       expect(mockDb.select).toHaveBeenCalled();
     });
   });
@@ -219,22 +206,34 @@ describe('BooksService', () => {
         },
       ];
 
-      mockDb.select = jest.fn().mockReturnValue({
-        from: jest.fn().mockReturnValue({
-          innerJoin: jest.fn().mockReturnValue({
+      mockDb.select = jest
+        .fn()
+        .mockReturnValueOnce({
+          from: jest.fn().mockReturnValue({
             innerJoin: jest.fn().mockReturnValue({
-              where: jest.fn().mockReturnValue({
-                orderBy: jest.fn().mockResolvedValue(mockRows),
+              innerJoin: jest.fn().mockReturnValue({
+                where: jest.fn().mockReturnValue({
+                  orderBy: jest.fn().mockResolvedValue(mockRows),
+                }),
               }),
             }),
           }),
-        }),
-      } as DrizzleMock);
-
-      // Mock getCategoriesForBook
-      jest
-        .spyOn(service, 'getCategoriesForBook')
-        .mockResolvedValue([{ id: 1, name: 'Fiction' }]);
+        })
+        .mockReturnValueOnce({
+          from: jest.fn().mockReturnValue({
+            innerJoin: jest.fn().mockReturnValue({
+              where: jest.fn().mockReturnValue({
+                orderBy: jest.fn().mockReturnValue({
+                  execute: jest
+                    .fn()
+                    .mockResolvedValue([
+                      { bookId: 1, categoryName: 'Fiction' },
+                    ]),
+                }),
+              }),
+            }),
+          }),
+        });
 
       const result = await service.findUserBooks(userId);
 
@@ -264,19 +263,30 @@ describe('BooksService', () => {
         },
       ];
 
-      mockDb.select = jest.fn().mockReturnValue({
-        from: jest.fn().mockReturnValue({
-          innerJoin: jest.fn().mockReturnValue({
+      mockDb.select = jest
+        .fn()
+        .mockReturnValueOnce({
+          from: jest.fn().mockReturnValue({
             innerJoin: jest.fn().mockReturnValue({
-              where: jest.fn().mockReturnValue({
-                orderBy: jest.fn().mockResolvedValue(mockRows),
+              innerJoin: jest.fn().mockReturnValue({
+                where: jest.fn().mockReturnValue({
+                  orderBy: jest.fn().mockResolvedValue(mockRows),
+                }),
               }),
             }),
           }),
-        }),
-      } as DrizzleMock);
-
-      jest.spyOn(service, 'getCategoriesForBook').mockResolvedValue([]);
+        })
+        .mockReturnValueOnce({
+          from: jest.fn().mockReturnValue({
+            innerJoin: jest.fn().mockReturnValue({
+              where: jest.fn().mockReturnValue({
+                orderBy: jest.fn().mockReturnValue({
+                  execute: jest.fn().mockResolvedValue([]),
+                }),
+              }),
+            }),
+          }),
+        });
 
       const result = await service.findUserBooks(userId);
 
@@ -304,19 +314,30 @@ describe('BooksService', () => {
         },
       ];
 
-      mockDb.select = jest.fn().mockReturnValue({
-        from: jest.fn().mockReturnValue({
-          innerJoin: jest.fn().mockReturnValue({
+      mockDb.select = jest
+        .fn()
+        .mockReturnValueOnce({
+          from: jest.fn().mockReturnValue({
             innerJoin: jest.fn().mockReturnValue({
-              where: jest.fn().mockReturnValue({
-                orderBy: jest.fn().mockResolvedValue(mockRows),
+              innerJoin: jest.fn().mockReturnValue({
+                where: jest.fn().mockReturnValue({
+                  orderBy: jest.fn().mockResolvedValue(mockRows),
+                }),
               }),
             }),
           }),
-        }),
-      } as DrizzleMock);
-
-      jest.spyOn(service, 'getCategoriesForBook').mockResolvedValue([]);
+        })
+        .mockReturnValueOnce({
+          from: jest.fn().mockReturnValue({
+            innerJoin: jest.fn().mockReturnValue({
+              where: jest.fn().mockReturnValue({
+                orderBy: jest.fn().mockReturnValue({
+                  execute: jest.fn().mockResolvedValue([]),
+                }),
+              }),
+            }),
+          }),
+        });
 
       const result = await service.findUserBooks(userId);
 
@@ -357,13 +378,13 @@ describe('BooksService', () => {
           from: jest.fn().mockReturnValue({
             where: jest.fn().mockResolvedValue([]),
           }),
-        } as DrizzleMock)
+        })
         // Mock list found
         .mockReturnValueOnce({
           from: jest.fn().mockReturnValue({
             where: jest.fn().mockResolvedValue([makeList({ id: 1, userId })]),
           }),
-        } as DrizzleMock);
+        });
 
       // Mock book insert and listBook insert
       mockDb.insert = jest
@@ -372,12 +393,12 @@ describe('BooksService', () => {
           values: jest.fn().mockReturnValue({
             returning: jest.fn().mockResolvedValue([newBook]),
           }),
-        } as DrizzleMock)
+        })
         .mockReturnValueOnce({
           values: jest.fn().mockReturnValue({
             returning: jest.fn().mockResolvedValue([]),
           }),
-        } as DrizzleMock);
+        });
 
       jest
         .spyOn(service, 'assignCategoriesFromNames')
@@ -407,20 +428,20 @@ describe('BooksService', () => {
           from: jest.fn().mockReturnValue({
             where: jest.fn().mockResolvedValue([existingBook]),
           }),
-        } as DrizzleMock)
+        })
         // Mock list found
         .mockReturnValueOnce({
           from: jest.fn().mockReturnValue({
             where: jest.fn().mockResolvedValue([makeList({ id: 1, userId })]),
           }),
-        } as DrizzleMock);
+        });
 
       // Mock listBook insert
       mockDb.insert = jest.fn().mockReturnValue({
         values: jest.fn().mockReturnValue({
           returning: jest.fn().mockResolvedValue([]),
         }),
-      } as DrizzleMock);
+      });
 
       jest
         .spyOn(service, 'assignCategoriesFromNames')
@@ -451,12 +472,12 @@ describe('BooksService', () => {
           from: jest.fn().mockReturnValue({
             where: jest.fn().mockResolvedValue([]),
           }),
-        } as DrizzleMock)
+        })
         .mockReturnValueOnce({
           from: jest.fn().mockReturnValue({
             where: jest.fn().mockResolvedValue([]),
           }),
-        } as DrizzleMock);
+        });
 
       // Mock book insert and list insert
       mockDb.insert = jest
@@ -465,17 +486,17 @@ describe('BooksService', () => {
           values: jest.fn().mockReturnValue({
             returning: jest.fn().mockResolvedValue([newBook]),
           }),
-        } as DrizzleMock)
+        })
         .mockReturnValueOnce({
           values: jest.fn().mockReturnValue({
             returning: jest.fn().mockResolvedValue([newList]),
           }),
-        } as DrizzleMock)
+        })
         .mockReturnValueOnce({
           values: jest.fn().mockReturnValue({
             returning: jest.fn().mockResolvedValue([]),
           }),
-        } as DrizzleMock);
+        });
 
       jest
         .spyOn(service, 'assignCategoriesFromNames')
@@ -498,14 +519,14 @@ describe('BooksService', () => {
         from: jest.fn().mockReturnValue({
           where: jest.fn().mockResolvedValue([makeList({ id: 1, userId })]),
         }),
-      } as DrizzleMock);
+      });
 
       // Mock delete
       mockDb.delete = jest.fn().mockReturnValue({
         where: jest.fn().mockReturnValue({
           returning: jest.fn().mockResolvedValue([deletedRow]),
         }),
-      } as DrizzleMock);
+      });
 
       const result = await service.removeFromUserList(userId, bookId);
 
@@ -533,13 +554,13 @@ describe('BooksService', () => {
           from: jest.fn().mockReturnValue({
             where: jest.fn().mockResolvedValue([makeList({ id: 1, userId })]),
           }),
-        } as DrizzleMock)
+        })
         // Mock book found
         .mockReturnValueOnce({
           from: jest.fn().mockReturnValue({
             where: jest.fn().mockResolvedValue([mockBook]),
           }),
-        } as DrizzleMock);
+        });
 
       // Mock update
       const updatedRow: ListBookRow = makeListBook({
@@ -552,9 +573,9 @@ describe('BooksService', () => {
         set: jest.fn().mockReturnValue({
           where: jest.fn().mockReturnValue({
             returning: jest.fn().mockResolvedValue([updatedRow]),
-          } as DrizzleMock),
-        } as DrizzleMock),
-      } as DrizzleMock);
+          }),
+        }),
+      });
 
       const result = await service.updateBookStatus(
         userId,
@@ -584,7 +605,7 @@ describe('BooksService', () => {
         from: jest.fn().mockReturnValue({
           where: jest.fn().mockResolvedValue([makeList({ id: 1, userId })]),
         }),
-      } as DrizzleMock);
+      });
 
       // Mock update returns empty
       mockDb.update = jest.fn().mockReturnValue({
@@ -593,7 +614,7 @@ describe('BooksService', () => {
             returning: jest.fn().mockResolvedValue([]),
           }),
         }),
-      } as DrizzleMock);
+      });
 
       await expect(
         service.updateBookStatus(userId, bookId, readStart, readEnd),
@@ -621,7 +642,7 @@ describe('BooksService', () => {
             }),
           }),
         }),
-      } as DrizzleMock);
+      });
 
       const result = await service.getCategoriesForBook(bookId);
 
@@ -643,7 +664,7 @@ describe('BooksService', () => {
             execute: jest.fn().mockResolvedValue(undefined),
           }),
         }),
-      } as DrizzleMock);
+      });
 
       await service.assignCategoriesFromNames(bookId, categoryNames);
 

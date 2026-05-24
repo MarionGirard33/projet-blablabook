@@ -19,9 +19,8 @@ vi.mock("@/api/books", () => ({
   updateBookStatus: vi.fn(),
 }));
 
-const { getUserBooks, removeBookFromUserList, updateBookStatus } = await import(
-  "@/api/books"
-);
+const { getUserBooks, removeBookFromUserList, updateBookStatus } =
+  await import("@/api/books");
 
 const createWrapper = () => {
   const queryClient = new QueryClient({
@@ -83,7 +82,7 @@ describe("useUserBooks", () => {
 
   it("does not fetch when userId is missing", () => {
     const { wrapper } = createWrapper();
-    renderHook(() => useUserBooks(undefined), { wrapper });
+    renderHook(() => useUserBooks(), { wrapper });
 
     expect(getUserBooks).not.toHaveBeenCalled();
   });

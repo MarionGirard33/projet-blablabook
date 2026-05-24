@@ -1,7 +1,11 @@
 import { Test, TestingModule } from '@nestjs/testing';
+import { JwtService } from '@nestjs/jwt';
 import { CategoryController } from './category.controller';
 import { CategoryService } from './category.service';
 import { NotFoundException } from '@nestjs/common';
+import { AuthGuard } from '../auth/auth.guard';
+import { TokenService } from '../security/token/token.service';
+import { CookieService } from '../security/cookie/cookie.service';
 
 describe('CategoryController', () => {
   let controller: CategoryController;
@@ -11,17 +15,46 @@ describe('CategoryController', () => {
     findAll: jest.fn(),
     findOne: jest.fn(),
   };
+  const mockAuthGuard = {
+    canActivate: jest.fn(() => true),
+  };
+  const mockJwtService = {
+    verifyAsync: jest.fn(),
+  };
+  const mockTokenService = {
+    rotateTokens: jest.fn(),
+    destroyToken: jest.fn(),
+    generateJWTToken: jest.fn(),
+    generateRefreshToken: jest.fn(),
+  };
+  const mockCookieService = {
+    generateCookiesConfig: jest.fn(),
+  };
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      controllers: [
-        CategoryController
-      ],
+      controllers: [CategoryController],
       providers: [
         // Injection du mock à la place du vrai service pour isoler le contrôleur
-        { 
-          provide: CategoryService, 
-          useValue: mockService 
+        {
+          provide: CategoryService,
+          useValue: mockService,
+        },
+        {
+          provide: AuthGuard,
+          useValue: mockAuthGuard,
+        },
+        {
+          provide: JwtService,
+          useValue: mockJwtService,
+        },
+        {
+          provide: TokenService,
+          useValue: mockTokenService,
+        },
+        {
+          provide: CookieService,
+          useValue: mockCookieService,
         },
       ],
     }).compile();
@@ -64,11 +97,13 @@ describe('CategoryController', () => {
 
     it('should propagate exceptions from the service', async () => {
       /**
-       * Si le service lance une erreur (ex: 404), 
+       * Si le service lance une erreur (ex: 404),
        * le contrôleur la laisse remonter correctement vers NestJS.
        */
       const errorMessage = 'Category with ID 99 not found';
-      mockService.findOne.mockRejectedValue(new NotFoundException(errorMessage));
+      mockService.findOne.mockRejectedValue(
+        new NotFoundException(errorMessage),
+      );
 
       await expect(controller.findOne(99)).rejects.toThrow(NotFoundException);
     });
