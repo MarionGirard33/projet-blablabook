@@ -8,12 +8,14 @@ type SearchBarProps = {
   readonly onSearch: (query: string) => void;
   readonly spacingClassName?: string;
   readonly placeholder?: string;
+  readonly inputAriaLabel?: string;
 };
 
 export default function SearchBar({
   onSearch,
   spacingClassName,
   placeholder,
+  inputAriaLabel,
 }: SearchBarProps) {
   const [query, setQuery] = useState("");
   const [debouncedQuery] = useDebounce(query, 400);
@@ -46,7 +48,7 @@ export default function SearchBar({
         placeholder={placeholder ?? "Rechercher un livre, un auteur..."}
         value={query}
         onChange={handleChange}
-        aria-label="Rechercher un livre ou un auteur"
+        aria-label={inputAriaLabel ?? "Rechercher un livre ou un auteur"}
         className="flex-1 border-none bg-white focus:ring-0 focus-visible:ring-2 focus-visible:ring-offset-2"
       />
       <Button

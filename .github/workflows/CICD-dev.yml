@@ -161,6 +161,28 @@ jobs:
       - name: Docker status
         run: docker compose ps
 
+      # Run Artillery smoke tests and archive reports
+      - name: Setup Node.js for Artillery
+        uses: actions/setup-node@v5
+        with:
+          node-version: 20
+
+      - name: Run Artillery smoke phase
+        run: |
+          mkdir -p backend/load-tests/reports
+          ARTIFACT_NAME="report-${{ github.run_id }}-${{ github.run_number }}"
+          # run only the smoke phase by overriding phases to keep CI fast
+          npx -y artillery run backend/load-tests/artillery-test.yml --overrides '{"phases":[{"duration":60,"arrivalRate":10}]}' --output backend/load-tests/reports/${ARTIFACT_NAME}.json
+          npx artillery report backend/load-tests/reports/${ARTIFACT_NAME}.json --output backend/load-tests/reports/${ARTIFACT_NAME}.html
+
+      # Evaluation script removed by request — pipeline will not auto-fail on report error rate
+
+      - name: Upload Artillery reports
+        uses: actions/upload-artifact@v4
+        with:
+          name: artillery-reports-${{ github.run_id }}
+          path: backend/load-tests/reports/*
+
       # Stop proprement
       - name: Stop containers
         run: docker compose down

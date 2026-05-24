@@ -45,16 +45,24 @@ export default function LibraryPage() {
     books?.filter((b: BookRow) => b.status === "À lire").length || 0;
 
   return (
-    <div className="flex w-full flex-col gap-6 px-4 pb-10 md:px-6">
+    <main
+      aria-labelledby="library-title"
+      className="flex w-full flex-col gap-6 px-4 pb-10 md:px-6"
+    >
       {/* Banner: page title + open AddBook modal */}
       <div className="w-full py-8 rounded-xl shadow-xl bg-card flex flex-col items-center bg-chart-2">
-        <h1 className="text-xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-center mb-4 sm:mb-6 text-foreground">
+        <h1
+          id="library-title"
+          className="text-xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-center mb-4 sm:mb-6 text-foreground"
+        >
           Ma Bibliothèque
         </h1>
         <Button
           onClick={() => setOpen(true)}
           size="lg"
           className="w-[80%] sm:w-auto whitespace-normal text-center mt-2"
+          aria-haspopup="dialog"
+          aria-controls="add-book-modal"
         >
           <Plus size={16} />
           Ajouter un livre
@@ -68,16 +76,33 @@ export default function LibraryPage() {
       </div>
 
       {/* Status: counters by reading status */}
-      <div className="flex flex-wrap justify-center gap-3 text-sm text-muted-foreground">
-        <span className="px-3 py-1.5 bg-muted/60 border border-border rounded-md shadow-sm text-foreground bg-primary text-primary-foreground">
+      <div
+        className="flex flex-wrap justify-center gap-3 text-sm text-muted-foreground"
+        role="region"
+        aria-labelledby="library-stats"
+      >
+        <h2 id="library-stats" className="sr-only">
+          Statistiques de lecture
+        </h2>
+
+        <span
+          className="px-3 py-1.5 bg-muted/60 border border-border rounded-md shadow-sm text-foreground bg-primary text-primary-foreground"
+          aria-label={`Lus ${readCount}`}
+        >
           Lus : <strong>{readCount}</strong>
         </span>
 
-        <span className="px-3 py-1.5 bg-muted/60 border border-border rounded-md shadow-sm text-foreground bg-primary text-primary-foreground">
+        <span
+          className="px-3 py-1.5 bg-muted/60 border border-border rounded-md shadow-sm text-foreground bg-primary text-primary-foreground"
+          aria-label={`En cours ${readingCount}`}
+        >
           En cours : <strong>{readingCount}</strong>
         </span>
 
-        <span className="px-3 py-1.5 bg-muted/60 border border-border rounded-md shadow-sm text-foreground bg-primary text-primary-foreground">
+        <span
+          className="px-3 py-1.5 bg-muted/60 border border-border rounded-md shadow-sm text-foreground bg-primary text-primary-foreground"
+          aria-label={`À lire ${toReadCount}`}
+        >
           À lire : <strong>{toReadCount}</strong>
         </span>
       </div>
@@ -87,6 +112,7 @@ export default function LibraryPage() {
         onSearch={setSearch}
         spacingClassName="mt-2 mb-2"
         placeholder="Rechercher dans ma bibliothèque..."
+        inputAriaLabel="Recherche dans ma bibliothèque"
       />
 
       {/* Books list: show empty state when no results */}
@@ -116,6 +142,6 @@ export default function LibraryPage() {
           ))
         )}
       </div>
-    </div>
+    </main>
   );
 }

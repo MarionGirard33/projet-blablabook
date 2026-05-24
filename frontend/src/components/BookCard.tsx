@@ -78,11 +78,21 @@ export function BookCard({ book, onRemove, onStatusChange }: Props) {
     );
   };
 
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      goToBookDetails();
+    }
+  };
+
   return (
     <div
       className="w-full max-w-sm min-h-[460px] transform hover:scale-101 transition-transform duration-500 cursor-pointer focus-within:ring-2 focus-within:ring-offset-2 rounded-xl"
       onClick={() => goToBookDetails()}
+      onKeyDown={handleKeyDown}
+      tabIndex={0}
       role="article"
+      aria-labelledby={`book-title-${book.id}`}
     >
       <Card className="w-full shadow-lg relative rounded-xl overflow-hidden p-0 gap-2 flex flex-col h-full bg-chart-2">
         {/* Book cover (fallback placeholder when no cover) */}
@@ -129,7 +139,9 @@ export function BookCard({ book, onRemove, onStatusChange }: Props) {
 
         <CardContent className="px-4 pt-0 pb-4 flex flex-col items-start">
           <div className="text-left w-full">
-            <h3 className="font-semibold text-lg">{book.name}</h3>
+            <h3 id={`book-title-${book.id}`} className="font-semibold text-lg">
+              {book.name}
+            </h3>
             <p className="text-sm text-gray-600">{book.author}</p>
             {book.description && (
               <div className="mt-2 max-h-20 overflow-y-auto overflow-x-hidden pr-2">
