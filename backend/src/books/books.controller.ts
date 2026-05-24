@@ -8,11 +8,13 @@ import {
   Body,
   ParseIntPipe,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import { BooksService } from './books.service';
 import { CreateBookDto } from './dto/create-book.dto';
 import { UpdateBookStatusDto } from './dto/update-book-status.dto';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { AuthGuard } from '../auth/auth.guard';
 
 /**
  * REST controller for book-related routes.
@@ -53,6 +55,7 @@ export class BooksController {
    * Returns all books linked to the user's list, with a computed `status`.
    */
   @Get('library/:userId')
+  @UseGuards(AuthGuard)
   @ApiOperation({ summary: 'Get all books for a user' })
   @ApiResponse({
     status: 200,
@@ -67,6 +70,7 @@ export class BooksController {
    * Adds a book to the user's list, creating the book and/or list if needed.
    */
   @Post('library/:userId')
+  @UseGuards(AuthGuard)
   @ApiOperation({ summary: 'Add a book to a user library' })
   @ApiResponse({ status: 201, description: 'Book added to user library' })
   async addBookToUserList(
@@ -81,6 +85,7 @@ export class BooksController {
    * Removes the link between a book and the user's list.
    */
   @Delete('library/:userId/book/:bookId')
+  @UseGuards(AuthGuard)
   @ApiOperation({ summary: 'Remove a book from a user library' })
   @ApiResponse({ status: 200, description: 'Book removed from user library' })
   async removeBookFromUserList(
@@ -96,6 +101,7 @@ export class BooksController {
    * This allows changing the computed status based on dates.
    */
   @Patch('library/:userId/book/:bookId/status')
+  @UseGuards(AuthGuard)
   @ApiOperation({ summary: 'Update reading status for a book in user library' })
   @ApiResponse({ status: 200, description: 'Book status updated successfully' })
   async updateBookStatusDates(

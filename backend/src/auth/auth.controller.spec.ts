@@ -12,7 +12,7 @@ import {
   UnprocessableEntityException,
 } from '@nestjs/common';
 import request from 'supertest'; // import par défaut
-import { Server } from 'http';
+import { Server } from 'node:http';
 import { AuthGuard } from './auth.guard';
 import { LoginResponseDto } from './dto/login-response.dto';
 import { CookieService } from '../security/cookie/cookie.service';

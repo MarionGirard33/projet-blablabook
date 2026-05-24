@@ -20,10 +20,10 @@ jobs:
         working-directory: frontend
     steps:
       # clone le repo sur la VM de Github
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       # installe Node.js version 20 dans la VM
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         with:
           node-version: 20
           # Active le cache NPM pour accélérer les builds suivants
@@ -65,10 +65,10 @@ jobs:
 
     steps:
       # Clone repo
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       # Node.js setup
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         with:
           node-version: 20
           cache: npm
@@ -111,7 +111,7 @@ jobs:
 
     steps:
       # Clone le repo
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       # Vérifie la version de Docker
       - name: Check Docker
@@ -171,7 +171,7 @@ jobs:
     needs: ci-frontend
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Download frontend build
         uses: actions/download-artifact@v4
