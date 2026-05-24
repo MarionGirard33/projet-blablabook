@@ -22,6 +22,7 @@ It allows you to mark books as read, currently reading, or to-read, in a **conta
   - [🧭 Project Structure](#-project-structure)
   - [🧪 Test Plan](#-test-plan)
     - [🔹 Category Module Validation](#-category-module-validation)
+    - [⚡ Load Testing (Artillery)](#-load-testing-artillery)
 
 ---
 
@@ -181,4 +182,33 @@ The project follows a testing strategy to ensure data integrity and API reliabil
 
 > **Note:** Backend tests are performed using **Jest** with a fully mocked Drizzle ORM to isolate business logic from the database layer.
 
----
+### ⚡ Load Testing (Artillery)
+
+All Artillery tests are centralized in `backend/load-tests/artillery-test.yml`.
+The file defines multiple phases:
+
+- **Smoke** — quick sanity check (60s @ 10 req/s). Recommended for CI/dev (fast and deterministic).
+- **Soak** — sustained load (5 min @ 20 req/s) to detect memory leaks or resource regressions.
+- **Stress** — ramp-up (`rampTo`) to identify breaking points and limits.
+
+Prerequisites
+
+```bash
+npm install -g artillery
+```
+
+- Run all phases (smoke + soak + stress) — use in local development when you need a full verification:
+
+```bash
+cd backend
+npx artillery run ./load-tests/artillery-test.yml --output load-tests/reports/full-report.json
+npx artillery report load-tests/reports/full-report.json --output load-tests/reports/full-report.html
+```
+
+Report location
+
+- Generated JSON/HTML reports are saved under `backend/load-tests/reports/`.
+
+CI
+
+- The CI pipeline (`.github/workflows/cicd-dev.yml`) runs only the _smoke_ phase (via `--overrides`) to keep pipelines fast. Generated reports are uploaded as workflow artifacts (Actions → run → Artifacts).

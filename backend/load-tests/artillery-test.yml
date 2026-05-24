@@ -1,0 +1,27 @@
+## Combined Artillery test
+## Phases:
+##  - Smoke: quick sanity check (60s) — suitable for CI (dev branch).
+##  - Soak: longer steady load (5min) — run in dev environment to detect leaks.
+##  - Stress: ramp-up to identify breaking point — run manually in dev and monitor resources.
+## In CI we recommend running only the Smoke phase to keep pipelines fast and deterministic.
+config:
+  target: 'http://localhost'
+  phases:
+    - duration: 60
+      arrivalRate: 10
+      name: 'Smoke - quick sanity check'
+    - duration: 300
+      arrivalRate: 20
+      name: 'Soak - steady load (5min)'
+    - duration: 180
+      arrivalRate: 50
+      rampTo: 200
+      name: 'Stress - rampTo (identify breaking point)'
+scenarios:
+  - flow:
+      - get:
+          url: 'http://localhost:5173/'
+      - get:
+          url: 'http://localhost:3000/books'
+      - get:
+          url: 'http://localhost:3000/books/random?limit=5'
