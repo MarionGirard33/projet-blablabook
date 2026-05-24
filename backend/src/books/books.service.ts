@@ -9,7 +9,7 @@ import { book, list, listBook, bookCategory, category } from '../db/schema';
 import * as schema from '../db/schema';
 import { NodePgDatabase } from 'drizzle-orm/node-postgres';
 import { CreateBookDto } from './dto/create-book.dto';
-import { eq, and, desc, sql } from 'drizzle-orm';
+import { eq, and, desc, sql, inArray } from 'drizzle-orm';
 import { BookSelect, ListBookSelect } from './types/books';
 import { CategoryService } from '../category/category.service';
 /**
@@ -35,23 +35,49 @@ export class BooksService {
     if (readStart) return 'En cours';
     return 'À lire';
   }
+
+  private async getCategoriesByBookIds(
+    bookIds: number[],
+  ): Promise<Map<number, string[]>> {
+    const categoriesByBookId = new Map<number, string[]>();
+    if (bookIds.length === 0) return categoriesByBookId;
+
+    // Single batched query for all requested books to avoid N+1 category lookups.
+    const rows = await this.db
+      .select({
+        bookId: bookCategory.bookId,
+        categoryName: category.name,
+      })
+      .from(bookCategory)
+      .innerJoin(category, eq(category.id, bookCategory.categoryId))
+      .where(inArray(bookCategory.bookId, bookIds))
+      .orderBy(bookCategory.bookId, bookCategory.id)
+      .execute();
+
+    for (const row of rows) {
+      const existing = categoriesByBookId.get(row.bookId) || [];
+      existing.push(row.categoryName);
+      categoriesByBookId.set(row.bookId, existing);
+    }
+
+    return categoriesByBookId;
+  }
   /**
    * Get all books from the `book` table.
    * @returns Array of persisted book records
    */
   async findAllBooks(): Promise<BookSelect[]> {
     const books = await this.db.select().from(book);
-
-    const booksWithCategories = await Promise.all(
-      books.map(async (b) => {
-        const categories = await this.getCategoriesForBook(b.id);
-        return {
-          ...b,
-          categories: categories.map((c) => c.name),
-        };
-      }),
+    // Enrich all books with categories in one DB roundtrip instead of one call per book.
+    const categoriesByBookId = await this.getCategoriesByBookIds(
+      books.map((b) => b.id),
     );
-    return booksWithCategories as BookSelect[];
+
+    const booksWithCategories = books.map((b) => ({
+      ...b,
+      categories: categoriesByBookId.get(b.id) || [],
+    }));
+    return booksWithCategories;
   }
 
   /**
@@ -95,19 +121,19 @@ export class BooksService {
       .where(eq(list.userId, userId))
       .orderBy(desc(listBook.addedAt));
 
-    // Compute status and attach categories for each book
-    const booksWithCategories = await Promise.all(
-      rows.map(async (b) => {
-        const categories = await this.getCategoriesForBook(b.id);
-        return {
-          ...b,
-          status: this.computeStatus(b.readStart, b.readEnd),
-          categories: categories.map((c) => c.name),
-        };
-      }),
+    // Reuse the same batched category fetch for user library results.
+    const categoriesByBookId = await this.getCategoriesByBookIds(
+      rows.map((r) => r.id),
     );
 
-    return booksWithCategories as BookSelect[];
+    // Compute status and attach categories for each book
+    const booksWithCategories = rows.map((b) => ({
+      ...b,
+      status: this.computeStatus(b.readStart, b.readEnd),
+      categories: categoriesByBookId.get(b.id) || [],
+    }));
+
+    return booksWithCategories;
   }
 
   /**

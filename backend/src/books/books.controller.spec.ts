@@ -1,7 +1,11 @@
 import { Test, TestingModule } from '@nestjs/testing';
+import { JwtService } from '@nestjs/jwt';
 import { BooksController } from './books.controller';
 import { BooksService } from './books.service';
 import { book, category, listBook } from '../db/schema';
+import { AuthGuard } from '../auth/auth.guard';
+import { TokenService } from '../security/token/token.service';
+import { CookieService } from '../security/cookie/cookie.service';
 
 type BookRow = typeof book.$inferSelect;
 type CategoryRow = typeof category.$inferSelect;
@@ -51,6 +55,21 @@ const makeListBook = (overrides: Partial<ListBookRow> = {}): ListBookRow => ({
 describe('BooksController', () => {
   let controller: BooksController;
   let mockBooksService: BooksServiceMock;
+  const mockAuthGuard = {
+    canActivate: jest.fn(() => true),
+  };
+  const mockJwtService = {
+    verifyAsync: jest.fn(),
+  };
+  const mockTokenService = {
+    rotateTokens: jest.fn(),
+    destroyToken: jest.fn(),
+    generateJWTToken: jest.fn(),
+    generateRefreshToken: jest.fn(),
+  };
+  const mockCookieService = {
+    generateCookiesConfig: jest.fn(),
+  };
 
   beforeEach(async () => {
     // Mock BooksService
@@ -69,6 +88,22 @@ describe('BooksController', () => {
         {
           provide: BooksService,
           useValue: mockBooksService,
+        },
+        {
+          provide: AuthGuard,
+          useValue: mockAuthGuard,
+        },
+        {
+          provide: JwtService,
+          useValue: mockJwtService,
+        },
+        {
+          provide: TokenService,
+          useValue: mockTokenService,
+        },
+        {
+          provide: CookieService,
+          useValue: mockCookieService,
         },
       ],
     }).compile();
