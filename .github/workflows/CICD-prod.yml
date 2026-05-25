@@ -127,7 +127,7 @@ jobs:
       DB_PASSWORD: ${{ secrets.SUPABASE_PASSWORD }}
       DATABASE_URL: ${{ secrets.SUPABASE_URL }}
       JWT_SECRET: ${{ secrets.JWT_SECRET }}
-      FRONTEND_URL_CORS: "https://MarionGirard33-blablabook.surge.sh"
+      FRONTEND_URL_CORS: "https://mariongirard33-blablabook.surge.sh"
       VITE_BACKEND_URL: ${{ secrets.VITE_BACKEND_URL }}
       NODE_ENV: "prod"
 

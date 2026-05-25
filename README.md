@@ -215,6 +215,45 @@ CI
 
 ---
 
+## **Variables d'environnement**
+
+Voici la liste des variables d'environnement utilisées par le projet (backend et frontend), leur rôle, où les définir et un exemple. Ne commitez JAMAIS de secrets dans le dépôt — utilisez les secrets de Render / Surge / GitHub Actions.
+
+- **`SUPABASE_URL` / `DATABASE_URL`** : URL de connexion Postgres (format `postgresql://...`). Utilisée par le backend pour se connecter à la base Supabase.
+  - Obligatoire en production.
+  - Où : Render (Service env), GitHub Actions (`secrets.SUPABASE_URL`).
+  - Exemple : `postgresql://user:password@db.host.supabase.co:5432/postgres`
+
+- **`JWT_SECRET`** : Clé secrète pour signer les JWT.
+  - Obligatoire en production.
+  - Où : Render (Service env), GitHub Actions (`secrets.JWT_SECRET`).
+  - Exemple : `a-very-secret-key-please-change-me`
+
+- **`NODE_ENV`** : définit l'environnement d'exécution (`prod`, `development`).
+  - Influence le comportement (SSL, logs, etc.).
+  - Exemple : `prod`
+
+- **`FRONTEND_URL_CORS`** : origine autorisée pour CORS (valeur exacte comparée côté serveur).
+  - Important : la comparaison est stricte (sensible à la casse). Assurez-vous que l'URL fournie sur Render corresponde exactement à l'Origin envoyé par le navigateur (recommandation : en minuscules, sans slash final).
+  - Où : Render (Service env) ou Docker Compose pour tests locaux.
+  - Exemple : `https://mariongirard33-blablabook.surge.sh`
+
+- **`VITE_BACKEND_URL`** : URL du backend utilisée au build du frontend (`import.meta.env.VITE_BACKEND_URL`).
+  - Définit l'URL de l'API embarquée au moment de la compilation du frontend.
+  - Où : Surge/Render (build env) ou GitHub Actions secrets (`secrets.VITE_BACKEND_URL`).
+  - Exemple : `https://projet-blablabook-m6gc.onrender.com`
+
+- **`SURGE_DOMAIN` / `SURGE_TOKEN`** : informations pour déployer sur Surge via CI.
+  - Où : GitHub Actions secrets.
+
+- **`RENDER_API_KEY` / `RENDER_SERVICE_ID`** : utilisés par le workflow GitHub Actions pour déclencher un déploiement Render.
+  - Où : GitHub Actions secrets.
+
+- **`DB_NAME` / `DB_USER` / `DB_PASSWORD` / `SUPABASE_PASSWORD`** : variables utilisées par les scripts Docker / CI pour démarrer la base en local ou tests.
+  - Où : GitHub Actions env (ci-docker job) ou `.env` local pour développement.
+
+---
+
 ## **Deployment**
 
 This section describes the steps to create the required accounts (Supabase, Surge, Render), apply migrations, seed the production database, and deploy the services.
