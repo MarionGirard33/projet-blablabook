@@ -17,19 +17,27 @@ export default function HomePage() {
   const [randomBooks, setRandomBooks] = useState<BookRow[]>();
   const [internalBooks, setInternalBooks] = useState<BookRow[]>();
 
-  const horrorBooks: BookRow[] = (internalBooks || []).filter((book) =>
+  // Defensive: ensure we operate on arrays (API may return an error object in prod)
+  const safeInternalBooks: BookRow[] = Array.isArray(internalBooks)
+    ? internalBooks
+    : [];
+  const safeRandomBooks: BookRow[] = Array.isArray(randomBooks)
+    ? randomBooks
+    : [];
+
+  const horrorBooks: BookRow[] = safeInternalBooks.filter((book) =>
     book.categories?.some((cat) =>
       horrorKeywords.some((keyword) => cat.toLowerCase().includes(keyword)),
     ),
   );
 
-  const loveBooks: BookRow[] = (internalBooks || []).filter((book) =>
+  const loveBooks: BookRow[] = safeInternalBooks.filter((book) =>
     book.categories?.some((cat) =>
       loveKeywords.some((keyword) => cat.toLowerCase().includes(keyword)),
     ),
   );
 
-  const fantasyBooks: BookRow[] = (internalBooks || []).filter((book) =>
+  const fantasyBooks: BookRow[] = safeInternalBooks.filter((book) =>
     book.categories?.some((cat) =>
       fantasyKeywords.some((keyword) => cat.toLowerCase().includes(keyword)),
     ),
@@ -88,8 +96,8 @@ export default function HomePage() {
       <>
         <CarouselDisplay
           title={"Suggestions Aléatoire"}
-          books={(randomBooks || [])?.map(mapBookRowToDisplay)}
-          isLoading={!randomBooks}
+          books={safeRandomBooks.map(mapBookRowToDisplay)}
+          isLoading={safeRandomBooks.length === 0}
           seeAllButton={true}
         />
         <CarouselDisplay
