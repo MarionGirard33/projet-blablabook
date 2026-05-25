@@ -212,3 +212,46 @@ Report location
 CI
 
 - The CI pipeline (`.github/workflows/cicd-dev.yml`) runs only the _smoke_ phase (via `--overrides`) to keep pipelines fast. Generated reports are uploaded as workflow artifacts (Actions → run → Artifacts).
+
+---
+
+## **Deployment**
+
+This section describes the steps to create the required accounts (Supabase, Surge, Render), apply migrations, seed the production database, and deploy the services.
+
+- **Prerequisites**: a Supabase account, a Render account for the backend, a Surge account (or another static host such as Render/Netlify), and access to the Git repository.
+
+### **1. Supabase (database)**
+
+- **Create a project**: go to app.supabase.com → New project. Note the Postgres `Connection string` (Settings → Database → Connection string).
+- **Get the connection URL**: use the full `Connection string (URI)` value (format `postgresql://...`). Store it in `SUPABASE_URL`.
+
+To apply migrations from your machine:
+
+```bash
+cd backend
+npx drizzle-kit push --schema ./src/db/schema.ts --url "$SUPABASE_URL" --dialect postgresql
+```
+
+### **2. Seed the database (production)**
+
+- The backend includes a production-specific seed script: [backend/src/seed-prod.ts](backend/src/seed-prod.ts#L1-L120). It forces `NODE_ENV=prod` and uses `SUPABASE_URL` as the source.
+- Run the seed (from `backend`):
+
+```bash
+# make sure SUPABASE_URL points to Supabase
+npm run seed:prod
+```
+
+### **3. Backend — Render**
+
+- **Create a Web Service**: Render dashboard → New → Web Service → connect your repository.
+- **Build & Start**:
+  - Build command: `npm install && npm run build`
+  - Start command: `npm run start:prod`
+- **Environment variables**: add `DATABASE_URL` (value: Supabase URI) and `NODE_ENV=prod`. Render provides `PORT` automatically.
+
+### **4. Frontend — Surge (static site)**
+
+- **Create an account**: https://surge.sh and install the CLI (`npm i -g surge` or `npx surge`).
+- **Build + deployment** Deploy the frontend on Render (Static Site) and set `VITE_BACKEND_URL` in the service environment variables.
