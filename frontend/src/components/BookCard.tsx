@@ -87,6 +87,7 @@ export function BookCard({ book, onRemove, onStatusChange }: Props) {
 
   return (
     <div
+      data-testid="book-result"
       className="w-full max-w-sm min-h-[460px] transform hover:scale-101 transition-transform duration-500 cursor-pointer focus-within:ring-2 focus-within:ring-offset-2 rounded-xl"
       onClick={() => goToBookDetails()}
       onKeyDown={handleKeyDown}
