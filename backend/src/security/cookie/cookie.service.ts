@@ -21,7 +21,7 @@ export class CookieService {
     const refreshCookieConfig: CookieOptions = {
       httpOnly: true,
       secure: secureProps,
-      sameSite: 'strict',
+      sameSite: secureProps ? 'none' : 'lax',
       path: '/',
       maxAge: 30 * 24 * 60 * 60 * 1000, // 30 day
     };
