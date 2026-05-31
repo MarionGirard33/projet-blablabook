@@ -13,7 +13,7 @@ export class CookieService {
     const jwtCookieConfig: CookieOptions = {
       httpOnly: true,
       secure: secureProps,
-      sameSite: 'strict',
+      sameSite: secureProps ? 'none' : 'lax',
       path: '/',
       maxAge: 15 * 60 * 1000, // 15min
     };
