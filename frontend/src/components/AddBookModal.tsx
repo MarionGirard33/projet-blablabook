@@ -85,6 +85,7 @@ export function AddBookModal({ isOpen, onClose, userId }: AddBookModalProps) {
     <Dialog open={isOpen} onOpenChange={handleClose}>
       <DialogContent
         id="add-book-modal"
+        data-testid="search-modal"
         className="max-w-2xl lg:max-w-3xl h-full sm:h-auto p-6 overflow-y-auto w-full py-8 rounded-xl bg-chart-2"
       >
         <DialogDescription className="sr-only">
