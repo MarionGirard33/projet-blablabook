@@ -127,7 +127,7 @@ jobs:
       DB_PASSWORD: ${{ secrets.SUPABASE_PASSWORD }}
       DATABASE_URL: ${{ secrets.SUPABASE_URL }}
       JWT_SECRET: ${{ secrets.JWT_SECRET }}
-      FRONTEND_URL_CORS: "https://mariongirard33-blablabook.surge.sh"
+      FRONTEND_URL_CORS: ${{ secrets.FRONTEND_URL_CORS }}
       VITE_BACKEND_URL: ${{ secrets.VITE_BACKEND_URL }}
       NODE_ENV: "prod"
 
@@ -228,4 +228,4 @@ jobs:
             -H "Authorization: Bearer ${{ secrets.RENDER_API_KEY }}" \
             -H "Content-Type: application/json" \
             -d '{"clearCache": true}' \
-            https://api.render.com/deploy/srv-${{ secrets.RENDER_SERVICE_ID }}
+            https://api.render.com/v1/services/${{ secrets.RENDER_SERVICE_ID }}/deploys
